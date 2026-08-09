@@ -1,0 +1,26 @@
+# Real-PostgreSQL integration-test profile (ORG-001 persistence hardening).
+# Used only by Postgres-backed integration tests (@ActiveProfiles("it")) and only
+# when a live database is provided via these connection settings. The default
+# hermetic "test" profile is untouched.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/mailsent
+    username: mailsent
+    password: change-me
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

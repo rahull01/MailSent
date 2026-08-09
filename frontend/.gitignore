@@ -1,0 +1,5 @@
+# Next.js build artifacts and local tooling
+.next
+out
+*.tsbuildinfo
+node_modules

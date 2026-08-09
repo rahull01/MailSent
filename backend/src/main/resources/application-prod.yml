@@ -1,0 +1,23 @@
+# MailSent backend — production profile.
+# Set SPRING_PROFILES_ACTIVE=prod. Externalized values come from the environment
+# (cloud/docker). No secrets are stored here.
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate   # schema must already exist; never auto-create in prod
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: WARN
+    com.mailsent: INFO

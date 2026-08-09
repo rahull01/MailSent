@@ -1,0 +1,68 @@
+# MailSent — .gitignore
+# Repository-wide ignore rules (Phase 00, REPO-000/REPO-001).
+# Secrets and credentials are NEVER committed. The secrets guard
+# (scripts/guard-secrets.sh) enforces this; this file is the first line.
+
+# ---- Credentials / secrets (never commit) ----
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+.secrets
+secrets.yaml
+secrets.yml
+config/credentials*
+!*.example
+
+# Local tool credential stores that must not enter the repository
+.jetro/
+
+# ---- Operating system ----
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ---- Editors / IDEs ----
+.idea/
+.vscode/*
+!.vscode/settings.json
+*.swp
+*.swo
+
+# ---- Build / dependency outputs ----
+node_modules/
+vendor/
+dist/
+build/
+out/
+target/
+bin/
+*.class
+*.jar
+*.war
+coverage/
+.hypothesis/
+
+# ---- Language caches ----
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- Logs / runtime ----
+*.log
+logs/
+tmp/
+.pids
+.pid
+
+# ---- Environment-local ----
+.local/
+.verdent/
+
+# ---- Keep a placeholder example pattern visible ----
+# Add repo-specific ignore rules below this line.

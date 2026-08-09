@@ -1,0 +1,14 @@
+# MailSent — CODEOWNERS (NOT YET ENABLED)
+#
+# WARNING: This file contains PLACEHOLDERS ONLY. They are NOT real GitHub
+# team handles and must not be activated as-is.
+#
+# TODO(founders): Before enabling CODEOWNERS in the code host, replace the
+# placeholder tokens below with real team handles (e.g. "your-org/founders").
+# Until then this file is intentionally inert — every rule is commented out.
+#
+# Intended rules (uncomment and fill real handles when ready):
+#   *                @__CHANGE_ME__/mailsent-engineering
+#   /docs/           @__CHANGE_ME__/mailsent-founders
+#   /implementation/ @__CHANGE_ME__/mailsent-founders
+#   /scripts/        @__CHANGE_ME__/mailsent-engineering

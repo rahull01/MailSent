@@ -1,0 +1,11 @@
+# MailSent — root Docker ignore (build context hygiene)
+.git
+.jetro
+node_modules
+target
+dist
+next
+.env
+*.log
+implementation/05_REPO_006_VALIDATION_REPORT.md
+docs
