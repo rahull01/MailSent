@@ -39,7 +39,8 @@ class SignUpControllerIntegrationTest {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.email").value("new.user@example.com"))
             .andExpect(jsonPath("$.role").value("Viewer"))
-            .andExpect(jsonPath("$.id").exists());
+            .andExpect(jsonPath("$.id").exists())
+            .andExpect(jsonPath("$.organizationId").doesNotExist());
     }
 
     @Test

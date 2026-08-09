@@ -6,11 +6,13 @@ import com.mailsent.identity.authentication.domain.Role;
  * SignUpResult — the outcome of a successful sign-up, exposed to callers.
  *
  * <p>Never carries the password, hashed or raw. Returns only the stable identity, the
- * canonical email, and the role assigned at creation, per least-authority disclosure.</p>
+ * canonical email, and the role assigned at creation, per least-authority disclosure.
+ * The user's home Organization id is an internal persistence invariant (D6 / INV-09)
+ * and intentionally is not part of the public sign-up contract (ORG-002 decision).</p>
  *
- * @param id    the stable identity of the new user
- * @param email the canonical email
- * @param role  the assigned role
+ * @param id       the stable identity of the new user
+ * @param email    the canonical email
+ * @param role     the assigned role
  */
 public record SignUpResult(String id, String email, Role role) {
 }

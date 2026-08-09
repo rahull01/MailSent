@@ -20,24 +20,36 @@ public final class User {
     private final String passwordHash;
     private final Role role;
     private final Instant createdAt;
+    private final String organizationId;
 
-    private User(String id, Email email, String passwordHash, Role role, Instant createdAt) {
+    private User(String id, Email email, String passwordHash, Role role, Instant createdAt,
+                 String organizationId) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
         this.createdAt = createdAt;
+        this.organizationId = organizationId;
     }
 
     /**
      * Creates a new User for sign up, assigning the least-authority default role.
      *
-     * @param email        the canonical identity
-     * @param passwordHash the hashed password (never the raw password)
-     * @param now          the registration instant
+     * <p>The {@code organizationId} is required and mandatory (D6 / "a user belongs to
+     * exactly one organization"): a signup always binds the user to its home Organization,
+     * so there is never a User without one.</p>
+     *
+     * @param email          the canonical identity
+     * @param passwordHash   the hashed password (never the raw password)
+     * @param now            the registration instant
+     * @param organizationId the home Organization the user belongs to (exactly one)
      */
-    public static User register(Email email, String passwordHash, Instant now) {
-        return new User(UUID.randomUUID().toString(), email, passwordHash, Role.defaultForSignUp(), now);
+    public static User register(Email email, String passwordHash, Instant now, String organizationId) {
+        if (organizationId == null || organizationId.isBlank()) {
+            throw new IllegalArgumentException("A user must belong to exactly one organization.");
+        }
+        return new User(UUID.randomUUID().toString(), email, passwordHash, Role.defaultForSignUp(), now,
+            organizationId);
     }
 
     /**
@@ -47,14 +59,16 @@ public final class User {
      * identity (INV-10 stable identity). It never reassigns the id or alters the role; it
      * is the inverse of persisting a {@link User}.</p>
      *
-     * @param id           the stored stable identity
-     * @param email        the canonical email
-     * @param passwordHash the stored irreversible hash
-     * @param role         the stored role
-     * @param createdAt    the stored registration instant
+     * @param id             the stored stable identity
+     * @param email          the canonical email
+     * @param passwordHash   the stored irreversible hash
+     * @param role           the stored role
+     * @param createdAt      the stored registration instant
+     * @param organizationId the stored home Organization id
      */
-    public static User restore(String id, Email email, String passwordHash, Role role, Instant createdAt) {
-        return new User(id, email, passwordHash, role, createdAt);
+    public static User restore(String id, Email email, String passwordHash, Role role, Instant createdAt,
+                               String organizationId) {
+        return new User(id, email, passwordHash, role, createdAt, organizationId);
     }
 
     /** The stable identity of the user. */
@@ -80,5 +94,10 @@ public final class User {
     /** The instant of registration. */
     public Instant createdAt() {
         return createdAt;
+    }
+
+    /** The home Organization the user belongs to (exactly one, INV-09 / D6). */
+    public String organizationId() {
+        return organizationId;
     }
 }

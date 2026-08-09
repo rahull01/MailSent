@@ -20,6 +20,7 @@ import com.mailsent.identity.authentication.infrastructure.InMemorySessionReposi
 import com.mailsent.identity.authentication.infrastructure.InMemoryUserRepository;
 import com.mailsent.identity.authentication.infrastructure.Pbkdf2PasswordHasher;
 import com.mailsent.identity.authentication.infrastructure.SecureSessionTokenFactory;
+import com.mailsent.portfolio.organization.application.OrganizationRepository;
 
 /**
  * Configuration and dependency wiring for the authentication module.
@@ -78,9 +79,9 @@ public class AuthenticationConfig {
     }
 
     @Bean
-    SignUpService signUpService(UserRepository userRepository, PasswordHasher passwordHasher,
-                                PasswordPolicy passwordPolicy) {
-        return new SignUpService(userRepository, passwordHasher, passwordPolicy);
+    SignUpService signUpService(UserRepository userRepository, OrganizationRepository organizationRepository,
+                                PasswordHasher passwordHasher, PasswordPolicy passwordPolicy) {
+        return new SignUpService(userRepository, organizationRepository, passwordHasher, passwordPolicy);
     }
 
     @Bean

@@ -37,7 +37,7 @@ class JpaUserRepositoryAdapterTest {
     void saveMapsConstraintViolationToDuplicateEmailException() {
         when(jpa.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException("uk_users_email"));
 
-        User user = User.register(new Email("owner@example.com"), "pbkdf2$hash", Instant.now());
+        User user = User.register(new Email("owner@example.com"), "pbkdf2$hash", Instant.now(), "org-1");
 
         assertThrows(DuplicateEmailException.class, () -> adapter.save(user));
     }
@@ -50,16 +50,18 @@ class JpaUserRepositoryAdapterTest {
 
     @Test
     void restorePreservesStableIdentityAndRole() {
-        User user = User.register(new Email("owner@example.com"), "hash", Instant.now());
-        User restored = User.restore(user.id(), user.email(), user.passwordHash(), Role.VIEWER, user.createdAt());
+        User user = User.register(new Email("owner@example.com"), "hash", Instant.now(), "org-1");
+        User restored = User.restore(user.id(), user.email(), user.passwordHash(), Role.VIEWER,
+            user.createdAt(), user.organizationId());
         assertEquals(user.id(), restored.id());
         assertEquals(Role.VIEWER, restored.role());
     }
 
     @Test
     void saveMapsAndFlushesDomainUserToEntity() {
-        User user = User.register(new Email("save@example.com"), "pbkdf2$hash", Instant.now());
-        UserJpaEntity saved = new UserJpaEntity(user.id(), user.email().value(), user.passwordHash(), user.role(), user.createdAt());
+        User user = User.register(new Email("save@example.com"), "pbkdf2$hash", Instant.now(), "org-1");
+        UserJpaEntity saved = new UserJpaEntity(user.id(), user.email().value(), user.passwordHash(),
+            user.role(), user.createdAt(), user.organizationId());
         when(jpa.saveAndFlush(any())).thenReturn(saved);
 
         User returned = adapter.save(user);
@@ -68,18 +70,20 @@ class JpaUserRepositoryAdapterTest {
         assertEquals("save@example.com", returned.email().value());
         assertEquals(user.passwordHash(), returned.passwordHash());
         assertEquals(user.createdAt(), returned.createdAt());
+        assertEquals("org-1", returned.organizationId(), "home Organization id round-trips through persistence");
     }
 
     @Test
     void entityExposesPersistenceFields() {
         Instant now = Instant.now();
-        UserJpaEntity e = new UserJpaEntity("id-1", "owner@example.com", "h", Role.VIEWER, now);
+        UserJpaEntity e = new UserJpaEntity("id-1", "owner@example.com", "h", Role.VIEWER, now, "org-1");
 
         assertEquals("id-1", e.id());
         assertEquals("owner@example.com", e.email());
         assertEquals("h", e.passwordHash());
         assertEquals(Role.VIEWER, e.role());
         assertEquals(now, e.createdAt());
+        assertEquals("org-1", e.organizationId());
     }
 
     @Test
@@ -87,9 +91,9 @@ class JpaUserRepositoryAdapterTest {
         // AUTH-002 identity/role persistence: a user created with a non-default role
         // (e.g. OWNER) must be stored and hydrated back with that exact role preserved —
         // the role is part of the identity's persisted state (INV-10/INV-13).
-        User user = User.restore("u-1", new Email("owner@example.com"), "h", Role.OWNER, Instant.now());
+        User user = User.restore("u-1", new Email("owner@example.com"), "h", Role.OWNER, Instant.now(), "org-1");
         UserJpaEntity saved = new UserJpaEntity(user.id(), user.email().value(),
-            user.passwordHash(), user.role(), user.createdAt());
+            user.passwordHash(), user.role(), user.createdAt(), user.organizationId());
         when(jpa.saveAndFlush(any())).thenReturn(saved);
         when(jpa.findByEmail("owner@example.com")).thenReturn(java.util.Optional.of(saved));
 

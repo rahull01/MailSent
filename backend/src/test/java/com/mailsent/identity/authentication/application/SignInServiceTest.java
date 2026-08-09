@@ -48,7 +48,7 @@ class SignInServiceTest {
         service = new SignInService(users, sessions, hasher, new SecureSessionTokenFactory(), CLOCK,
             Duration.ofMinutes(60));
         // Seed a registered account so sign-in has something to authenticate.
-        users.save(User.register(new Email("owner@example.com"), hasher.hash(PWD), CLOCK.instant()));
+        users.save(User.register(new Email("owner@example.com"), hasher.hash(PWD), CLOCK.instant(), "org-1"));
     }
 
     @Test

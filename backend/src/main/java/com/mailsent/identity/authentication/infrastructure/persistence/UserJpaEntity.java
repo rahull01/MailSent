@@ -48,16 +48,26 @@ public class UserJpaEntity {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    /**
+     * The home Organization this user belongs to (exactly one, INV-09 / D6). Nullable at
+     * the schema level so the additive V4 migration is compatible with any pre-existing
+     * rows; a new signup always provides a valid value (see SignUpService).
+     */
+    @Column(name = "organization_id", length = 36, nullable = true)
+    private String organizationId;
+
     protected UserJpaEntity() {
         // JPA requires a no-arg constructor.
     }
 
-    public UserJpaEntity(String id, String email, String passwordHash, Role role, Instant createdAt) {
+    public UserJpaEntity(String id, String email, String passwordHash, Role role, Instant createdAt,
+                         String organizationId) {
         this.id = id;
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
         this.createdAt = createdAt;
+        this.organizationId = organizationId;
     }
 
     public String id() {
@@ -78,5 +88,9 @@ public class UserJpaEntity {
 
     public Instant createdAt() {
         return createdAt;
+    }
+
+    public String organizationId() {
+        return organizationId;
     }
 }

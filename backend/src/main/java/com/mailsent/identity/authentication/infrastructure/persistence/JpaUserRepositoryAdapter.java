@@ -47,7 +47,8 @@ public class JpaUserRepositoryAdapter implements UserRepository {
     @Transactional
     public User save(User user) {
         UserJpaEntity entity = new UserJpaEntity(
-            user.id(), user.email().value(), user.passwordHash(), user.role(), user.createdAt());
+            user.id(), user.email().value(), user.passwordHash(), user.role(), user.createdAt(),
+            user.organizationId());
         try {
             UserJpaEntity saved = jpa.saveAndFlush(entity);
             return toUser(saved);
@@ -64,6 +65,7 @@ public class JpaUserRepositoryAdapter implements UserRepository {
     }
 
     private User toUser(UserJpaEntity entity) {
-        return User.restore(entity.id(), new Email(entity.email()), entity.passwordHash(), entity.role(), entity.createdAt());
+        return User.restore(entity.id(), new Email(entity.email()), entity.passwordHash(), entity.role(),
+            entity.createdAt(), entity.organizationId());
     }
 }
