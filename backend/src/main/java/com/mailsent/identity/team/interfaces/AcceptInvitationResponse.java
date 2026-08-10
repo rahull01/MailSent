@@ -1,14 +1,13 @@
 package com.mailsent.identity.team.interfaces;
 
 /**
- * AcceptInvitationResponse — the outbound acceptance contract for TEAM-001. Confirms the
- * membership established. The user's home Organization is intentionally not exposed here
- * (it is unchanged by acceptance and stays internal to the backend).
+ * AcceptInvitationResponse — the exact TEAM-001 acceptance success contract (v8 §11).
  *
- * @param membershipId    the stable identity of the created membership
- * @param userId          the stable identity of the member
- * @param organizationId  the Organization joined
- * @param role            the granted role (business label)
+ * <p>The body is exactly {@code {"accepted":true,"invitationId":"<id>"}}. No token, email,
+ * organization data, role, tokenHash, or other invitation metadata is returned.</p>
+ *
+ * @param accepted      always {@code true} on a successful acceptance
+ * @param invitationId  the stable identity of the accepted invitation
  */
-public record AcceptInvitationResponse(String membershipId, String userId, String organizationId, String role) {
+public record AcceptInvitationResponse(boolean accepted, String invitationId) {
 }
