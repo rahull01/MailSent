@@ -1,6 +1,7 @@
 package com.mailsent.portfolio.domain.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -11,8 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import com.mailsent.portfolio.domain.domain.Domain;
+import com.mailsent.portfolio.domain.domain.DomainAlreadyExistsException;
 import com.mailsent.portfolio.domain.infrastructure.persistence.DomainJpaEntity;
 import com.mailsent.portfolio.domain.infrastructure.persistence.JpaDomainRepository;
 import com.mailsent.portfolio.domain.infrastructure.persistence.JpaDomainRepositoryAdapter;
@@ -77,5 +80,14 @@ class JpaDomainRepositoryAdapterTest {
     void existsByNameDelegatesToSpringData() {
         when(jpa.existsByName("example.com")).thenReturn(true);
         assertTrue(adapter.existsByName("example.com"));
+    }
+
+    @Test
+    void saveMapsUniqueViolationToDomainAlreadyExistsException() {
+        Domain domain = Domain.register("org-1", "example.com", now);
+        // The uk_domains_name constraint rejected a concurrent/duplicate insert.
+        when(jpa.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException("uk_domains_name"));
+
+        assertThrows(DomainAlreadyExistsException.class, () -> adapter.save(domain));
     }
 }

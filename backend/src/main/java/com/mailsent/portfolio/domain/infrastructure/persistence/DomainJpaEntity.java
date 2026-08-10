@@ -8,16 +8,20 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 /**
  * DomainJpaEntity — durable persistence mapping for the {@link Domain} aggregate. A
  * persistence concern, not a duplicate domain model. Stores the stable identity, the
  * single owning organization, the canonical name, and the registration instant. The
  * {@code NOT NULL} owning-organization and global name uniqueness are enforced at the
- * schema level ({@code V5__create_domains.sql}).
+ * schema level ({@code V5__create_domains.sql}); the {@link UniqueConstraint} below
+ * mirrors {@code uk_domains_name} so the JPA mapping expresses the same invariant the
+ * schema enforces (the race-safe backstop for duplicate registrations; INV-10).
  */
 @Entity
-@Table(name = "domains")
+@Table(name = "domains",
+    uniqueConstraints = @UniqueConstraint(name = "uk_domains_name", columnNames = "name"))
 public class DomainJpaEntity {
 
     @Id

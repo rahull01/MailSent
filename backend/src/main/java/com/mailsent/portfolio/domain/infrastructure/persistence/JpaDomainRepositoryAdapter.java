@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Profile;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mailsent.portfolio.domain.application.DomainRepository;
 import com.mailsent.portfolio.domain.domain.Domain;
+import com.mailsent.portfolio.domain.domain.DomainAlreadyExistsException;
 
 /**
  * JpaDomainRepositoryAdapter — production {@link DomainRepository} backed by PostgreSQL.
@@ -28,7 +30,12 @@ public class JpaDomainRepositoryAdapter implements DomainRepository {
     @Override
     @Transactional
     public Domain save(Domain domain) {
-        return toDomain(jpa.saveAndFlush(toEntity(domain)));
+        try {
+            return toDomain(jpa.saveAndFlush(toEntity(domain)));
+        } catch (DataIntegrityViolationException ex) {
+            // The uk_domains_name constraint rejected a concurrent/duplicate insert.
+            throw new DomainAlreadyExistsException(domain.name());
+        }
     }
 
     @Override
