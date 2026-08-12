@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import com.mailsent.portfolio.domain.application.DomainImportService;
 import com.mailsent.portfolio.domain.application.DomainRepository;
 import com.mailsent.portfolio.domain.application.DomainService;
 import com.mailsent.portfolio.domain.infrastructure.InMemoryDomainRepository;
@@ -36,5 +37,10 @@ public class DomainConfig {
     @Bean
     DomainService domainService(DomainRepository repository, OrganizationRepository organizations, Clock clock) {
         return new DomainService(repository, organizations, clock);
+    }
+
+    @Bean
+    DomainImportService domainImportService(DomainService domains, OrganizationRepository organizations) {
+        return new DomainImportService(domains, organizations);
     }
 }
