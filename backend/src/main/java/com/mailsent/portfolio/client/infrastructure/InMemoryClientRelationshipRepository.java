@@ -1,5 +1,6 @@
 package com.mailsent.portfolio.client.infrastructure;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +26,13 @@ public class InMemoryClientRelationshipRepository implements ClientRelationshipR
     @Override
     public Optional<ClientRelationship> findById(String id) {
         return Optional.ofNullable(byId.get(id));
+    }
+
+    @Override
+    public List<ClientRelationship> findByAgencyOrganizationId(String agencyOrganizationId) {
+        return byId.values().stream()
+            .filter(relationship -> relationship.agencyOrganizationId().equals(agencyOrganizationId))
+            .toList();
     }
 
     /** Clears all state; used by tests to reset the shared bean between cases. */

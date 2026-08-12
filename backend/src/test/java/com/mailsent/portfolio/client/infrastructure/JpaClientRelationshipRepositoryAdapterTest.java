@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -51,5 +52,18 @@ class JpaClientRelationshipRepositoryAdapterTest {
         assertTrue(adapter.findById("rel-1").isPresent());
         assertEquals("rel-1", adapter.findById("rel-1").get().id());
         assertEquals(ClientRelationship.Status.ENDED, adapter.findById("rel-1").get().status());
+    }
+
+    @Test
+    void findByAgencyOrganizationIdListsThatAgencysRelationships() {
+        ClientRelationshipJpaEntity a = new ClientRelationshipJpaEntity("rel-a1", "org-agency-a",
+            "org-client-a1", now, ClientRelationship.Status.ACTIVE, null);
+        ClientRelationshipJpaEntity a2 = new ClientRelationshipJpaEntity("rel-a2", "org-agency-a",
+            "org-client-a2", now, ClientRelationship.Status.ACTIVE, null);
+        when(jpa.findByAgencyOrganizationId("org-agency-a")).thenReturn(List.of(a, a2));
+
+        assertEquals(2, adapter.findByAgencyOrganizationId("org-agency-a").size());
+        assertEquals("org-agency-a", adapter.findByAgencyOrganizationId("org-agency-a").get(0).agencyOrganizationId());
+        assertEquals("org-client-a2", adapter.findByAgencyOrganizationId("org-agency-a").get(1).clientOrganizationId());
     }
 }

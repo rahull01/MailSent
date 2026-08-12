@@ -1,5 +1,6 @@
 package com.mailsent.portfolio.client.infrastructure.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Profile;
@@ -34,6 +35,12 @@ public class JpaClientRelationshipRepositoryAdapter implements ClientRelationshi
     @Transactional(readOnly = true)
     public Optional<ClientRelationship> findById(String id) {
         return jpa.findById(id).map(this::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ClientRelationship> findByAgencyOrganizationId(String agencyOrganizationId) {
+        return jpa.findByAgencyOrganizationId(agencyOrganizationId).stream().map(this::toDomain).toList();
     }
 
     private ClientRelationshipJpaEntity toEntity(ClientRelationship relationship) {
