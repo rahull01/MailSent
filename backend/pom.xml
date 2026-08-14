@@ -67,6 +67,13 @@
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-database-postgresql</artifactId>
     </dependency>
+    <!-- DNS observation (INF-001): mature, minimal Java DNS library for reading
+         MX / TXT (SPF) records. Version managed here (not in the Spring BOM). -->
+    <dependency>
+      <groupId>dnsjava</groupId>
+      <artifactId>dnsjava</artifactId>
+      <version>3.6.2</version>
+    </dependency>
     <!-- Testing foundation -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
