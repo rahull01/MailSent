@@ -2,6 +2,9 @@
 # Excludes persistence/cache autoconfig so the context loads without a
 # running database or redis — the baseline test foundation is hermetic.
 spring:
+  task:
+    scheduling:
+      enabled: false
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
@@ -10,7 +13,12 @@ spring:
       - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
 
 management:
+  server:
+    port: -1
   endpoints:
     web:
       exposure:
         include: health,info
+  endpoint:
+    health:
+      show-details: never

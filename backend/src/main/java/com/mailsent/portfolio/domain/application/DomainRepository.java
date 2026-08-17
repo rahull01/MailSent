@@ -10,9 +10,9 @@ import com.mailsent.portfolio.domain.domain.Domain;
  *
  * <p>Owned by the application; satisfied by an infrastructure adapter. The durable
  * PostgreSQL adapter is wired in the non-test profile; a hermetic in-memory adapter backs
- * the tests. Only the ORG-003 surface (register/lookup-by-identity/lookup-by-name/
- * lookup-by-organization/exists) is declared — reassignment and sender resolution are
- * later ORG tasks.</p>
+ * the tests. The ORG-003 surface (register/lookup-by-identity/lookup-by-name/
+ * lookup-by-organization/exists) plus {@link #findAll()} for scheduled re-observation
+ * (INF-004) are declared — reassignment and sender resolution are later ORG tasks.</p>
  */
 public interface DomainRepository {
 
@@ -27,6 +27,9 @@ public interface DomainRepository {
 
     /** Lists all domains owned by a single organization. */
     List<Domain> findByOrganizationId(String organizationId);
+
+    /** Lists every registered domain (INF-004 re-observation). */
+    List<Domain> findAll();
 
     /** Whether a canonical name is already registered (used for the duplicate check). */
     boolean existsByName(String name);

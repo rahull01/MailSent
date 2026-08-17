@@ -3,6 +3,9 @@
 # when a live database is provided via these connection settings. The default
 # hermetic "test" profile is untouched.
 spring:
+  task:
+    scheduling:
+      enabled: false
   datasource:
     url: jdbc:postgresql://localhost:5433/mailsent
     username: mailsent
@@ -20,7 +23,12 @@ spring:
       - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
 
 management:
+  server:
+    port: -1
   endpoints:
     web:
       exposure:
         include: health,info
+  endpoint:
+    health:
+      show-details: never

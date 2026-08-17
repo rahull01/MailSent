@@ -77,6 +77,20 @@ class JpaDomainRepositoryAdapterTest {
     }
 
     @Test
+    void findAllMapsSpringDataFindAllToDomain() {
+        DomainJpaEntity a = new DomainJpaEntity("dom-1", "org-1", "example.com", now);
+        DomainJpaEntity b = new DomainJpaEntity("dom-2", "org-2", "other.com", now);
+        when(jpa.findAll()).thenReturn(List.of(a, b));
+
+        List<Domain> all = adapter.findAll();
+
+        assertEquals(2, all.size());
+        assertEquals("example.com", all.get(0).name());
+        assertEquals("org-2", all.get(1).organizationId());
+        assertEquals("dom-2", all.get(1).id());
+    }
+
+    @Test
     void existsByNameDelegatesToSpringData() {
         when(jpa.existsByName("example.com")).thenReturn(true);
         assertTrue(adapter.existsByName("example.com"));

@@ -58,6 +58,12 @@ public class JpaDomainRepositoryAdapter implements DomainRepository {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Domain> findAll() {
+        return jpa.findAll().stream().map(this::toDomain).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public boolean existsByName(String name) {
         return jpa.existsByName(name);
     }

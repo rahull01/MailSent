@@ -3,6 +3,7 @@ package com.mailsent.portfolio.domain.infrastructure;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,6 +42,11 @@ public class InMemoryDomainRepository implements DomainRepository {
         return byId.values().stream()
             .filter(domain -> domain.organizationId().equals(organizationId))
             .toList();
+    }
+
+    @Override
+    public List<Domain> findAll() {
+        return List.copyOf(byId.values());
     }
 
     @Override

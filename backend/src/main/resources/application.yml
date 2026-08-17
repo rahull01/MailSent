@@ -21,19 +21,43 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+  task:
+    scheduling:
+      pool:
+        size: 1
+
+mailsent:
+  observation:
+    reobserve:
+      interval: 86400000
+  ingest:
+    dmarc:
+      rate-limit:
+        per-ip-per-minute: 60
+        per-uuid-per-minute: 20
+        per-uuid-per-hour: 40
+        per-ip-per-hour: 120
 
 server:
   port: ${BACKEND_PORT:8080}
+  tomcat:
+    max-http-form-post-size: 5MB
+    max-swallow-size: 2MB
 
-# Observability foundation
+# Observability: health/info only on the management port. Prometheus is prod-only
+# on that same internal port (see application-prod.yml). Details are never public.
 management:
+  server:
+    port: ${MANAGEMENT_PORT:8081}
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info
   endpoint:
     health:
-      show-details: always
+      show-details: never
+      probes:
+        enabled: true
   metrics:
     tags:
       application: ${spring.application.name}
