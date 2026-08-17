@@ -260,9 +260,9 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Trace anchors:** CP-5 · WF-9 (AI) + AI Explanation · Arch CTX Business Explanation / AIAD.
 
 - **EXPL-001 — Explanation (what/why/impact)** — P0 60 · FUN-E1/E2 · AIR-AI1 ✅
-- **EXPL-002 — Deeper technical view** — P1 60 · FUN-E3 ⬜
+- **EXPL-002 — Deeper technical view** — P1 60 · FUN-E3 ✅
 - **EXPL-003 — Simpler toggle** — P2 45 · FUN-E4 ⬜
-- **EXPL-004 — Grounding + trace** — P0 90 · AIR-AI5/6 ⬜
+- **EXPL-004 — Grounding + trace** — P0 90 · AIR-AI5/6 ✅
 
 ---
 
@@ -270,8 +270,8 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** prioritized, verifiable fix. **Deps:** 09-11. **Exit:** a customer fixes with verified outcome. **Progress:** 0% · 0/4 · 0.
 **Trace anchors:** CP-6/7 · WF-6 Guided Fix + AI Action Queue.
 
-- **RES-001 — Action list (prioritized)** — P0 60 · FUN-G1/P2 ⬜
-- **RES-002 — Steps with exact values** — P0 60 · FUN-G2 ⬜
+- **RES-001 — Action list (prioritized)** — P0 60 · FUN-G1/P2 ✅
+- **RES-002 — Steps with exact values** — P0 60 · FUN-G2 ✅
 - **RES-003 — Match by DNS provider** — P1 90 · FUN-G3 ⬜
 - **RES-004 — Fix verification loop** — P0 60 · FUN-G5 ⬜
 
