@@ -110,16 +110,16 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Trace anchors:** CP-1 · VP-4/5 · Arch DATA Organization / CTX Portfolio.
 
 - **ORG-001 — Create/read/list/close org** — P0 60 · Data DATA Organization · Status 🟪 (Tests Complete — aggregate+persistence; no API contract in frozen docs)
-- **ORG-002 — Membership** — user joins an org. P0 60 ⬜
-- **ORG-003 — Org→Domain ownership** — registry authorization. P0 60 ⬜
-- **ORG-004 — Isolation invariant** — INV-09 test. P0 45 ⬜
+- **ORG-002 — Membership** — user joins an org. P0 60 🟪
+- **ORG-003 — Org→Domain ownership** — registry authorization. P0 60 🟪
+- **ORG-004 — Isolation invariant** — INV-09 test. P0 45 🟪
 
 ---
 
 # PHASE 04 — Teams
 **Purpose:** roles, invite, least-authority, audit. **Deps:** 02,03. **Exit:** a team admin adds an analyst who acts in scope. **Progress:** 0% · 0/4 · 0.
 
-- **TEAM-001 — Invite by email & accept** — P0 60 · Arch CTX Identity · FUN-D5 · Status ⬜
+- **TEAM-001 — Invite by email & accept** — P0 60 · Arch CTX Identity · FUN-D5 · Status 🟪
 - **TEAM-002 — Role→capability map (least-authority)** — P0 60 ⬜
 - **TEAM-003 — Access audit record** — P1 60 · NFR-AU ⬜
 - **TEAM-004 — Team list query** — P1 45 ⬜
@@ -129,18 +129,18 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 # PHASE 05 — Clients
 **Purpose:** Client relationship (agency). **Deps:** 03,04. **Exit:** client created, assigned, isolated. **Progress:** 0% · 0/3 · 0.
 
-- **CLIENT-001 — Client CRUD** — P0 60 · DATA Client/Portfolio ⬜
+- **CLIENT-001 — Client CRUD** — P0 60 · DATA Client/Portfolio 🟪
 - **CLIENT-002 — Assign client to agency** — P0 60 ⬜
-- **CLIENT-003 — Client isolation (INV-09)** — P0 45 ⬜
+- **CLIENT-003 — Client isolation (INV-09)** — P0 45 🟪
 
 ---
 
 # PHASE 06 — Portfolio
 **Purpose:** portfolio-scale view. **Deps:** 05. **Exit:** an agency sees a portfolio with risk. **Progress:** 0% · 0/3 · 0.
 
-- **PORT-001 — Portfolio container** — P0 60 · FUN-D4 ⬜
-- **PORT-002 — Portfolio overview data** — P0 90 ⬜
-- **PORT-003 — Portfolio isolation** — P1 45 · INV-09 ⬜
+- **PORT-001 — Portfolio container** — P0 60 · FUN-D4 🟪
+- **PORT-002 — Portfolio overview data** — P0 90 🟪
+- **PORT-003 — Portfolio isolation** — P1 45 · INV-09 🟪
 
 ---
 
@@ -148,49 +148,108 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** Domain entity + registry. **Deps:** 03,06. **Exit:** add/import/list domains with ownership. **Progress:** 0% · 0/4 · 0.
 
 - **DOM-001 — Add domain (manual)** — P0 60 · FUN-D1 ⬜
-- **DOM-002 — Bulk CSV import** — P1 90 · FUN-D2 ⬜
+- **DOM-002 — Bulk CSV import** — P1 90 · FUN-D2 🟪
 - **DOM-003 — Domain list/state** — P0 60 · FUN-D3 ⬜
 - **DOM-004 — Registry ownership** — P0 60 · FUN-D4 ⬜
 
 ---
 
 # PHASE 08 — Infrastructure Observation
-**Purpose:** observe infrastructure into truth (Evidence). **Deps:** 07. **Exit:** domain records read and stored as evidence, not inferred. **Progress:** 0% · 0/12 · 0.
+**Purpose:** observe infrastructure into Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, Reputation Observation, and Blacklist Observation (raw observed facts). **Deps:** 07. **Exit:** domain records read and stored as those snapshots, not inferred, not Health Signal, and not Phase 16 proof of health. **Progress:** 75% · 9/12 · 0.
 **Trace anchors:** CP-1/2 · VP-1/2 · WF-2 + Scanner · Arch CTX Delivery Observation / DATA / INFO.
 
-- **INF-001 — DNS read (MX/SPF/TXT/DKIM)** — P0 90 · FUN-H2 · INV-01 · Status ⬜
-- **INF-002 — Observation lifecycle → Evidence** — P0 90 · no fabrication · ⬜
-- **INF-003 — Reputation ingest (mocked first, grounded)** — P0 90 · FUN-H3 · ⬜
-- **INF-004 — Re-observe (schedule)** — P0 60 · FUN-M1 · ⬜
-- **INF-005 — Reverse DNS (PTR)** — P1 60 ⬜
-- **INF-006 — HELO/EHLO validation** — P1 45 ⬜
-- **INF-007 — DNS health (prop/TTL/DNSSEC)** — P1 60 ⬜
-- **INF-008 — Blacklist monitor (Spamhaus/Barracuda/SURBL/URIBL)** — P1 90 ⬜
+- **INF-001 — DNS read (MX/SPF/TXT/DKIM)** — P0 90 · FUN-H2 · INV-01 · Status ✅
+  - Freeze note: the title's DKIM is leftover. DKIM facts are not Phase 08 Observation Evidence outputs. Observation Evidence remains frozen to MX/TXT/SPF/observedAt/identity. DKIM observation is not in OE. Do not infer DKIM, DMARC, or alignment from Phase 08 DNS TXT. INF-001 implementation is not reopened.
+- **INF-002 — Observation lifecycle → Observation Evidence** — P0 90 · no fabrication · not Phase 16 proof · ✅
+- **INF-003 — Reputation ingest (mocked first, grounded)** — P0 90 · FUN-H3 · ✅
+- **INF-004 — Re-observe (schedule)** — P0 60 · FUN-M1 · ✅
+  - Delivery Observation scheduled re-read of Observation Evidence (DNS) and Reputation Observation. Not HEALTH-001 (Health Signal unification) and not MON-001 (Phase 13 Monitoring of health over time). Default daily `mailsent.observation.reobserve.interval` (86400000 ms); same-instance non-overlap via `spring.task.scheduling.pool.size=1` plus an AtomicBoolean skip. No Flyway V10.
+- **INF-005 — Reverse DNS Observation (ReverseDnsObservation)** — P1 60 · MX→A/AAAA→PTR · raw facts · not Health · not FCrDNS · ✅
+  - Delivery Observation raw reverse-DNS snapshot for IPs of observed MX hosts of a registered Domain (resolve MX hostname to A and/or AAAA, then PTR; both families when addresses actually exist). Store raw reverse-DNS facts only. Separate from Observation Evidence (frozen MX/TXT/SPF/observedAt/identity; do not add PTR to OE). Append-only immutable. Identity from registered Domain; caller supplies domainName only. No public HTTP API. No independent scheduler. Not INF-007 (DNSSEC/TTL), not INF-008 (blacklists). HEALTH-001 may consume later; INF-005 must not create Health Signal. Future Flyway required; do not create now. INF-001–004 untouched until implementation authorized.
+- **INF-006 — SMTP Greeting Observation (SmtpGreetingObservation)** — P1 45 · MX→SMTP · HELO-EHLO raw facts · not Health · ✅
+  - Delivery Observation raw SMTP greeting/banner and EHLO capability snapshot for IPs of observed MX hosts from Observation Evidence of a registered Domain (resolve MX hostname to A and/or AAAA, then observe SMTP). Store raw facts only. Active probe permitted only against registered-domain infrastructure; no mail send, no mutation, no SMTP auth, no relay/delivery testing, no arbitrary IPs or third-party hosts. Separate from Observation Evidence (do not add greeting/EHLO to OE) and from Reverse DNS Observation. Append-only immutable. Identity from registered Domain; caller supplies domainName only. No public HTTP API. No independent scheduler; do not modify INF-004. Not INF-007 (DNSSEC/TTL), not INF-008 (blacklists), not HEALTH-001, not mail sending. HEALTH-001 may consume later; INF-006 must not create Health Signal. Unavailable (timeout/refusal/DNS) persists nothing; do not fabricate banner or EHLO; connection/probe outcome records unavailability without fabricated greeting/EHLO text. Own persistence model and future Flyway required; do not create now. Do not modify Observation Evidence, V8, or ReverseDnsObservation. INF-001–005 implementation untouched until implementation is authorized.
+- **INF-007 — DNS Health Observation (DnsHealthObservation)** — P1 60 · TTL/DNSSEC/propagation raw facts · not Health · ✅
+  - Delivery Observation raw DNS TTL, DNSSEC-related presence, and named-resolver propagation snapshot for a registered Domain. Store raw facts only. Separate from Observation Evidence (frozen MX/TXT/SPF/observedAt/identity; do not add TTL/DNSSEC/propagation to OE). Append-only immutable. Identity from registered Domain; caller supplies domainName only. No public HTTP API. No independent scheduler; INF-004 unchanged. Not Health Signal, not Trust Score, not HEALTH-001, not INF-008. HEALTH-001 may consume later; INF-007 must not create Health Signal. Flyway V10 `dns_health_observation`.
+- **INF-008 — Blacklist monitor (Spamhaus/Barracuda/SURBL/URIBL)** — P1 90 ✅
+  - Delivery Observation raw blacklist snapshot (Blacklist Observation) for a registered Domain from Spamhaus, Barracuda, SURBL, and URIBL. Store raw provider facts only. Append-only immutable. Identity from registered Domain; caller supplies domainName only. Four ports queried independently; persist only a real observation; unavailable/empty/exception persists nothing for that provider. Production adapters report unavailability (no invented HTTP/zones/credentials). No public HTTP API. No independent scheduler; INF-004 unchanged. Not Health Signal. Flyway V11 `blacklist_observation`. INF-001–007, V1–V10, ReObservationService, Observation Evidence, and Reputation Observation unchanged.
 **Infrastructure Map (WF-5)**
-- **MAP-001 — Map model** (Domain→DNS→SPF→DKIM→DMARC→Senders→Inbox) — P1 60 ⬜
+- **MAP-001 — Map model** (Domain→DNS→SPF→DKIM→DMARC→Senders→Inbox) — P1 60 ✅
+  - Topology read-model only (not an aggregate, not Health, not MAP-002–004). Checkbox remains until CTO audit.
 - **MAP-002 — Color-coded view** — P1 90 ⬜
+  - CTO freeze: G/Y/R represents HEALTH, not observation availability. MAP-001 remains topology/read-model only. MAP-001 OBSERVED/NOT_OBSERVED/UNAVAILABLE must never map directly to G/Y/R. Raw INF-001–008 observations must never be converted into MAP-002 colors. Trust Score is not a color source. HEALTH-001 (Phase 10) is the authoritative source of health state. MAP-002 **consumes** Health Signal; HEALTH-001 does **not** freeze colors, thresholds, UI, or per-node health. MAP-002 remains blocked on HEALTH-001 producing the canonical signal **and** on a later MAP-002 freeze of how unknown/healthy/at-risk maps to colors. An envelope whose indication is only **unknown** is not a color source. Do not start MAP-002 in this HEALTH-001 freeze. No Health Signal implementation in Phase 08. No table, Flyway, backend health-calculation, HTTP API, or frontend in this freeze. MAP-001 unchanged. Checklist remains ⬜.
 - **MAP-003 — Node detail panel** — P1 90 ⬜
+  - CTO freeze: opened by selecting/clicking a MAP-001 node (WF-5 click-to-detail). Panel MAY show node identity, type, observation availability/status, and real raw observation facts or evidence references WHEN those facts exist. Contents are raw node metadata/observations, not independent health computation. Must NOT calculate, create, infer, or own Health Signal. Health meaning and G/Y/R owned by MAP-002 consuming HEALTH-001. OBSERVED/NOT_OBSERVED/UNAVAILABLE never translated into health/severity/warning/critical/color. No Trust Score, deprecated scoring, diagnosis, recommendation, compliance, or fabricated explanation. NOT_OBSERVED nodes must not receive fabricated details. Evidence refs must not automatically become arbitrary raw-payload dumps; detailed evidence-access/API contract frozen separately before implementation. DKIM, DMARC, Senders, Inbox currently have no observed facts — must not display invented details. Must not modify INF-001–008, MAP-001, MAP-002, V1–V11, HEALTH-001. No new table, Flyway, scheduler, independent backend health service. No frontend/API implementation in this freeze. Do not invent per-node health. Checklist remains ⬜.
 - **MAP-004 — PNG/SVG export** — P2 90 ⬜
+  - CTO freeze: export of the Infrastructure Map visualization. PNG and SVG are both frozen output formats. NOT Phase 16 proof; does not replace EVID-003. NOT Phase 15 PDF/email reporting; must not merge into FUN-R2. Keep separate from Phase 15/16 reporting/proof. Exported structure based on MAP-001 topology. If health colors eventually appear in the export, they come from MAP-002 consuming real HEALTH-001 Health Signal. Never derive G/Y/R from raw INF-001–008 observations, OBSERVED status, Trust Score, or deprecated scoring. NOT_OBSERVED nodes must not receive fabricated health/facts/details. MAP-004 must not calculate or create Health Signal. No new table, Flyway, scheduler, graph DB, or persistence model. Do not invent HTTP/API contract. Do not select or add a rendering/export library in this freeze. No frontend/backend export code in this freeze. Must not modify INF-001–008, MAP-001, MAP-002, MAP-003, V1–V11, or HEALTH-001. Checklist remains ⬜.
 
 ---
 
 # PHASE 09 — Diagnosis Engine
-**Purpose:** derive cause from signals. **Deps:** 08. **Exit:** root cause with lineage. **Progress:** 0% · 0/4 · 0.
-**Trace anchors:** CP-6 · WF-3 Alignment Intelligence · Arch CTX Diagnosis.
+**Purpose:** derive cause from signals. **Deps:** 08. **Exit:** root cause with lineage. **Progress:** 25% · 1/4 · 0.
+**Trace anchors:** CP-6 · WF Analyzer (DIAG-001 Alignment Engine) + WF-3 Alignment Intelligence (DIAG-002/003) · Arch CTX Diagnosis.
+**CTO freeze (DIAG-001 / Phase 09–10):** Health Signal is produced by HEALTH-001 (Phase 10 / Delivery Observation health engine), **not** by Diagnosis. Diagnosis must not fabricate Health Signal. Program order remains 08→09→10 for ingest facts (INT-003–006 + Aggregate Evidence); HEALTH-001 code after its freeze need not wait for DIAG-002/003/004. DIAG-001 Alignment derivation does not start from health and does not wait on HEALTH-001 as a fabricated input. DIAG-001 in-memory Alignment is not a HEALTH-001 input. DIAG-003 (root cause / Issue) remains blocked until **Java** assigns **healthy vs at-risk** per the HEALTH-001 interpretation freeze, not merely **unknown** (do not implement DIAG-003). MAP-002 still waits for a persisted real Health Signal **and** a later MAP-002 color freeze; MAP-002/003/004 remain ⬜ and unimplemented.
 
-- **DIAG-001 — Alignment** (SPF/DKIM, envelope vs header) — P0 90 · FUN-X1 ⬜
-- **DIAG-002 — Sender detection** (recognized providers) — P0 90 · FUN-X2 ⬜
-- **DIAG-003 — Root cause determination** — P0 90 · FUN-X3 · INV-11 ⬜
+- **DIAG-001 — Alignment** (SPF/DKIM, envelope vs header) — P0 90 · Alignment Engine / FUN-H2 (not FUN-X1 as primary) 🟪 Tests Complete
+  - CTO freeze & Ratification: Analyzer-class Alignment derivation (Constitution Analyzer: SPF/DKIM/DMARC parsing + alignment). Ratified once INT-003–006 produced evidence in code. Does not persist Alignment table. Does not create Health Signal or Trust Score. Unit tested in `AlignmentDerivationServiceTest`.
+- **DIAG-002 — Sender detection** (recognized providers) — P0 90 · FUN-X2 ⬜ (No frozen provider catalog; existing code preserved standalone)
+- **DIAG-003 — Root cause determination** — P0 90 · FUN-X3 · INV-11 ⬜ (Blocked on HEALTH-001)
+  - `RootCause` and `RootCauseDeterminationService` exist in code; blocked until HEALTH-001 healthy/at-risk signals are assigned in execution pipeline.
 - **DIAG-004 — Issue entity lifecycle** — P0 60 · DATA Issue ⬜
 
 ---
 
 # PHASE 10 — Health Signal Engine
-**Purpose:** unified Health Signal + trend. **Deps:** 09. **Exit:** single, truthful signal with trend; no fabricated rank. **Progress:** 0% · 0/4 · 0.
+**Purpose:** unified Health Signal + trend. **Deps:** 09 ingest facts (INT-003–006 + DMARC Aggregate Evidence); DIAG-002/003/004 remain ⬜ and are **not** HEALTH-001 inputs. **Exit:** single, truthful signal with trend; no fabricated rank. Phase 10 exit “signal with trend” is **phase exit**, not HEALTH-001 item exit. **Progress:** 25% · 1/4 · 0.
 **Trace anchors:** CP-3 · WF-4 · GLOS Health Signal.
+**CTO freeze (HEALTH-001 interpretation, 2026-08-15):** Delivery Observation **owns** Health Signal and Health Trend (trend is HEALTH-002). Diagnosis does **not** own Health Signal. DIAG-001 does not create Health Signal. HEALTH-001 consumes **persisted snapshots only** — never `Alignment.lastDerived()` / in-memory DIAG-001.
 
-- **HEALTH-001 — Unify Health Signal (components)** — P0 60 · FUN-H1 · INV-01/05 ⬜
+- **HEALTH-001 — Unify Health Signal (components)** — P0 60 · FUN-H1 · INV-01/05 🟪 Tests Complete (not INF-004)
+  - **Owner:** Delivery Observation. Diagnosis does not own Health Signal. DIAG-001 does not create Health Signal.
+  - **V1 required persisted snapshots** (latest per Domain; identity from registered Domain). Missing **any** ⇒ **persist nothing** (not a healthy/at-risk/unknown row):
+    - **Observation Evidence (V8)** — Java/SQL fields actually stored: `id`, `organization_id`, `domain_id`, `domain_name`, `observed_at`, `mx_records`, `txt_records`, `spf_record`. Frozen DNS records, **not** SPF-pass. Latest OE by `observedAt` then `id` (current Java).
+    - **DMARC Aggregate Evidence (V15)** — Java/SQL fields actually stored: `id`, `organization_id`, `domain_id`, `domain_name`, `receipt_id`, `report_id`, `source_ip`, `utc_day`, `message_count` (`count` in Java), `spf_result`, `dkim_result`, `spf_aligned`, `dkim_aligned`, `envelope_from`, `header_from`, `dkim_domains`, `disposition`. Cite **all rows of the latest report** as current Java: greatest non-null `utc_day`, then max `report_id` on that day, then every row with that `report_id`.
+    - **Reputation Observation (V9)** — Java/SQL fields actually stored: `id`, `organization_id`, `domain_id`, `domain_name`, `source` (`POSTMASTER` | `SNDS`), `observed_at`, `payload` (opaque TEXT, required non-null). At least **one** persisted row for the Domain (current Java: latest per source that exists). Production `UnavailableGooglePostmasterAdapter` / `UnavailableMicrosoftSndsAdapter` return empty and INF-003 **persists nothing** — no row is not a snapshot.
+  - **V1 not required** (must not wait; must not invent from them): Blacklist Observation, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, DIAG-001 Alignment VO.
+  - **Alignment intake:** HEALTH-001 reads DMARC Aggregate Evidence row fields. It does **not** persist Alignment, create an Alignment table, recompute RFC alignment, string-compare `envelope_from`/`header_from`, or treat DIAG-001 as a stored input.
+  - **INT-004 stored tokens (quoted from parser + tests; raw XML text, trimmed; empty node ⇒ null):**
+    - `spf_result` / `dkim_result` = first `auth_results/spf/result` and first `auth_results/dkim/result` (additional DKIM auth results are **not** stored in `dkim_result`). Tests persist lowercase `pass` and `fail`. RFC 7208/6376 may also yield `none`, `neutral`, `softfail`, `temperror`, `permerror` — stored as-is if present; **not** mapped.
+    - `spf_aligned` / `dkim_aligned` = raw `policy_evaluated/spf` and `policy_evaluated/dkim`. Tests persist `pass` and `fail`. RFC 7489 PolicyEvaluated is typically `pass`/`fail`.
+    - `disposition` = raw `policy_evaluated/disposition`. Tests persist `none` and `quarantine`. RFC 7489 is typically `none` / `quarantine` / `reject`. **Do not** use `policy_published/p` (parsed on the report, **not** a V15 row column).
+    - Compare tokens **case-insensitively** after trim. Do not invent other tokens.
+  - **Voters vs lineage (explicit — do not guess):**
+    - **OE does not vote** healthy/at-risk from MX/TXT/SPF strings (that would invent SPF validity). OE is **lineage-required presence**. Present OE never by itself yields healthy. Missing OE ⇒ persist nothing.
+    - **Reputation Observation is lineage-required presence only, not an indication voter.** V9 has **no** health-like fact (no grade/score/listed column). Opaque `payload` is **not** parsed (would invent provider scores). A persisted row (including a real payload) **does not** create at-risk and **does not** block healthy solely due to reputation. Unavailable adapters persist **no** row: that is missing snapshot ⇒ persist nothing, not unknown. An honest empty observation **is** a snapshot only if a row was actually persisted.
+    - **Only cited V15 judgment fields vote:** `disposition`, `spf_result`, `dkim_result`, `spf_aligned`, `dkim_aligned`. Do not vote from `envelope_from`, `header_from`, `dkim_domains`, `source_ip`, `utc_day`, `count`/`message_count`, `report_id`, `receipt_id` (selection/lineage only).
+  - **Row evaluation** (every cited row of the latest report; no last-win; no discarding failing rows; no averaging):
+    1. **At-risk row** if any of (case-insensitive): `disposition` ∈ {`quarantine`, `reject`}; `spf_result` = `fail`; `dkim_result` = `fail`; `spf_aligned` = `fail`; `dkim_aligned` = `fail`. A known failure token on a row **wins over nulls on that same row** (e.g. `disposition=reject` with null `spf_result` is at-risk).
+    2. Else **unknown row** if any of those five fields is **null**, **or** any non-null value is not a healthy token below (including `none`/`neutral`/`softfail`/`temperror`/`permerror` on auth/alignment, mixed `pass`+`none`, or any other token). **Only `fail` is at-risk** for auth/alignment — `softfail`/`none`/etc. are **unknown for that aspect**, not at-risk.
+    3. Else **healthy row** iff all five are non-null **and** `disposition` = `none` **and** `spf_result` = `pass` **and** `dkim_result` = `pass` **and** `spf_aligned` = `pass` **and** `dkim_aligned` = `pass`. SPF-pass with DKIM-`none` is **unknown**, not healthy (cannot claim both authentications succeeded). Disposition `pass` is **not** RFC PolicyEvaluated and is **not** healthy.
+  - **Unified indication** (required snapshots present):
+    - Any cited row at-risk ⇒ **at-risk** (union of failures; known failure wins over pass **and** over unknown on other IPs).
+    - Else every cited row healthy ⇒ **healthy**.
+    - Else ⇒ **unknown**.
+    - Never persist **unknown** (or any indication) when a required **snapshot** is missing — persist nothing.
+  - **Stale:** **no TTL**. HEALTH-001 does **not** treat age as at-risk or unknown. Staleness is HEALTH-002 / later. Do not invent “older than 4 hours”.
+  - **No scoring / colors / Trust Score / G/Y/R** in HEALTH-001.
+  - **Explainability:** V16 has **no** reason column (`id`, `organization_id`, `domain_id`, `domain_name`, `indication`, `observation_evidence_id`, `dmarc_aggregate_evidence_ids`, `reputation_observation_ids`, `observed_at` only). **Do not add reason columns.** Explanation is the deterministic rule that fired, derived at read time from cited evidence (application-level names, e.g. `dmarc_disposition_reject`, `spf_fail`, `insufficient_auth_facts`). Indication + lineage ids suffice on the snapshot.
+  - **INV-11 lineage** on every persisted Health Signal (including persisted unknown): organizationId, domainId, domainName; observationEvidenceId; dmarcAggregateEvidence ids actually used; reputationObservation ids actually used; observedAt of the Health Signal. Must **not** cite Observation Evidence as the source of alignment identities. Must **not** cite an Alignment table. Must **not** cite DIAG-001 memory.
+  - **Trigger / idempotency / API (unchanged envelope):** explicit in-process `record`/`derive` by domainName. **Not** scheduled. **Not** INF-004. **Not** INT-006. No public HTTP. Append-only allowed only when at least one cited source snapshot id differs from the latest Health Signal; same cited ids ⇒ persist nothing new. This freeze does **not** authorize overwrite or backfill of existing always-unknown rows; they remain until a cited source id changes.
+  - **Owns:** Health Signal (unified indication + lineage). **Does not own:** Issues, Root cause, Alignment, Trust Score, Diagnosis, MAP-001–004, Health Trend (HEALTH-002).
+  - **HEALTH-002:** trend later. HEALTH-001 completion does **not** require trend. Do not start HEALTH-002.
+  - **MAP-002** consumes healthy/at-risk/unknown; **colors later**. An **unknown** indication is not a color source. Do not start MAP-002.
+  - **DIAG-003** may later consume Health Signal; HEALTH-001 does not diagnose. DIAG-003 remains blocked until **Java** assigns healthy vs at-risk per this freeze (current always-unknown does not unblock). Do not implement DIAG-003.
+  - **Implementation impact:** Prefer **no V16 change**. Later Java must assign healthy/at-risk/unknown per these rules. This freeze does **not** implement Java. Checklist remains ⬜.
+  - **Acceptance criteria (HEALTH-001 remains ⬜; docs freeze only):**
+    - Missing latest OE **or** latest aggregate report rows **or** any Reputation Observation row ⇒ persist nothing.
+    - Required snapshots present; any cited row has `quarantine`/`reject` disposition or auth/alignment `fail` ⇒ persist **at-risk** with lineage.
+    - Required snapshots present; every cited row has non-null `disposition`/`spf_result`/`dkim_result`/`spf_aligned`/`dkim_aligned` equal to `none`/`pass`/`pass`/`pass`/`pass` respectively; no at-risk token ⇒ persist **healthy** with lineage.
+    - Required snapshots present; no at-risk token; any null required judgment field **or** any token other than the healthy set (e.g. `dkim_result=none`, `softfail`) ⇒ persist **unknown** with lineage.
+    - Conflicting rows (fail/reject/quarantine vs pass) ⇒ **at-risk**.
+    - OE SPF/MX/TXT strings and Reputation `payload` never flip the indication.
+    - Same cited ids as latest Health Signal ⇒ persist nothing new.
+    - No new Flyway column, no HTTP, no scheduler, no MAP colors, no Trust Score.
 - **HEALTH-002 — Health Trend series** — P0 90 · FUN-H4 ⬜
+  - CTO freeze (HEALTH-001, 2026-08-15): Health Trend remains HEALTH-002. Derived from append-only Health Signal snapshots. Not required to complete HEALTH-001. Phase 10 exit “signal with trend” is phase exit, not HEALTH-001 item exit. Do not start HEALTH-002 in this freeze.
 - **HEALTH-003 — Grounding invariant** — P0 45 ⬜
 - **HEALTH-004 — Benchmark context (real data only, no rank)** — P2 90 · FUN-H5 ⬜
 
@@ -222,7 +281,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** continuous observation. **Deps:** 08,10. **Exit:** health over time is tracked. **Progress:** 0% · 0/4 · 0.
 **Trace anchors:** CP-4 · WF-7 Continuous Monitoring.
 
-- **MON-001 — Scheduled re-observe** — P0 60 · FUN-M1 ⬜
+- **MON-001 — Scheduled re-observe** — P0 60 · FUN-M1 ⬜ (not INF-004: Phase 13 Monitoring of health over time; INF-004 is Delivery Observation DNS+reputation re-read)
 - **MON-002 — Change detection** — P0 60 · FUN-M2 ⬜
 - **MON-003 — Health history store** — P0 60 · FUN-H4 ⬜
 - **MON-004 — Incident record** — P1 60 ⬜
@@ -365,13 +424,18 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 ---
 
 # PHASE 26 — Integrations
-**Purpose:** major integrations only (no sprawl). **Deps:** 08. **Progress:** 0% · 0/6 · 0.
-**Trace anchors:** WF DMARC Ingestion.
+**Purpose:** major integrations only (no sprawl). **Deps:** 08 (runtime Domain identity from Phase 07 / registered Domain). **Progress:** 0% · 0/6 · 0.
+**Trace anchors:** WF DMARC Ingestion. No FUN catalog row for ingest; H2/D1/R4 are related, not new IDs. Do not invent a FUN ID.
+**CTO freeze (INT-003–006 / DMARC Report Ingestion, 2026-08-15):** RUA aggregate reports only. RUF/forensic ingest is OUT OF SCOPE. Delivery Observation owns DMARC ingest evidence (Constitution Scanner). Observation Evidence remains MX/TXT/SPF/observedAt/identity only. Diagnosis consumes ingest; it does not own or persist ingest. V1 receive is an inbound HTTP webhook on the Spring Boot application (Phase 01 stack: Java 21 / Spring Boot / PostgreSQL). IMAP is deferred. AWS SES → S3 → Lambda is not authorized for V1. No public business HTTP API for listing/querying reports. No dedicated ingest scheduler; do not extend INF-004. INT-005 includes Store (no new INT ID). Conceptual persistence of DMARC Report Receipt and DMARC Aggregate Evidence is authorized; no physical table names, no Flyway in this freeze. LAUNCH-002 remains Phase 31 and does not block writing ingest code after this freeze. Order: INT-003 Receive → INT-004 Parse → INT-005 Aggregate/Store → INT-006 Trigger → DIAG-001. Do not start DIAG-001/002/003/004, HEALTH-001, or MAP-002. DOM-001–004 remain ⬜; registered Domain identity already exists as a runtime concept used by Phase 08 observation — do not implement Phase 07 here. This freeze does not implement Java, SQL, or APIs. INT-003–006 remain ⬜.
 
 - **INT-003 — DMARC ingest: receive** — P0 90 ⬜
+  - CTO freeze: inbound webhook on the application (ingest transport only; not a Diagnosis/Alignment API; not a public product REST resource). `{uuid}` in `reports+{uuid}@mailsent.io` is the registered Domain id. Accept only if uuid matches a registered Domain; organizationId comes from that Domain (INV-09). Unknown/unregistered uuid: discard, do not persist Receipt or facts, do not invent a domain, do not trigger DIAG-001. Persist received raw attachment bytes as DMARC Report Receipt when Domain is known. IMAP not used. SES/Lambda not used. Observation Evidence unchanged.
 - **INT-004 — DMARC ingest: parse** — P0 90 ⬜
+  - CTO freeze: RFC 7489 aggregate XML only; zip/gz are transport compression, not a second schema. Required to accept as Parsed DMARC Report: `report_id`. Extract listed workflow fields when present (ReportMetadata org/date range/report_id; Records source_ip, count, spf_result, dkim_result, spf_aligned, dkim_aligned, envelope_from, header_from, dkim_domains; PolicyEvaluated disposition, dkim, spf). Absent fields stay absent. Missing `report_id` or malformed/unsupported XML: unusable — persist Receipt if already received for a known Domain, do not produce DMARC Aggregate Evidence, do not trigger DIAG-001, do not write OE, do not fabricate Alignment. Parser must not emit Health Signal or Alignment table rows. Partial records: keep raw values; do not fabricate alignment flags.
 - **INT-005 — DMARC ingest: aggregate** — P0 90 ⬜
+  - CTO freeze: includes Store (no separate checklist ID). Per-domain = registered Domain. Per-sender = `source_ip` (do not invent DIAG-002 provider matching). Per-day = UTC calendar date of `date_range.begin`. Append-only DMARC Aggregate Evidence snapshots (INV-12 spirit). Duplicate `report_id` scoped to the same Domain is idempotent: no second snapshot. Lineage: receipt id + Domain identity + `report_id` when parse succeeds. Conceptual persistence only; no table names; future Flyway authorized in principle when implementation starts (do not name a version now). Not an Alignment table. Not Observation Evidence.
 - **INT-006 — DMARC ingest: trigger** — P0 60 ⬜
+  - CTO freeze: in-process after successful INT-005 Store. Triggers DIAG-001 only, and only when valid DMARC Aggregate Evidence exists for that Domain. Must not trigger DIAG-003 or HEALTH-001. Same `report_id` + Domain does not re-trigger as a new analysis if the evidence snapshot was already stored. No dedicated scheduler. Do not extend INF-004 to DMARC.
 - **INT-001 — Slack webhook channel** — P1 90 ⬜
 - **INT-002 — Provider mapping for Guided Fix** — P1 60 ⬜
 
@@ -425,6 +489,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 
 - **LAUNCH-001 — Landing + lead magnet (free health check)** — P0 120 ⬜
 - **LAUNCH-002 — Onboarding with DMARC generator** — P0 90 ⬜
+  - CTO freeze (INT-003–006): remains Phase 31. INT-003–006 implementation is not blocked on LAUNCH-002 code. LAUNCH-002 is onboarding copy of rua= (and may still mention ruf= as later-launch copy). Without customers publishing rua=, no live reports arrive; tests/fakes can still exercise receive/parse.
 - **LAUNCH-003 — Launch-day monitoring** — P0 60 ⬜
 - **LAUNCH-004 — Feedback intake to V1.1** — P1 60 ⬜
 
