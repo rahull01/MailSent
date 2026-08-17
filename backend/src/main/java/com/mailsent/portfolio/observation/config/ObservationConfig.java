@@ -25,7 +25,7 @@ public class ObservationConfig {
     }
 
     @Bean
-    DnsObservationService dnsObservationService(DnsResolver resolver, DomainRepository domains) {
-        return new DnsObservationService(resolver, domains);
+    DnsObservationService dnsObservationService(DnsResolver resolver, DomainRepository domains, com.mailsent.identity.consent.application.ConsentService consentService) {
+        return new DnsObservationService(resolver, domains, consentService);
     }
 }
