@@ -42,6 +42,7 @@ class DnsObservationPersistenceIntegrationTest {
     @Autowired private OrganizationService organizationService;
     @Autowired private DomainService domains;
     @Autowired private DnsObservationService observationService;
+    @Autowired private com.mailsent.identity.consent.application.ConsentService consentService;
 
     @TestConfiguration
     static class FakeResolverConfig {
@@ -58,7 +59,8 @@ class DnsObservationPersistenceIntegrationTest {
     void observeRegisteredDomainThroughRealRegistry() {
         String orgId = organizationService.create("Observation " + UUID.randomUUID()).id();
         String domainName = "it-" + UUID.randomUUID() + ".com";
-        domains.register(orgId, domainName);
+        com.mailsent.portfolio.domain.domain.Domain domain = domains.register(orgId, domainName);
+        consentService.grantConsent(orgId, domain.id(), "test-user", com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
 
         DnsObservation observation = observationService.observe(domainName);
 
@@ -79,8 +81,10 @@ class DnsObservationPersistenceIntegrationTest {
         String orgB = organizationService.create("ObservationB " + UUID.randomUUID()).id();
         String domainA = "it-" + UUID.randomUUID() + "a.com";
         String domainB = "it-" + UUID.randomUUID() + "b.com";
-        domains.register(orgA, domainA);
-        domains.register(orgB, domainB);
+        com.mailsent.portfolio.domain.domain.Domain domA = domains.register(orgA, domainA);
+        com.mailsent.portfolio.domain.domain.Domain domB = domains.register(orgB, domainB);
+        consentService.grantConsent(orgA, domA.id(), "test-user", com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+        consentService.grantConsent(orgB, domB.id(), "test-user", com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
 
         DnsObservation forA = observationService.observe(domainA);
         assertEquals(domainA, forA.domainName(), "observing domain A returns only domain A's observation");

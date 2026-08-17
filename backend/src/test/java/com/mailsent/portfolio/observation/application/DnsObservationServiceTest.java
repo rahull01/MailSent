@@ -25,12 +25,14 @@ class DnsObservationServiceTest {
     private InMemoryDomainRepository domains;
     private RecordingResolver resolver;
     private DnsObservationService service;
+    private com.mailsent.identity.consent.application.ConsentService consentService;
 
     @BeforeEach
     void setUp() {
         domains = new InMemoryDomainRepository();
         resolver = new RecordingResolver();
-        service = new DnsObservationService(resolver, domains);
+        consentService = org.mockito.Mockito.mock(com.mailsent.identity.consent.application.ConsentService.class);
+        service = new DnsObservationService(resolver, domains, consentService);
         domains.save(Domain.register("org-1", "example.com", NOW));
     }
 

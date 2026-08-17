@@ -18,10 +18,12 @@ public class DnsObservationService {
 
     private final DnsResolver resolver;
     private final DomainRepository domains;
+    private final com.mailsent.identity.consent.application.ConsentService consentService;
 
-    public DnsObservationService(DnsResolver resolver, DomainRepository domains) {
+    public DnsObservationService(DnsResolver resolver, DomainRepository domains, com.mailsent.identity.consent.application.ConsentService consentService) {
         this.resolver = resolver;
         this.domains = domains;
+        this.consentService = consentService;
     }
 
     /**
@@ -34,7 +36,8 @@ public class DnsObservationService {
      */
     public DnsObservation observe(String domainName) {
         String canonical = Domain.normalize(domainName);
-        domains.findByName(canonical).orElseThrow(() -> new DomainNotRegisteredException(canonical));
+        Domain domain = domains.findByName(canonical).orElseThrow(() -> new DomainNotRegisteredException(canonical));
+        consentService.requireConsent(domain.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
         return resolver.observe(canonical);
     }
 }
