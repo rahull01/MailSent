@@ -293,8 +293,8 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Trace anchors:** CP-4 · WF-8 Alerts.
 
 - **ALERT-001 — Severity levels** — P1 45 · FUN-M5 ✅
-- **ALERT-002 — Business-language body** — P0 60 · FUN-M4 ⬜
-- **ALERT-003 — Channels (email/Slack/in-app)** — P1 90 · FUN-M6 ⬜
+- **ALERT-002 — Business-language body** — P0 60 · FUN-M4 ✅
+- **ALERT-003 — Channels (email/Slack/in-app)** — P1 90 · FUN-M6 ✅
 - **ALERT-004 — Digest + control** — P1 60 · FUN-M7 ⬜
 
 ---
