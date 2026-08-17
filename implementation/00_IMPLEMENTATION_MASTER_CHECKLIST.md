@@ -282,7 +282,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Trace anchors:** CP-4 · WF-7 Continuous Monitoring.
 
 - **MON-001 — Scheduled re-observe** — P0 60 · FUN-M1 ✅ (not INF-004: Phase 13 Monitoring of health over time; INF-004 is Delivery Observation DNS+reputation re-read)
-- **MON-002 — Change detection** — P0 60 · FUN-M2 ⬜
+- **MON-002 — Change detection** — P0 60 · FUN-M2 ✅
 - **MON-003 — Health history store** — P0 60 · FUN-H4 ⬜
 - **MON-004 — Incident record** — P1 60 ⬜
 
