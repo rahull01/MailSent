@@ -303,8 +303,8 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** executive summaries & reports. **Deps:** 10,11. **Exit:** recurring report produced. **Progress:** 0% · 0/4 · 0.
 **Trace anchors:** CP-8 · WF-12 Reporting.
 
-- **REP-001 — Weekly summary (3-bullet)** — P1 90 · FUN-R1 ⬜
-- **REP-002 — Report generator** — P0 90 · FUN-R2 ⬜
+- **REP-001 — Weekly summary (3-bullet)** — P1 90 · FUN-R1 ✅
+- **REP-002 — Report generator** — P0 90 · FUN-R2 ✅
 - **REP-003 — Schedule & deliver** — P1 45 · FUN-R3 ⬜
 - **REP-004 — White label (Agency)** — P2 90 ⬜
 
