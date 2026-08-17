@@ -314,7 +314,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** grounded proof + audit trail. **Deps:** 15. **Exit:** every report line traces to a source. **Progress:** 0% · 0/3 · 0.
 **Trace anchors:** VP-4/5 · FUN-R4 · NFR-AU · INV-11.
 
-- **EVID-001 — Report grounding** — P0 90 · each line ← source · Status ⬜
+- **EVID-001 — Report grounding** — P0 90 · each line ← source · Status ✅
 - **EVID-002 — Audit trail record** — P0 45 · INV-11 ⬜
 - **EVID-003 — Evidence API/export** — P1 60 · API 08 ⬜
 
