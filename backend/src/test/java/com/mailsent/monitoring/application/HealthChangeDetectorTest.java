@@ -18,7 +18,9 @@ import com.mailsent.portfolio.observation.domain.HealthSignal;
 
 class HealthChangeDetectorTest {
 
-    private final HealthChangeDetector detector = new HealthChangeDetector();
+    private final HealthChangeEventRepository mockRepo = org.mockito.Mockito.mock(HealthChangeEventRepository.class);
+    private final IncidentService mockIncidents = org.mockito.Mockito.mock(IncidentService.class);
+    private final HealthChangeDetector detector = new HealthChangeDetector(mockRepo, mockIncidents);
 
     @Test
     void detectsChangeWhenIndicationsDiffer() {
@@ -34,6 +36,8 @@ class HealthChangeDetectorTest {
         assertEquals("dom-1", event.domainId());
         assertEquals(HealthIndication.HEALTHY, event.previousIndication());
         assertEquals(HealthIndication.AT_RISK, event.currentIndication());
+        
+        org.mockito.Mockito.verify(mockRepo).save(event);
     }
 
     @Test
@@ -47,6 +51,8 @@ class HealthChangeDetectorTest {
         HealthChangeEvent event = eventOpt.get();
         assertEquals("dom-1", event.domainId());
         assertEquals(HealthIndication.AT_RISK, event.currentIndication());
+        
+        org.mockito.Mockito.verify(mockRepo).save(event);
     }
 
     @Test
@@ -59,6 +65,8 @@ class HealthChangeDetectorTest {
         Optional<HealthChangeEvent> eventOpt = detector.detectChange(Optional.of(previous), current, Instant.now());
 
         assertFalse(eventOpt.isPresent());
+        
+        org.mockito.Mockito.verifyNoInteractions(mockRepo);
     }
 
     @Test
