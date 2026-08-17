@@ -273,7 +273,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 - **RES-001 — Action list (prioritized)** — P0 60 · FUN-G1/P2 ✅
 - **RES-002 — Steps with exact values** — P0 60 · FUN-G2 ✅
 - **RES-003 — Match by DNS provider** — P1 90 · FUN-G3 ⬜
-- **RES-004 — Fix verification loop** — P0 60 · FUN-G5 ⬜
+- **RES-004 — Fix verification loop** — P0 60 · FUN-G5 ✅
 
 ---
 
