@@ -305,7 +305,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 
 - **REP-001 — Weekly summary (3-bullet)** — P1 90 · FUN-R1 ✅
 - **REP-002 — Report generator** — P0 90 · FUN-R2 ✅
-- **REP-003 — Schedule & deliver** — P1 45 · FUN-R3 ⬜
+- **REP-003 — Schedule & deliver** — P1 45 · FUN-R3 ✅
 - **REP-004 — White label (Agency)** — P2 90 ⬜
 
 ---
