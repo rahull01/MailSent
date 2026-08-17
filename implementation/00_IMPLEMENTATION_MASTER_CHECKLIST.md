@@ -325,7 +325,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Trace anchors:** CP-5 · WF-9 AI Layer · Arch AIAD · AIR-AI1-12.
 
 - **AI-001 — Explanation with grounding** — P0 90 · AIR-AI1/5/6 · AI-MAT full ✅
-- **AI-002 — Prioritization engine** — P0 90 · AIR-AI2 · FUN-P2 ⬜
+- **AI-002 — Prioritization engine** — P0 90 · AIR-AI2 · FUN-P2 ✅
 - **AI-003 — Recommendation + confidence** — P0 60 · AIR-AI3/7 ⬜
 - **AI-004 — Transparency & feedback loop** — P1 60 · AIR-AI9/12 ⬜
 - **AI-005 — Consent-gated action lane** — P0 60 · AIR-AI4 ⬜
