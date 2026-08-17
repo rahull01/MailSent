@@ -250,7 +250,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
     - No new Flyway column, no HTTP, no scheduler, no MAP colors, no Trust Score.
 - **HEALTH-002 — Health Trend series** — P0 90 · FUN-H4 ⬜
   - CTO freeze (HEALTH-001, 2026-08-15): Health Trend remains HEALTH-002. Derived from append-only Health Signal snapshots. Not required to complete HEALTH-001. Phase 10 exit “signal with trend” is phase exit, not HEALTH-001 item exit. Do not start HEALTH-002 in this freeze.
-- **HEALTH-003 — Grounding invariant** — P0 45 ⬜
+- **HEALTH-003 — Grounding invariant** — P0 45 ✅
 - **HEALTH-004 — Benchmark context (real data only, no rank)** — P2 90 · FUN-H5 ⬜
 
 ---
@@ -259,7 +259,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** business-first translation. **Deps:** 09. **Exit:** a non-technical user understands the issue and impact. **Progress:** 0% · 0/4 · 0.
 **Trace anchors:** CP-5 · WF-9 (AI) + AI Explanation · Arch CTX Business Explanation / AIAD.
 
-- **EXPL-001 — Explanation (what/why/impact)** — P0 60 · FUN-E1/E2 · AIR-AI1 ⬜
+- **EXPL-001 — Explanation (what/why/impact)** — P0 60 · FUN-E1/E2 · AIR-AI1 ✅
 - **EXPL-002 — Deeper technical view** — P1 60 · FUN-E3 ⬜
 - **EXPL-003 — Simpler toggle** — P2 45 · FUN-E4 ⬜
 - **EXPL-004 — Grounding + trace** — P0 90 · AIR-AI5/6 ⬜
