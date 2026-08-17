@@ -316,7 +316,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 
 - **EVID-001 — Report grounding** — P0 90 · each line ← source · Status ✅
 - **EVID-002 — Audit trail record** — P0 45 · INV-11 ✅
-- **EVID-003 — Evidence API/export** — P1 60 · API 08 ⬜
+- **EVID-003 — Evidence API/export** — P1 60 · API 08 ✅
 
 ---
 
