@@ -130,7 +130,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** Client relationship (agency). **Deps:** 03,04. **Exit:** client created, assigned, isolated. **Progress:** 0% · 0/3 · 0.
 
 - **CLIENT-001 — Client CRUD** — P0 60 · DATA Client/Portfolio 🟪
-- **CLIENT-002 — Assign client to agency** — P0 60 ⬜
+- **CLIENT-002 — Assign client to agency** — P0 60 ✅
 - **CLIENT-003 — Client isolation (INV-09)** — P0 45 🟪
 
 ---

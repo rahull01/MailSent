@@ -1,8 +1,11 @@
 package com.mailsent.portfolio.client.infrastructure.persistence;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.mailsent.portfolio.client.domain.ClientRelationship;
 
 /**
  * JpaClientRelationshipRepository — Spring Data repository over
@@ -12,4 +15,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface JpaClientRelationshipRepository extends JpaRepository<ClientRelationshipJpaEntity, String> {
 
     List<ClientRelationshipJpaEntity> findByAgencyOrganizationId(String agencyOrganizationId);
+
+    Optional<ClientRelationshipJpaEntity> findByAgencyOrganizationIdAndClientOrganizationIdAndStatus(
+            String agencyOrganizationId, String clientOrganizationId, ClientRelationship.Status status);
 }

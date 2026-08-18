@@ -4,22 +4,23 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Optional;
 
+import com.mailsent.identity.authentication.domain.Role;
+import com.mailsent.identity.authentication.domain.User;
+import com.mailsent.identity.team.domain.AccessDeniedException;
 import com.mailsent.portfolio.client.domain.ClientRelationship;
 import com.mailsent.portfolio.client.domain.OrganizationNotFoundException;
 import com.mailsent.portfolio.organization.application.OrganizationRepository;
 
 /**
- * ClientRelationshipService — the CLIENT-001 application boundary.
+ * ClientRelationshipService — the CLIENT-001 / CLIENT-002 application boundary.
  *
- * <p>Application operations are limited to the approved lifecycle: {@link #form} (an Agency
- * Organization takes on an existing Client Organization), {@link #findById} (read), and
- * {@link #end} (ACTIVE → ENDED, irreversible). There is no generic update, no physical
- * delete, and — per the frozen contract — no HTTP, no authorization (AUTH-006 deferred), no
- * portfolio, and no membership semantics.</p>
- *
- * <p>Both referenced organizations must already exist (CLIENT-001 never creates one); the
- * V7 foreign keys are the final integrity backstop. A {@link Clock} is injected for
- * deterministic lifecycle timestamps, mirroring the organization module.</p>
+ * <p>Application operations:
+ * <ul>
+ *   <li>{@link #form} — forms a relationship directly between two organizations (internal CLIENT-001).</li>
+ *   <li>{@link #assign} — assigns a client organization to an agency on behalf of an authenticated Owner (CLIENT-002).</li>
+ *   <li>{@link #findById} — reads relationship by id.</li>
+ *   <li>{@link #end} — transitions ACTIVE → ENDED irreversibly.</li>
+ * </ul></p>
  */
 public class ClientRelationshipService {
 
@@ -48,6 +49,71 @@ public class ClientRelationshipService {
             .orElseThrow(() -> new OrganizationNotFoundException(agencyOrganizationId));
         organizations.findById(clientOrganizationId)
             .orElseThrow(() -> new OrganizationNotFoundException(clientOrganizationId));
+
+        ClientRelationship relationship = ClientRelationship.form(
+            agencyOrganizationId, clientOrganizationId, Instant.now(clock));
+        return relationships.save(relationship);
+    }
+
+    /**
+     * Assigns a client organization to an agency on behalf of an authenticated agency owner (CLIENT-002).
+     *
+     * <p>Enforces:
+     * 1. Multi-Tenant Isolation (INV-09): Caller's home organization must match the agency organization.
+     * 2. Least Authority (09_SECURITY_ARCHITECTURE §4): Caller must possess {@link Role#OWNER}.
+     * 3. Target Organization Validation (INV-14): Both agency and client must exist in OrganizationRepository.
+     * 4. Self-Assignment Guard: Agency cannot assign itself as a client.
+     * 5. Idempotency: Returns existing active relationship if one is already active between agency and client.</p>
+     *
+     * @param caller               the authenticated user making the assignment
+     * @param agencyOrganizationId the Agency Organization's stable identity
+     * @param clientOrganizationId the Client Organization's stable identity
+     * @return the active ClientRelationship
+     * @throws AccessDeniedException         if caller is unauthenticated, not an OWNER, or tenant mismatch (INV-09)
+     * @throws OrganizationNotFoundException if either organization does not exist (INV-14)
+     * @throws IllegalArgumentException      if self-assignment or invalid inputs
+     */
+    public ClientRelationship assign(User caller, String agencyOrganizationId, String clientOrganizationId) {
+        if (caller == null) {
+            throw new AccessDeniedException("anonymous", agencyOrganizationId, null, "Caller is unauthenticated.");
+        }
+
+        if (agencyOrganizationId == null || agencyOrganizationId.isBlank()) {
+            throw new AccessDeniedException(caller.id(), "none", null, "Agency organization ID must not be blank.");
+        }
+
+        // Multi-Tenant Isolation (INV-09): Caller must belong to the agency organization
+        if (caller.organizationId() == null || !caller.organizationId().equals(agencyOrganizationId)) {
+            throw new AccessDeniedException(caller.id(), agencyOrganizationId, null,
+                    String.format("Multi-tenant violation: user home org '%s' does not match agency org '%s'",
+                            caller.organizationId(), agencyOrganizationId));
+        }
+
+        // Role Authorization: Only OWNER can assign clients to the agency
+        if (caller.role() != Role.OWNER) {
+            String roleName = caller.role() != null ? caller.role().name() : "none";
+            throw new AccessDeniedException(caller.id(), agencyOrganizationId, null,
+                    String.format("Role %s is not authorized to assign clients to agency", roleName));
+        }
+
+        if (clientOrganizationId == null || clientOrganizationId.isBlank()) {
+            throw new IllegalArgumentException("A client organization id is required.");
+        }
+
+        if (agencyOrganizationId.equals(clientOrganizationId)) {
+            throw new IllegalArgumentException("An organization cannot be its own client.");
+        }
+
+        organizations.findById(agencyOrganizationId)
+            .orElseThrow(() -> new OrganizationNotFoundException(agencyOrganizationId));
+        organizations.findById(clientOrganizationId)
+            .orElseThrow(() -> new OrganizationNotFoundException(clientOrganizationId));
+
+        // Idempotency: Check if an active relationship already exists
+        Optional<ClientRelationship> active = relationships.findActiveByAgencyAndClient(agencyOrganizationId, clientOrganizationId);
+        if (active.isPresent()) {
+            return active.get();
+        }
 
         ClientRelationship relationship = ClientRelationship.form(
             agencyOrganizationId, clientOrganizationId, Instant.now(clock));

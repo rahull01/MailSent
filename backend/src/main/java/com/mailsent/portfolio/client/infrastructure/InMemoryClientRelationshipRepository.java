@@ -35,6 +35,15 @@ public class InMemoryClientRelationshipRepository implements ClientRelationshipR
             .toList();
     }
 
+    @Override
+    public Optional<ClientRelationship> findActiveByAgencyAndClient(String agencyOrganizationId, String clientOrganizationId) {
+        return byId.values().stream()
+            .filter(r -> r.agencyOrganizationId().equals(agencyOrganizationId)
+                    && r.clientOrganizationId().equals(clientOrganizationId)
+                    && r.status() == ClientRelationship.Status.ACTIVE)
+            .findFirst();
+    }
+
     /** Clears all state; used by tests to reset the shared bean between cases. */
     public void clear() {
         byId.clear();

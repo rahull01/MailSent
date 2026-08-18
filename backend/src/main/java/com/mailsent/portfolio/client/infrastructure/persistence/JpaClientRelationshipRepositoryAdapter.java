@@ -43,6 +43,14 @@ public class JpaClientRelationshipRepositoryAdapter implements ClientRelationshi
         return jpa.findByAgencyOrganizationId(agencyOrganizationId).stream().map(this::toDomain).toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ClientRelationship> findActiveByAgencyAndClient(String agencyOrganizationId, String clientOrganizationId) {
+        return jpa.findByAgencyOrganizationIdAndClientOrganizationIdAndStatus(
+                agencyOrganizationId, clientOrganizationId, ClientRelationship.Status.ACTIVE)
+                .map(this::toDomain);
+    }
+
     private ClientRelationshipJpaEntity toEntity(ClientRelationship relationship) {
         return new ClientRelationshipJpaEntity(relationship.id(), relationship.agencyOrganizationId(),
             relationship.clientOrganizationId(), relationship.formedAt(), relationship.status(),
