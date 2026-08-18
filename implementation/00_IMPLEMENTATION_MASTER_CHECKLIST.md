@@ -138,7 +138,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 # PHASE 06 — Portfolio
 **Purpose:** portfolio-scale view. **Deps:** 05. **Exit:** an agency sees a portfolio with risk. **Progress:** 0% · 0/3 · 0.
 
-- **PORT-001 — Portfolio container** — P0 60 · FUN-D4 🟪
+- **PORT-001 — Portfolio container** — P0 60 · FUN-D4 ✅
 - **PORT-002 — Portfolio overview data** — P0 90 🟪
 - **PORT-003 — Portfolio isolation** — P1 45 · INV-09 🟪
 
