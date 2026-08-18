@@ -140,7 +140,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 
 - **PORT-001 — Portfolio container** — P0 60 · FUN-D4 ✅
 - **PORT-002 — Portfolio overview data** — P0 90 ✅
-- **PORT-003 — Portfolio isolation** — P1 45 · INV-09 🟪
+- **PORT-003 — Portfolio isolation** — P1 45 · INV-09 ✅
 
 ---
 
