@@ -1,5 +1,6 @@
 package com.mailsent.identity.authentication.infrastructure.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,7 @@ public interface JpaUserRepository extends JpaRepository<UserJpaEntity, String> 
 
     /** Loads a user by its normalized email, if present. */
     Optional<UserJpaEntity> findByEmail(String email);
+
+    /** Loads users by organization id ordered deterministically. */
+    List<UserJpaEntity> findByOrganizationIdOrderByCreatedAtAscIdAsc(String organizationId);
 }

@@ -1,5 +1,7 @@
 package com.mailsent.identity.authentication.infrastructure;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,6 +47,22 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public Optional<User> findByEmail(Email email) {
         return Optional.ofNullable(byEmail.get(email.value()));
+    }
+
+    @Override
+    public Optional<User> findById(String id) {
+        return byEmail.values().stream().filter(u -> u.id().equals(id)).findFirst();
+    }
+
+    @Override
+    public List<User> findAllByOrganizationId(String organizationId) {
+        if (organizationId == null || organizationId.isBlank()) {
+            return List.of();
+        }
+        return byEmail.values().stream()
+                .filter(u -> organizationId.equals(u.organizationId()))
+                .sorted(Comparator.comparing(User::createdAt).thenComparing(User::id))
+                .toList();
     }
 
     /** Count of users, for tests and observability. */

@@ -1,5 +1,6 @@
 package com.mailsent.identity.authentication.infrastructure.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Profile;
@@ -62,6 +63,23 @@ public class JpaUserRepositoryAdapter implements UserRepository {
     @Transactional(readOnly = true)
     public Optional<User> findByEmail(Email email) {
         return jpa.findByEmail(email.value()).map(this::toUser);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<User> findById(String id) {
+        return jpa.findById(id).map(this::toUser);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> findAllByOrganizationId(String organizationId) {
+        if (organizationId == null || organizationId.isBlank()) {
+            return List.of();
+        }
+        return jpa.findByOrganizationIdOrderByCreatedAtAscIdAsc(organizationId).stream()
+                .map(this::toUser)
+                .toList();
     }
 
     private User toUser(UserJpaEntity entity) {

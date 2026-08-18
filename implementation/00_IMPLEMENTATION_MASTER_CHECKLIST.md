@@ -122,7 +122,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 - **TEAM-001 — Invite by email & accept** — P0 60 · Arch CTX Identity · FUN-D5 · Status 🟪
 - **TEAM-002 — Role→capability map (least-authority)** — P0 60 ✅
 - **TEAM-003 — Access audit record** — P1 60 · NFR-AU ✅
-- **TEAM-004 — Team list query** — P1 45 ⬜
+- **TEAM-004 — Team list query** — P1 45 ✅
 
 ---
 

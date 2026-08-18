@@ -191,8 +191,16 @@ class SignUpServiceTest {
                 return java.util.Optional.empty();
             }
             @Override
+            public java.util.Optional<User> findById(String id) {
+                return java.util.Optional.empty();
+            }
+            @Override
             public User save(User user) {
                 throw new IllegalStateException("database unavailable");
+            }
+            @Override
+            public java.util.List<User> findAllByOrganizationId(String organizationId) {
+                return java.util.List.of();
             }
         };
         // A real in-memory org repository stores the Organization; the user write then
