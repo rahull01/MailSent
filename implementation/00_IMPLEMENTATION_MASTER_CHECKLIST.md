@@ -131,7 +131,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 
 - **CLIENT-001 — Client CRUD** — P0 60 · DATA Client/Portfolio 🟪
 - **CLIENT-002 — Assign client to agency** — P0 60 ✅
-- **CLIENT-003 — Client isolation (INV-09)** — P0 45 🟪
+- **CLIENT-003 — Client isolation (INV-09)** — P0 45 ✅
 
 ---
 
