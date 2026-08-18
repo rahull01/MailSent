@@ -3,6 +3,7 @@ package com.mailsent.portfolio.client;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Clock;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,12 +12,31 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
+import com.mailsent.portfolio.client.application.ClientRelationshipRepository;
 import com.mailsent.portfolio.client.application.ClientRelationshipService;
 import com.mailsent.portfolio.client.domain.ClientRelationship;
+import com.mailsent.portfolio.client.infrastructure.persistence.ClientRelationshipJpaEntity;
+import com.mailsent.portfolio.client.infrastructure.persistence.JpaClientRelationshipRepository;
+import com.mailsent.portfolio.client.infrastructure.persistence.JpaClientRelationshipRepositoryAdapter;
+import com.mailsent.portfolio.organization.application.OrganizationRepository;
 import com.mailsent.portfolio.organization.application.OrganizationService;
+import com.mailsent.portfolio.organization.domain.Organization;
+import com.mailsent.portfolio.organization.infrastructure.persistence.JpaOrganizationRepository;
+import com.mailsent.portfolio.organization.infrastructure.persistence.JpaOrganizationRepositoryAdapter;
+import com.mailsent.portfolio.organization.infrastructure.persistence.OrganizationJpaEntity;
 
 /**
  * Real-PostgreSQL integration tests for the CLIENT-003 INV-09 isolation invariant over the
@@ -43,10 +63,35 @@ import com.mailsent.portfolio.organization.application.OrganizationService;
  * applies V1–V7 at startup. Gated on {@code mailsent.it.postgres}; idempotent
  * (randomized org names).</p>
  */
-@SpringBootTest
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("it")
+@ContextConfiguration(classes = ClientRelationshipIsolationPersistenceIntegrationTest.TestConfig.class)
 @EnabledIfSystemProperty(named = "mailsent.it.postgres", matches = "true")
 class ClientRelationshipIsolationPersistenceIntegrationTest {
+
+    @Configuration
+    @EnableAutoConfiguration(exclude = {RedisAutoConfiguration.class, RedisRepositoriesAutoConfiguration.class})
+    @EntityScan(basePackageClasses = {OrganizationJpaEntity.class, ClientRelationshipJpaEntity.class})
+    @EnableJpaRepositories(basePackageClasses = {JpaOrganizationRepository.class, JpaClientRelationshipRepository.class})
+    @Import({JpaOrganizationRepositoryAdapter.class, JpaClientRelationshipRepositoryAdapter.class})
+    static class TestConfig {
+        @Bean
+        Clock clock() {
+            return Clock.systemUTC();
+        }
+
+        @Bean
+        OrganizationService organizationService(OrganizationRepository repository, Clock clock) {
+            return new OrganizationService(repository, clock);
+        }
+
+        @Bean
+        ClientRelationshipService clientRelationshipService(ClientRelationshipRepository relationships,
+                                                            OrganizationRepository organizations, Clock clock) {
+            return new ClientRelationshipService(relationships, organizations, clock);
+        }
+    }
 
     private static final String PREFIX = "it-" + UUID.randomUUID() + "-";
 
@@ -136,7 +181,7 @@ class ClientRelationshipIsolationPersistenceIntegrationTest {
         assertEquals(ClientRelationship.Status.ACTIVE,
             clientRelationships.findById(relB.id()).orElseThrow().status());
         for (String orgId : List.of(agencyA, clientA, agencyB, clientB)) {
-            assertEquals(com.mailsent.portfolio.organization.domain.Organization.Status.ACTIVE,
+            assertEquals(Organization.Status.ACTIVE,
                 organizationService.findById(orgId).orElseThrow().status(),
                 "organization " + orgId + " unchanged by relationship forming/ending");
         }
