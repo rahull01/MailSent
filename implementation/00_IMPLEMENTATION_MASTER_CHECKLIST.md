@@ -350,7 +350,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 - **ANAL-001 — Event capture (scan/fix/alert)** — P1 60 ✅
 - **ANAL-002 — Feature-adoption score** — P1 60 · FUN-F3 ✅
 - **ANAL-003 — Drop-off & time-to-value** — P1 90 ✅
-- **ANAL-004 — In-app helpful feedback** — P1 45 · FUN-F1 ⬜
+- **ANAL-004 — In-app helpful feedback** — P1 45 · FUN-F1 ✅
 - **ANAL-005 — Contextual suggestions** — P1 60 · FUN-F2 ⬜
 
 ---
