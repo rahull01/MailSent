@@ -378,8 +378,8 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 - **PORTAL-004 — Viewer (seat) access** — P1 60 ✅
 - **PORTAL-005 — Bulk scan** — P1 60 ✅
 - **PORTAL-006 — Bulk actions (tag/archive/rescan)** — P1 60 ✅
-- **PORTAL-007 — Client grouping (folders/tags)** — P1 60 ⬜
-- **PORTAL-008 — Organization switcher** — P1 45 ⬜
+- **PORTAL-007 — Client grouping (folders/tags)** — P1 60 ✅
+- **PORTAL-008 — Organization switcher** — P1 45 ✅
 
 ---
 
