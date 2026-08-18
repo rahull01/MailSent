@@ -360,7 +360,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Trace anchors:** WF-1 Agency Control Center · UX U2 · NFR A1/A2.
 
 - **DASH-001 — Health overview** — P0 90 ✅
-- **DASH-002 — Issue queue (prioritized)** — P0 90 ⬜
+- **DASH-002 — Issue queue (prioritized)** — P0 90 ✅
 - **DASH-003 — Monitoring list** — P0 60 ⬜
 - **DASH-004 — Action queue widget** — P0 60 ⬜
 - **DASH-005 — Five-questions rule** — P0 60 · NFR-U2 ⬜
