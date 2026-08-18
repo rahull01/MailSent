@@ -203,7 +203,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Trace anchors:** CP-3 · WF-4 · GLOS Health Signal.
 **CTO freeze (HEALTH-001 interpretation, 2026-08-15):** Delivery Observation **owns** Health Signal and Health Trend (trend is HEALTH-002). Diagnosis does **not** own Health Signal. DIAG-001 does not create Health Signal. HEALTH-001 consumes **persisted snapshots only** — never `Alignment.lastDerived()` / in-memory DIAG-001.
 
-- **HEALTH-001 — Unify Health Signal (components)** — P0 60 · FUN-H1 · INV-01/05 🟪 Tests Complete (not INF-004)
+- **HEALTH-001 — Unify Health Signal (components)** — P0 60 · FUN-H1 · INV-01/05 ✅ (not INF-004)
   - **Owner:** Delivery Observation. Diagnosis does not own Health Signal. DIAG-001 does not create Health Signal.
   - **V1 required persisted snapshots** (latest per Domain; identity from registered Domain). Missing **any** ⇒ **persist nothing** (not a healthy/at-risk/unknown row):
     - **Observation Evidence (V8)** — Java/SQL fields actually stored: `id`, `organization_id`, `domain_id`, `domain_name`, `observed_at`, `mx_records`, `txt_records`, `spf_record`. Frozen DNS records, **not** SPF-pass. Latest OE by `observedAt` then `id` (current Java).

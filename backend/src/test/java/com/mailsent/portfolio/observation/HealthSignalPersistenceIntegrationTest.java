@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -22,24 +23,53 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 
+import com.mailsent.identity.authentication.application.UserRepository;
+import com.mailsent.identity.authentication.infrastructure.persistence.JpaUserRepository;
+import com.mailsent.identity.authentication.infrastructure.persistence.JpaUserRepositoryAdapter;
+import com.mailsent.identity.authentication.infrastructure.persistence.UserJpaEntity;
+import com.mailsent.identity.consent.application.ConsentRepository;
+import com.mailsent.identity.consent.application.ConsentService;
+import com.mailsent.identity.consent.domain.ActionType;
+import com.mailsent.identity.consent.domain.Consent;
+import com.mailsent.identity.consent.infrastructure.persistence.ConsentJpaEntity;
+import com.mailsent.identity.consent.infrastructure.persistence.JpaConsentRepository;
+import com.mailsent.identity.consent.infrastructure.persistence.JpaConsentRepositoryAdapter;
+import com.mailsent.portfolio.domain.application.DomainRepository;
 import com.mailsent.portfolio.domain.application.DomainService;
 import com.mailsent.portfolio.domain.domain.Domain;
+import com.mailsent.portfolio.domain.infrastructure.persistence.DomainJpaEntity;
+import com.mailsent.portfolio.domain.infrastructure.persistence.JpaDomainRepository;
+import com.mailsent.portfolio.domain.infrastructure.persistence.JpaDomainRepositoryAdapter;
+import com.mailsent.portfolio.observation.application.DmarcAggregateEvidenceRepository;
 import com.mailsent.portfolio.observation.application.DmarcAggregateEvidenceService;
 import com.mailsent.portfolio.observation.application.DmarcReportParseService;
 import com.mailsent.portfolio.observation.application.DmarcReportReceiveService;
+import com.mailsent.portfolio.observation.application.DmarcReportReceiptRepository;
+import com.mailsent.portfolio.observation.application.DnsObservationService;
 import com.mailsent.portfolio.observation.application.DnsResolver;
 import com.mailsent.portfolio.observation.application.DomainNotRegisteredException;
 import com.mailsent.portfolio.observation.application.GooglePostmasterPort;
+import com.mailsent.portfolio.observation.application.HealthSignalRepository;
 import com.mailsent.portfolio.observation.application.HealthSignalService;
 import com.mailsent.portfolio.observation.application.MicrosoftSndsPort;
+import com.mailsent.portfolio.observation.application.ObservationEvidenceRepository;
 import com.mailsent.portfolio.observation.application.ObservationEvidenceService;
+import com.mailsent.portfolio.observation.application.ReputationObservationRepository;
 import com.mailsent.portfolio.observation.application.ReputationObservationService;
 import com.mailsent.portfolio.observation.application.ReputationProviderObservation;
 import com.mailsent.portfolio.observation.domain.DnsObservation;
@@ -47,36 +77,87 @@ import com.mailsent.portfolio.observation.domain.HealthIndication;
 import com.mailsent.portfolio.observation.domain.HealthSignal;
 import com.mailsent.portfolio.observation.domain.MxRecord;
 import com.mailsent.portfolio.observation.domain.ObservationEvidence;
+import com.mailsent.portfolio.observation.infrastructure.Rfc7489DmarcAggregateXmlParser;
+import com.mailsent.portfolio.observation.infrastructure.persistence.DmarcAggregateEvidenceJpaEntity;
+import com.mailsent.portfolio.observation.infrastructure.persistence.DmarcReportReceiptJpaEntity;
+import com.mailsent.portfolio.observation.infrastructure.persistence.HealthSignalJpaEntity;
+import com.mailsent.portfolio.observation.infrastructure.persistence.JpaDmarcAggregateEvidenceRepository;
+import com.mailsent.portfolio.observation.infrastructure.persistence.JpaDmarcAggregateEvidenceRepositoryAdapter;
+import com.mailsent.portfolio.observation.infrastructure.persistence.JpaDmarcReportReceiptRepository;
+import com.mailsent.portfolio.observation.infrastructure.persistence.JpaDmarcReportReceiptRepositoryAdapter;
+import com.mailsent.portfolio.observation.infrastructure.persistence.JpaHealthSignalRepository;
+import com.mailsent.portfolio.observation.infrastructure.persistence.JpaHealthSignalRepositoryAdapter;
+import com.mailsent.portfolio.observation.infrastructure.persistence.JpaObservationEvidenceRepository;
+import com.mailsent.portfolio.observation.infrastructure.persistence.JpaObservationEvidenceRepositoryAdapter;
+import com.mailsent.portfolio.observation.infrastructure.persistence.JpaReputationObservationRepository;
+import com.mailsent.portfolio.observation.infrastructure.persistence.JpaReputationObservationRepositoryAdapter;
+import com.mailsent.portfolio.observation.infrastructure.persistence.ObservationEvidenceJpaEntity;
+import com.mailsent.portfolio.observation.infrastructure.persistence.ReputationObservationJpaEntity;
+import com.mailsent.portfolio.organization.application.OrganizationRepository;
 import com.mailsent.portfolio.organization.application.OrganizationService;
+import com.mailsent.portfolio.organization.infrastructure.persistence.JpaOrganizationRepository;
+import com.mailsent.portfolio.organization.infrastructure.persistence.JpaOrganizationRepositoryAdapter;
+import com.mailsent.portfolio.organization.infrastructure.persistence.OrganizationJpaEntity;
 
 /**
  * Real-PostgreSQL integration tests for the HEALTH-001 Health Signal
- * persistence path.
+ * persistence path over the frozen V1–V16 schema.
  *
- * <p>Runs against a live PostgreSQL on port 5433 (see {@code application-it.yml}).
- * Flyway applies V1–V16 at context startup, and {@code ddl-auto: validate}
- * verifies the schema against the JPA entity. Gated on
- * {@code mailsent.it.postgres}.</p>
+ * <p>Uses scoped @DataJpaTest to prevent loading unrelated Phase 13+ entities
+ * (such as HealthChangeEventEntity) while enforcing ddl-auto: validate
+ * against real PostgreSQL 16 on port 5433.</p>
  */
-@SpringBootTest
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("it")
+@ContextConfiguration(classes = HealthSignalPersistenceIntegrationTest.TestConfig.class)
 @EnabledIfSystemProperty(named = "mailsent.it.postgres", matches = "true")
 class HealthSignalPersistenceIntegrationTest {
 
     private static final Instant BASE = Instant.parse("2026-08-15T10:00:00Z");
 
-    @Autowired private OrganizationService organizationService;
-    @Autowired private DomainService domainService;
-    @Autowired private ObservationEvidenceService evidenceService;
-    @Autowired private ReputationObservationService reputationService;
-    @Autowired private DmarcReportReceiveService receiveService;
-    @Autowired private DmarcReportParseService parseService;
-    @Autowired private DmarcAggregateEvidenceService aggregateService;
-    @Autowired private HealthSignalService healthSignalService;
-    @Autowired private DataSource dataSource;
+    @Configuration
+    @EnableAutoConfiguration(exclude = {RedisAutoConfiguration.class, RedisRepositoriesAutoConfiguration.class})
+    @EntityScan(basePackageClasses = {
+        OrganizationJpaEntity.class,
+        UserJpaEntity.class,
+        ConsentJpaEntity.class,
+        DomainJpaEntity.class,
+        ObservationEvidenceJpaEntity.class,
+        ReputationObservationJpaEntity.class,
+        DmarcReportReceiptJpaEntity.class,
+        DmarcAggregateEvidenceJpaEntity.class,
+        HealthSignalJpaEntity.class
+    })
+    @EnableJpaRepositories(basePackageClasses = {
+        JpaOrganizationRepository.class,
+        JpaUserRepository.class,
+        JpaConsentRepository.class,
+        JpaDomainRepository.class,
+        JpaObservationEvidenceRepository.class,
+        JpaReputationObservationRepository.class,
+        JpaDmarcReportReceiptRepository.class,
+        JpaDmarcAggregateEvidenceRepository.class,
+        JpaHealthSignalRepository.class
+    })
+    @Import({
+        JpaOrganizationRepositoryAdapter.class,
+        JpaUserRepositoryAdapter.class,
+        JpaConsentRepositoryAdapter.class,
+        JpaDomainRepositoryAdapter.class,
+        JpaObservationEvidenceRepositoryAdapter.class,
+        JpaReputationObservationRepositoryAdapter.class,
+        JpaDmarcReportReceiptRepositoryAdapter.class,
+        JpaDmarcAggregateEvidenceRepositoryAdapter.class,
+        JpaHealthSignalRepositoryAdapter.class
+    })
+    static class TestConfig {
 
-    @TestConfiguration
-    static class FakePortsConfig {
+        @Bean
+        Clock clock() {
+            return Clock.systemUTC();
+        }
+
         @Bean
         SequenceResolver sequenceResolver() {
             return new SequenceResolver();
@@ -100,6 +181,74 @@ class HealthSignalPersistenceIntegrationTest {
         MicrosoftSndsPort fakeMicrosoftSndsPort() {
             return domainName -> Optional.empty();
         }
+
+        @Bean
+        OrganizationService organizationService(OrganizationRepository repository, Clock clock) {
+            return new OrganizationService(repository, clock);
+        }
+
+        @Bean
+        DomainService domainService(DomainRepository repository, OrganizationRepository organizations, Clock clock) {
+            return new DomainService(repository, organizations, clock);
+        }
+
+        @Bean
+        ConsentService consentService(ConsentRepository consentRepository, DomainRepository domainRepository, UserRepository userRepository) {
+            return new ConsentService(consentRepository, domainRepository, userRepository);
+        }
+
+        @Bean
+        DnsObservationService dnsObservationService(DnsResolver resolver, DomainRepository domains, ConsentService consentService) {
+            return new DnsObservationService(resolver, domains, consentService);
+        }
+
+        @Bean
+        ObservationEvidenceService observationEvidenceService(ObservationEvidenceRepository repository,
+                                                              DomainRepository domains,
+                                                              DnsObservationService dnsObservationService) {
+            return new ObservationEvidenceService(repository, domains, dnsObservationService);
+        }
+
+        @Bean
+        ReputationObservationService reputationObservationService(ReputationObservationRepository repository,
+                                                                  DomainRepository domains,
+                                                                  GooglePostmasterPort postmaster,
+                                                                  MicrosoftSndsPort snds) {
+            return new ReputationObservationService(repository, domains, postmaster, snds);
+        }
+
+        @Bean
+        Rfc7489DmarcAggregateXmlParser rfc7489DmarcAggregateXmlParser() {
+            return new Rfc7489DmarcAggregateXmlParser();
+        }
+
+        @Bean
+        DmarcReportReceiveService dmarcReportReceiveService(DmarcReportReceiptRepository receipts,
+                                                           DomainRepository domains) {
+            return new DmarcReportReceiveService(receipts, domains);
+        }
+
+        @Bean
+        DmarcReportParseService dmarcReportParseService(DmarcReportReceiptRepository receipts,
+                                                       Rfc7489DmarcAggregateXmlParser parser) {
+            return new DmarcReportParseService(receipts, parser);
+        }
+
+        @Bean
+        DmarcAggregateEvidenceService dmarcAggregateEvidenceService(DmarcAggregateEvidenceRepository repository) {
+            return new DmarcAggregateEvidenceService(repository);
+        }
+
+        @Bean
+        HealthSignalService healthSignalService(HealthSignalRepository signals,
+                                               DomainRepository domains,
+                                               ObservationEvidenceRepository observationEvidence,
+                                               DmarcAggregateEvidenceRepository aggregateEvidence,
+                                               ReputationObservationRepository reputationObservations,
+                                               Clock clock) {
+            return new HealthSignalService(signals, domains, observationEvidence, aggregateEvidence,
+                    reputationObservations, clock);
+        }
     }
 
     static final class SequenceResolver implements DnsResolver {
@@ -118,9 +267,28 @@ class HealthSignalPersistenceIntegrationTest {
         }
     }
 
+    @Autowired private OrganizationService organizationService;
+    @Autowired private DomainService domainService;
+    @Autowired private ObservationEvidenceService evidenceService;
+    @Autowired private ReputationObservationService reputationService;
+    @Autowired private DmarcReportReceiveService receiveService;
+    @Autowired private DmarcReportParseService parseService;
+    @Autowired private DmarcAggregateEvidenceService aggregateService;
+    @Autowired private HealthSignalService healthSignalService;
+    @Autowired private ConsentRepository consentRepository;
+    @Autowired private DataSource dataSource;
+
     private Domain registeredDomain() {
         String orgId = organizationService.create("Health " + UUID.randomUUID()).id();
-        return domainService.register(orgId, "it-" + UUID.randomUUID() + ".com");
+        Domain domain = domainService.register(orgId, "it-" + UUID.randomUUID() + ".com");
+        // Grant consent for infrastructure observation
+        consentRepository.save(Consent.grant(
+            orgId,
+            domain.id(),
+            "user-" + UUID.randomUUID(),
+            ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE
+        ));
+        return domain;
     }
 
     private void seedRequiredSources(Domain domain, String xml) {
@@ -210,7 +378,7 @@ class HealthSignalPersistenceIntegrationTest {
 
     @Test
     void schemaEnforcesPrimaryKeyForeignKeysIndexesAndAllowsRepeatDomainSignals() throws Exception {
-        try (Connection con = DataSourceUtils.getConnection(dataSource)) {
+        try (Connection con = dataSource.getConnection()) {
             DatabaseMetaData meta = con.getMetaData();
 
             boolean pkFound = false;
