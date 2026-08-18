@@ -387,9 +387,9 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** internal control plane. **Deps:** 02-21. **Exit:** customers/domains/metrics visible. **Progress:** 0% · 0/4 · 0.
 **Trace anchors:** WF Internal Operations.
 
-- **ADMIN-001 — Customer/domain metrics** — P1 90 ⬜
-- **ADMIN-002 — Feature-adoption distribution** — P1 60 ⬜
-- **ADMIN-003 — Churn-risk view** — P1 60 ⬜
+- **ADMIN-001 — Customer/domain metrics** — P1 90 ✅
+- **ADMIN-002 — Feature-adoption distribution** — P1 60 ✅
+- **ADMIN-003 — Churn-risk view** — P1 60 ✅
 - **ADMIN-004 — Revenue/MRR tracker** — P2 60 ⬜
 
 ---
