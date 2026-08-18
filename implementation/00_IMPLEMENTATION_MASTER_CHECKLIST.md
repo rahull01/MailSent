@@ -406,20 +406,20 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 ---
 
 # PHASE 24 — Settings
-**Purpose:** per-org settings. **Progress:** 0% · 0/3 · 0.
+**Purpose:** per-org settings. **Progress:** 100% · 3/3 · 0.
 
-- **SET-001 — Alert/digest settings** — P1 45 ⬜
-- **SET-002 — Team & role (ref 04)** — P1 45 ⬜
-- **SET-003 — Domain pause/remove** — P1 45 ⬜
+- **SET-001 — Alert/digest settings** — P1 45 ✅
+- **SET-002 — Team & role (ref 04)** — P1 45 ✅
+- **SET-003 — Domain pause/remove** — P1 45 ✅
 
 ---
 
 # PHASE 25 — Notifications
-**Purpose:** deliver via the user's channel. **Deps:** 14. **Progress:** 0% · 0/3 · 0.
+**Purpose:** deliver via the user's channel. **Deps:** 14. **Progress:** 100% · 3/3 · 0.
 
-- **NOTIF-001 — Notification service** — P1 90 · O-MAT · D-MAT ⬜
-- **NOTIF-002 — Notification inventory** — P1 60 ⬜
-- **NOTIF-003 — Digest builder** — P1 60 ⬜
+- **NOTIF-001 — Notification service** — P1 90 · O-MAT · D-MAT ✅
+- **NOTIF-002 — Notification inventory** — P1 60 ✅
+- **NOTIF-003 — Digest builder** — P1 60 ✅
 
 ---
 
