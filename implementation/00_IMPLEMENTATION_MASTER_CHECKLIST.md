@@ -120,7 +120,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** roles, invite, least-authority, audit. **Deps:** 02,03. **Exit:** a team admin adds an analyst who acts in scope. **Progress:** 0% · 0/4 · 0.
 
 - **TEAM-001 — Invite by email & accept** — P0 60 · Arch CTX Identity · FUN-D5 · Status 🟪
-- **TEAM-002 — Role→capability map (least-authority)** — P0 60 ⬜
+- **TEAM-002 — Role→capability map (least-authority)** — P0 60 ✅
 - **TEAM-003 — Access audit record** — P1 60 · NFR-AU ⬜
 - **TEAM-004 — Team list query** — P1 45 ⬜
 
@@ -451,7 +451,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 # PHASE 28 — Testing
 **Purpose:** full coverage + failure paths. **Deps:** 01, features. **Exit:** T-MAT complete on critical path. **Progress:** 0% · 0/5 · 0.
 
-- **TEST-001 — Unit coverage complete** — P0 · 3×30 ⬜
+- **TEST-001 — Unit coverage complete** — P0 · 3×30 ✅
 - **TEST-002 — Integration scenario set** — P1 90 ⬜
 - **TEST-003 — Critical-path E2E** — P1 90 ⬜
 - **TEST-004 — Failure-path matrix** — P1 90 ⬜
