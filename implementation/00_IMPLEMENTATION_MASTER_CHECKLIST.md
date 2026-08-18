@@ -337,7 +337,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Trace anchors:** CP-8 · WF-10 Compliance · Arch CTX Readiness.
 
 - **COMP-001 — Provider requirement checklists** — P1 90 · FUN-C1 ✅
-- **COMP-002 — Readiness badge/view** — P1 60 · FUN-C2 ⬜
+- **COMP-002 — Readiness badge/view** — P1 60 · FUN-C2 ✅
 - **COMP-003 — Compliance PDF** — P2 90 · FUN-C3 ⬜
 - **COMP-004 — MTA-STS / BIMI / TLS-RPT readiness** — P2 90 ⬜
 
