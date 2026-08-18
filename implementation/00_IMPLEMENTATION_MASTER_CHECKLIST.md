@@ -398,10 +398,10 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** subscription tiers (hypothesis, V1). **Deps:** 02. **Exit:** plan + subscribed state. **Progress:** 0% · 0/4 · 0. **Note:** hypothesis; avoid overbuild (Golden Rule).
 **Trace anchors:** WF Pricing (hypothesis).
 
-- **BILL-001 — Plan definitions** — P0 60 ⬜
-- **BILL-002 — Subscribed state handling** — P0 60 ⬜
-- **BILL-003 — Free-tier gate** — P1 45 ⬜
-- **BILL-004 — Annual discount rule** — P2 45 ⬜
+- **BILL-001 — Plan definitions** — P0 60 ✅
+- **BILL-002 — Subscribed state handling** — P0 60 ✅
+- **BILL-003 — Free-tier gate** — P1 45 ✅
+- **BILL-004 — Annual discount rule** — P2 45 ✅
 
 ---
 
