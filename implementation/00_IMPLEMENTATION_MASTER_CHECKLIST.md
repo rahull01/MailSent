@@ -150,7 +150,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 - **DOM-001 — Add domain (manual)** — P0 60 · FUN-D1 ✅
 - **DOM-002 — Bulk CSV import** — P1 90 · FUN-D2 ✅
 - **DOM-003 — Domain list/state** — P0 60 · FUN-D3 ✅
-- **DOM-004 — Registry ownership** — P0 60 · FUN-D4 ⬜
+- **DOM-004 — Registry ownership** — P0 60 · FUN-D4 ✅
 
 ---
 
