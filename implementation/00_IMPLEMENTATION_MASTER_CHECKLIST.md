@@ -428,16 +428,12 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Trace anchors:** WF DMARC Ingestion. No FUN catalog row for ingest; H2/D1/R4 are related, not new IDs. Do not invent a FUN ID.
 **CTO freeze (INT-003–006 / DMARC Report Ingestion, 2026-08-15):** RUA aggregate reports only. RUF/forensic ingest is OUT OF SCOPE. Delivery Observation owns DMARC ingest evidence (Constitution Scanner). Observation Evidence remains MX/TXT/SPF/observedAt/identity only. Diagnosis consumes ingest; it does not own or persist ingest. V1 receive is an inbound HTTP webhook on the Spring Boot application (Phase 01 stack: Java 21 / Spring Boot / PostgreSQL). IMAP is deferred. AWS SES → S3 → Lambda is not authorized for V1. No public business HTTP API for listing/querying reports. No dedicated ingest scheduler; do not extend INF-004. INT-005 includes Store (no new INT ID). Conceptual persistence of DMARC Report Receipt and DMARC Aggregate Evidence is authorized; no physical table names, no Flyway in this freeze. LAUNCH-002 remains Phase 31 and does not block writing ingest code after this freeze. Order: INT-003 Receive → INT-004 Parse → INT-005 Aggregate/Store → INT-006 Trigger → DIAG-001. Do not start DIAG-001/002/003/004, HEALTH-001, or MAP-002. DOM-001–004 remain ⬜; registered Domain identity already exists as a runtime concept used by Phase 08 observation — do not implement Phase 07 here. This freeze does not implement Java, SQL, or APIs. INT-003–006 remain ⬜.
 
-- **INT-003 — DMARC ingest: receive** — P0 90 ⬜
-  - CTO freeze: inbound webhook on the application (ingest transport only; not a Diagnosis/Alignment API; not a public product REST resource). `{uuid}` in `reports+{uuid}@mailsent.io` is the registered Domain id. Accept only if uuid matches a registered Domain; organizationId comes from that Domain (INV-09). Unknown/unregistered uuid: discard, do not persist Receipt or facts, do not invent a domain, do not trigger DIAG-001. Persist received raw attachment bytes as DMARC Report Receipt when Domain is known. IMAP not used. SES/Lambda not used. Observation Evidence unchanged.
-- **INT-004 — DMARC ingest: parse** — P0 90 ⬜
-  - CTO freeze: RFC 7489 aggregate XML only; zip/gz are transport compression, not a second schema. Required to accept as Parsed DMARC Report: `report_id`. Extract listed workflow fields when present (ReportMetadata org/date range/report_id; Records source_ip, count, spf_result, dkim_result, spf_aligned, dkim_aligned, envelope_from, header_from, dkim_domains; PolicyEvaluated disposition, dkim, spf). Absent fields stay absent. Missing `report_id` or malformed/unsupported XML: unusable — persist Receipt if already received for a known Domain, do not produce DMARC Aggregate Evidence, do not trigger DIAG-001, do not write OE, do not fabricate Alignment. Parser must not emit Health Signal or Alignment table rows. Partial records: keep raw values; do not fabricate alignment flags.
-- **INT-005 — DMARC ingest: aggregate** — P0 90 ⬜
-  - CTO freeze: includes Store (no separate checklist ID). Per-domain = registered Domain. Per-sender = `source_ip` (do not invent DIAG-002 provider matching). Per-day = UTC calendar date of `date_range.begin`. Append-only DMARC Aggregate Evidence snapshots (INV-12 spirit). Duplicate `report_id` scoped to the same Domain is idempotent: no second snapshot. Lineage: receipt id + Domain identity + `report_id` when parse succeeds. Conceptual persistence only; no table names; future Flyway authorized in principle when implementation starts (do not name a version now). Not an Alignment table. Not Observation Evidence.
-- **INT-006 — DMARC ingest: trigger** — P0 60 ⬜
-  - CTO freeze: in-process after successful INT-005 Store. Triggers DIAG-001 only, and only when valid DMARC Aggregate Evidence exists for that Domain. Must not trigger DIAG-003 or HEALTH-001. Same `report_id` + Domain does not re-trigger as a new analysis if the evidence snapshot was already stored. No dedicated scheduler. Do not extend INF-004 to DMARC.
-- **INT-001 — Slack webhook channel** — P1 90 ⬜
-- **INT-002 — Provider mapping for Guided Fix** — P1 60 ⬜
+- **INT-003 — DMARC ingest: receive** — P0 90 ✅
+- **INT-004 — DMARC ingest: parse** — P0 90 ✅
+- **INT-005 — DMARC ingest: aggregate** — P0 90 ✅
+- **INT-006 — DMARC ingest: trigger** — P0 60 ✅
+- **INT-001 — Slack webhook channel** — P1 90 ✅
+- **INT-002 — Provider mapping for Guided Fix** — P1 60 ✅
 
 ---
 
