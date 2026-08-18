@@ -373,7 +373,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Trace anchors:** WF-1 Agency Control Center.
 
 - **PORTAL-001 — Multi-client grid** — P0 90 ✅
-- **PORTAL-002 — Client drill-down** — P1 60 ⬜
+- **PORTAL-002 — Client drill-down** — P1 60 ✅
 - **PORTAL-003 — White-label report exposure** — P2 90 ⬜
 - **PORTAL-004 — Viewer (seat) access** — P1 60 ⬜
 - **PORTAL-005 — Bulk scan** — P1 60 ⬜
