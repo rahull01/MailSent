@@ -372,7 +372,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** multi-client command center. **Deps:** 05,06,15,16. **Exit:** an agency manages many clients at once. **Progress:** 0% · 0/8 · 0.
 **Trace anchors:** WF-1 Agency Control Center.
 
-- **PORTAL-001 — Multi-client grid** — P0 90 ⬜
+- **PORTAL-001 — Multi-client grid** — P0 90 ✅
 - **PORTAL-002 — Client drill-down** — P1 60 ⬜
 - **PORTAL-003 — White-label report exposure** — P2 90 ⬜
 - **PORTAL-004 — Viewer (seat) access** — P1 60 ⬜
