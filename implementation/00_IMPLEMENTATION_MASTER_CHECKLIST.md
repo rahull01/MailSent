@@ -359,7 +359,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 **Purpose:** single hub answering the five questions. **Deps:** 10,12,13,15. **Exit:** hub answers what/why/impact/do/ignore. **Progress:** 0% · 0/6 · 0.
 **Trace anchors:** WF-1 Agency Control Center · UX U2 · NFR A1/A2.
 
-- **DASH-001 — Health overview** — P0 90 ⬜
+- **DASH-001 — Health overview** — P0 90 ✅
 - **DASH-002 — Issue queue (prioritized)** — P0 90 ⬜
 - **DASH-003 — Monitoring list** — P0 60 ⬜
 - **DASH-004 — Action queue widget** — P0 60 ⬜
