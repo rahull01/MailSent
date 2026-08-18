@@ -438,13 +438,13 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 ---
 
 # PHASE 27 — Security Hardening
-**Purpose:** NFR security + AI trust. **Deps:** 01-26. **Exit:** S-MAT complete. **Progress:** 0% · 0/5 · 0.
+**Purpose:** NFR security + AI trust. **Deps:** 01-26. **Exit:** S-MAT complete. **Progress:** 100% · 5/5 · 0.
 
-- **SEC-001 — Hardened consent flow** — P0 90 · INV-02 ⬜
-- **SEC-002 — Least-privilege audit** — P0 90 · NFR-S1 ⬜
-- **SEC-003 — Input validation across contracts** — P0 60 · NFR-S4 ⬜
-- **SEC-004 — Vulnerability baseline** — P1 90 · S-MAT 10-12 ⬜
-- **SEC-005 — Encryption in transit and at rest** — P0 60 · NFR-S2 ⬜
+- **SEC-001 — Hardened consent flow** — P0 90 · INV-02 ✅
+- **SEC-002 — Least-privilege audit** — P0 90 · NFR-S1 ✅
+- **SEC-003 — Input validation across contracts** — P0 60 · NFR-S4 ✅
+- **SEC-004 — Vulnerability baseline** — P1 90 · S-MAT 10-12 ✅
+- **SEC-005 — Encryption in transit and at rest** — P0 60 · NFR-S2 ✅
 
 ---
 
