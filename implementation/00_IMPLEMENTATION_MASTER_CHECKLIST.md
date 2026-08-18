@@ -361,7 +361,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 
 - **DASH-001 — Health overview** — P0 90 ✅
 - **DASH-002 — Issue queue (prioritized)** — P0 90 ✅
-- **DASH-003 — Monitoring list** — P0 60 ⬜
+- **DASH-003 — Monitoring list** — P0 60 ✅
 - **DASH-004 — Action queue widget** — P0 60 ⬜
 - **DASH-005 — Five-questions rule** — P0 60 · NFR-U2 ⬜
 - **DASH-006 — Accessibility baseline** — P1 60 · NFR-A1/A2 ⬜
