@@ -192,8 +192,7 @@ Planning → Implementation → Testing → Documentation → Review → Deploym
 - **DIAG-001 — Alignment** (SPF/DKIM, envelope vs header) — P0 90 · Alignment Engine / FUN-H2 (not FUN-X1 as primary) ✅
   - CTO freeze & Ratification: Analyzer-class Alignment derivation (Constitution Analyzer: SPF/DKIM/DMARC parsing + alignment). Ratified once INT-003–006 produced evidence in code. Does not persist Alignment table. Does not create Health Signal or Trust Score. Unit tested in `AlignmentDerivationServiceTest`.
 - **DIAG-002 — Sender detection** (recognized providers) — P0 90 · FUN-X2 ✅
-- **DIAG-003 — Root cause determination** — P0 90 · FUN-X3 · INV-11 ⬜ (Blocked on HEALTH-001)
-  - `RootCause` and `RootCauseDeterminationService` exist in code; blocked until HEALTH-001 healthy/at-risk signals are assigned in execution pipeline.
+- **DIAG-003 — Root cause determination** — P0 90 · FUN-X3 · INV-11 ✅
 - **DIAG-004 — Issue entity lifecycle** — P0 60 · DATA Issue ⬜
 
 ---
