@@ -54,7 +54,7 @@ class SignUpServiceTest {
         organizations = new InMemoryOrganizationRepository();
         hasher = new Pbkdf2PasswordHasher();
         policy = new PasswordPolicy(12);
-        service = new SignUpService(users, organizations, hasher, policy);
+        service = new SignUpService(users, organizations, hasher, policy, new com.mailsent.identity.consent.infrastructure.persistence.InMemoryConsentRepository());
     }
 
     private SignUpCommand command(String email, String password) {
@@ -170,7 +170,7 @@ class SignUpServiceTest {
                 return java.util.List.of();
             }
         };
-        SignUpService svc = new SignUpService(users, failingOrgs, hasher, policy);
+        SignUpService svc = new SignUpService(users, failingOrgs, hasher, policy, new com.mailsent.identity.consent.infrastructure.persistence.InMemoryConsentRepository());
 
         assertThrows(IllegalStateException.class,
             () -> svc.signUp(command("owner@example.com", "a-sufficiently-long-password-1")));
@@ -207,7 +207,7 @@ class SignUpServiceTest {
         // fails. In production the single @Transactional rolls this back (verified in the
         // PostgreSQL integration test); here we assert the failure surfaces and no user
         // was created.
-        SignUpService svc = new SignUpService(failing, organizations, hasher, policy);
+        SignUpService svc = new SignUpService(failing, organizations, hasher, policy, new com.mailsent.identity.consent.infrastructure.persistence.InMemoryConsentRepository());
 
         assertThrows(IllegalStateException.class,
             () -> svc.signUp(command("owner@example.com", "a-sufficiently-long-password-1")));

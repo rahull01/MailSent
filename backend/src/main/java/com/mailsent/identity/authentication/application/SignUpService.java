@@ -53,13 +53,16 @@ public class SignUpService {
     private final OrganizationRepository organizations;
     private final PasswordHasher passwordHasher;
     private final PasswordPolicy passwordPolicy;
+    private final com.mailsent.identity.consent.application.ConsentRepository consentRepository;
 
     public SignUpService(UserRepository users, OrganizationRepository organizations,
-                         PasswordHasher passwordHasher, PasswordPolicy passwordPolicy) {
+                         PasswordHasher passwordHasher, PasswordPolicy passwordPolicy,
+                         com.mailsent.identity.consent.application.ConsentRepository consentRepository) {
         this.users = users;
         this.organizations = organizations;
         this.passwordHasher = passwordHasher;
         this.passwordPolicy = passwordPolicy;
+        this.consentRepository = consentRepository;
     }
 
     /**
@@ -106,6 +109,16 @@ public class SignUpService {
 
         User user = User.register(email, hash, Instant.now(), savedOrganization.id());
         User saved = users.save(user);
+
+        // AUTH-000 / INV-02: Record initial consent.
+        // We grant consent at the organization level ("*") since the domain is not yet created.
+        com.mailsent.identity.consent.domain.Consent consent = com.mailsent.identity.consent.domain.Consent.grant(
+            savedOrganization.id(),
+            "*",
+            saved.id(),
+            com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE
+        );
+        consentRepository.save(consent);
 
         // The home Organization id stays internal (backend domain/persistence); it is not
         // part of the public sign-up contract (ORG-002 decision).

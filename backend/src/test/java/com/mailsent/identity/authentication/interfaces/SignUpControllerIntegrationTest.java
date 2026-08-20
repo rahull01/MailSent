@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("h2-test")
 class SignUpControllerIntegrationTest {
 
     private static final String ENDPOINT = "/api/identities";
