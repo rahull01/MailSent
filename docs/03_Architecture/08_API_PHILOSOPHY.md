@@ -75,12 +75,19 @@ For each resource category: Canonical owner, Producers, Consumers, Ownership rul
 - Producers: Delivery Observation.
 - Consumers: Diagnosis, Monitoring, Reporting, Readiness.
 - Ownership rule: the Health Signal is produced by the owner; consumers read it, never change it.
+- **CTO freeze (HEALTH-001, 2026-08-15):** **No public HTTP API** for Health Signal in HEALTH-001 (same as INF observation snapshots). Internal application contract only (`record`/`derive` by domainName). API philosophy resource remains conceptual for later phases. HEALTH-001 does not invent OpenAPI paths. Trust Score is not a Health resource.
 
 ### Diagnosis Resources
 - Canonical owner: Diagnosis.
 - Producers: Diagnosis.
 - Consumers: Business Explanation, Impact, Guidance, Reporting.
-- Ownership rule: the Root cause is authoritative in the owner; no consumer revises it.
+- Ownership rule: the Root cause is authoritative in the owner; no consumer revises it. Diagnosis owns Issue and Root cause. Alignment is a derived value, not a Diagnosis API resource and not a persisted table. DIAG-001 does not invent an Alignment HTTP contract. Diagnosis does not own DMARC ingest and does not expose ingest as a Diagnosis resource.
+
+### Observation ingest (not a product resource)
+- Canonical owner: Delivery Observation.
+- Producers: inbound system ingest of RUA aggregate reports (INT-003).
+- Consumers: INT-004–006 and DIAG-001 (as a consumer of DMARC Aggregate Evidence).
+- Ownership rule: V1 receive is an inbound webhook on the Spring Boot application — ingest transport only. It is not a public business HTTP API for listing or querying DMARC reports (same pattern as INF observation: no public observation HTTP). It is not a Diagnosis resource and not an Alignment API. Tenant binding is RUA uuid → registered Domain, not the caller inventing a domain. Authenticated as a system ingest boundary, not an end-user session. This freeze does not invent OpenAPI paths, OAuth, or API-key schemes. IMAP is deferred. AWS SES → S3 → Lambda is not authorized for V1.
 
 ### Explanation Resources
 - Canonical owner: Business Explanation.
@@ -190,8 +197,8 @@ As a predecessor for the future documents `09_SECURITY_ARCHITECTURE.md`, `10_DEP
 - **Changes to the philosophy.** Changing a principle or an ownership rule is a written proposal reviewed by the founders or the chief architect.
 - **Traceability.** Every API concept and resource traces through the data model to a domain concept and a problem; an orphan contract is removed.
 - **Consistency.** The API is bound by the Glossary and the ubiquitous language; a term used against them is out of compliance.
-- **Not a technology decision.** REST, GraphQL, gRPC, HTTP, JSON, authentication, and serialization are decided elsewhere, not here.
+- **Not a technology decision.** REST, GraphQL, gRPC, HTTP, JSON, authentication, and serialization are decided elsewhere, not here. The INT-003 inbound webhook is a receive-transport freeze on the existing Spring Boot application, not a published product resource contract and not an invented OpenAPI specification.
 
 ---
 
-*This document defines the philosophy of the API of MailSent, in the terms of the business. It proposes no endpoint and no transport — it states the law the contracts follow, so that the APIs the company builds are stable, honest, and faithful to the business.*
+*This document defines the philosophy of the API of MailSent, in the terms of the business. It proposes no product OpenAPI and no public DMARC-report resource — it states the law the contracts follow. The INT-003 inbound webhook is ingest transport on the existing application, not a published business resource.*

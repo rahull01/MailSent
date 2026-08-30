@@ -47,20 +47,20 @@ The candidate contexts align with the Domain Model's context preview and the req
 ### Delivery Observation
 
 - Purpose: To establish the truth about a domain's delivery health.
-- Responsibilities: Add a domain to health observation; read its infrastructure; produce and keep its Health Signal and Health Trend.
-- Owns: Health Signal, Health Trend.
-- Does Not Own: the meaning of an Issue or an explanation.
+- Responsibilities: Add a domain to health observation; read its infrastructure; persist Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, and Blacklist Observation as immutable factual snapshots; persist DMARC Report Receipt, Parsed DMARC Report, and DMARC Aggregate Evidence from RUA ingest (INT-003–006); produce and keep its Health Signal and Health Trend. Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, and Blacklist Observation have no public HTTP API and no independent scheduler. INF-004 does not yet re-observe DNS Health Observation or Blacklist Observation and is not extended to DMARC ingest. DMARC ingest has no public report-list HTTP API; V1 receive is an inbound webhook (ingest transport only). HEALTH-001 Health Signal has **no public HTTP API**; derivation is explicit in-process (`record`/`derive` by domainName), not scheduled, not INF-004, not INT-006.
+- Owns: Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, Blacklist Observation, DMARC Report Receipt, Parsed DMARC Report, DMARC Aggregate Evidence, Health Signal, Health Trend.
+- Does Not Own: Report / Proof Evidence (Evidence / proof of health); the meaning of an Issue or an explanation; Alignment as a table; Issues (Diagnosis / DIAG-004); Trust Score; MAP-001–004. HEALTH-001 owns the Health Signal envelope (unified indication + lineage), not Issues. Consumers may read Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, Blacklist Observation, and DMARC Aggregate Evidence; they must not rewrite or mutate them. DMARC ingest evidence is not Observation Evidence. Reputation Observation is not a Reputation aggregate and is not Health Signal. Reverse DNS Observation is not Observation Evidence, not FCrDNS, and not Health Signal. SMTP Greeting Observation is not Observation Evidence, not Reverse DNS Observation, not HELO/EHLO validation, and not Health Signal. DNS Health Observation is not Observation Evidence, not Health Signal, not Trust Score, and not HEALTH-001. Blacklist Observation is not Health Signal and not a listed/not-listed conclusion. MAP-001 remains topology/read-model only. MAP-002 does not calculate or create Health Signal; HEALTH-001 is the authoritative health state. MAP-002 **consumes** Health Signal; HEALTH-001 does not freeze G/Y/R. MAP-003 is WF-5 click-to-detail on a MAP-001 node: raw identity, type, observation availability, and real facts/evidence refs when they exist; it does not calculate, create, infer, or own Health Signal. MAP-004 is export of the Infrastructure Map visualization (PNG and SVG both frozen); it is not Phase 16 proof, not EVID-003, not Phase 15 PDF/email reporting, and must not merge into FUN-R2. MAP-004 does not calculate or create Health Signal. Phase 08 does not implement Health Signal, MAP-002, MAP-003, or MAP-004. HEALTH-001 V1 required persisted inputs are Observation Evidence (V8), DMARC Aggregate Evidence, and Reputation Observation (V9) — not in-memory DIAG-001 Alignment.
 - Depends On: none (the first step of the flow).
 - Success: a customer can answer "is my email working?" truthfully.
 
 ### Diagnosis
 
 - Purpose: to understand why delivery is at risk.
-- Responsibilities: reason across the signals health reflects; identify the Root cause of a delivery failure.
+- Responsibilities: derive Analyzer-class Alignment (DIAG-001) from DMARC Aggregate Evidence when INT-003–006 facts exist; when Health Signal exists **and can state healthy vs at-risk (not merely unknown)**, reason across the signals health reflects and identify the Root cause of a delivery failure (DIAG-003). Diagnosis must not fabricate Health Signal. DIAG-001 does not create Health Signal. Diagnosis does not own or persist DMARC ingest.
 - Owns: Issue, Root cause.
-- Does Not Own: the business explanation, the impact, or the guidance.
-- Depends On: Delivery Observation (the health it diagnoses).
-- Success: a problem is stated as a real root cause, not a symptom.
+- Does Not Own: Alignment as a persisted entity or table (Alignment is a derived/value concept); Health Signal; Trust Score; DMARC Report Receipt; Parsed DMARC Report; DMARC Aggregate Evidence; the business explanation, the impact, or the guidance. Alignment is not an Issue. DIAG-001 does not own Issue lifecycle. DIAG-001 is not sender detection (DIAG-002) and not root cause (DIAG-003).
+- Depends On: Delivery Observation for Observation Evidence (DNS/SPF facts) and, for Issue/root-cause, Health Signal **when Java can state healthy vs at-risk per the HEALTH-001 interpretation freeze** — an **unknown** indication does not unblock DIAG-003. Alignment (DIAG-001) depends on DMARC Aggregate Evidence (INT-003–006), not on Health Signal and not on Phase 08 DNS TXT inferred DKIM/DMARC. HEALTH-001 does not consume DIAG-001 in-memory Alignment.
+- Success: a problem is stated as a real root cause, not a symptom; Alignment, when derived, traces to DMARC Aggregate Evidence.
 
 ### Business Explanation
 
@@ -102,8 +102,8 @@ The candidate contexts align with the Domain Model's context preview and the req
 
 - Purpose: to let the customer prove rather than assert.
 - Responsibilities: produce recurring executive summaries and a grounded account of health that can be shown to a client, auditor, or board.
-- Owns: Report, Evidence.
-- Does Not Own: the health it reflects.
+- Owns: Report, Evidence / proof of health (Report / Proof Evidence).
+- Does Not Own: Observation Evidence; the health it reflects. Consumers of Observation Evidence must not rewrite it. MAP-004 (PNG/SVG export of the Infrastructure Map visualization) is not Report / Proof Evidence, not Phase 16 proof, not EVID-003, and not Phase 15 PDF/email reporting; it must not merge into FUN-R2.
 - Depends On: Delivery Observation, and Diagnosis where it states a cause.
 - Success: a customer can show proof of a healthy delivery.
 
@@ -147,13 +147,13 @@ The candidate contexts align with the Domain Model's context preview and the req
 
 | Context | Owns | Requirement capability |
 | --- | --- | --- |
-| Delivery Observation | Health Signal, Health Trend | Health Measurement |
-| Diagnosis | Issue, Root cause | Diagnosis and Root Cause |
+| Delivery Observation | Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, Blacklist Observation, DMARC Report Receipt, Parsed DMARC Report, DMARC Aggregate Evidence, Health Signal, Health Trend | Health Measurement |
+| Diagnosis | Issue, Root cause (Alignment is derived, not owned as persistence) | Diagnosis and Root Cause; DIAG-001 traces to Alignment Engine / H2 |
 | Business Explanation | Explanation | Business Explanation |
 | Impact and Prioritization | Business impact, Priority | Impact and Prioritization |
 | Guidance and Resolution | Guidance, Verification | Guidance and Resolution |
 | Monitoring and Alerting | Alert | Continuous Monitoring and Alerting |
-| Reporting and Evidence | Report, Evidence | Reporting and Evidence |
+| Reporting and Evidence | Report, Evidence / proof of health | Reporting and Evidence |
 | Readiness and Compliance | Readiness | Readiness and Compliance |
 | Portfolio and Client Management | Organization, Client, Portfolio, Domain | Domain and Portfolio Management |
 | Feedback and Learning | Feedback | Feedback and Adoption |
@@ -163,7 +163,7 @@ Every candidate traces to a requirement capability and, through it, to a custome
 
 ## 4. Context Relationships
 
-Contexts collaborate through the business words they share, in the natural ordered flow of the product: Delivery Observation produces a Health Signal; Diagnosis reads it to find an Issue and its Root cause; Business Explanation turns the issue into business language; Impact and Prioritization sets the Business impact and Priority; Guidance and Resolution acts on the priority and verifies; Monitoring and Alerting watches the health and raises an Alert; Reporting and Evidence reflects health and diagnosis into proof; Readiness and Compliance assesses against mailbox requirements; Portfolio and Client Management holds the domains and clients across all of this; Feedback and Learning gathers usefulness back into the explanation; and Identity and Access governs who may act.
+Contexts collaborate through the business words they share, in the natural ordered flow of the product: Delivery Observation reads infrastructure and records Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, and Blacklist Observation, and records DMARC Aggregate Evidence from RUA ingest, then produces a Health Signal **when HEALTH-001 exists**; Diagnosis consumes Health Signal **when it exists (HEALTH-001)** for Issue/root-cause, and derives Alignment (DIAG-001) from DMARC Aggregate Evidence rather than from Health Signal; Diagnosis does not own ingest; Business Explanation turns the issue into business language; Impact and Prioritization sets the Business impact and Priority; Guidance and Resolution acts on the priority and verifies; Monitoring and Alerting watches the health and raises an Alert; Reporting and Evidence reflects health and diagnosis into Report / Proof Evidence; Readiness and Compliance assesses against mailbox requirements; Portfolio and Client Management holds the domains and clients across all of this; Feedback and Learning gathers usefulness back into the explanation; and Identity and Access governs who may act.
 
 The relationships are stated in the business words that pass between contexts — the shared concepts — not as calls, messages, or data. A context reaches another only by the concept it owns, and never into another's internals. The flow is upstream to downstream, and each step yields a fact to the next.
 
@@ -176,14 +176,14 @@ Portfolio & Client Management
   (owns: Domain, Client, Organization, Portfolio)
       │  owns the domains that are observed
       ▼
-Delivery Observation ──produces: Health Signal / Health Trend──▶ Diagnosis
+Delivery Observation ──produces: Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, Blacklist Observation, DMARC Aggregate Evidence, then Health Signal / Health Trend (HEALTH-001)──▶ Diagnosis (Issue/root-cause when Health Signal exists; Alignment from DMARC Aggregate Evidence)
       ▲                                                          │
-      │  re-observed for verification                            │  produces: Issue / Root cause
+      │  re-observed for verification                            │  produces: Issue / Root cause (DIAG-003); derives Alignment (DIAG-001) from DMARC Aggregate Evidence, not from Health Signal; does not persist ingest
       │                                                          ▼
 Guidance & Resolution ◀─produces: Priority── Impact & Prioritization ◀──produces: explanation── Business Explanation
 
 Delivery Observation ──feeds──▶ Monitoring & Alerting ──produces: Alert
-Delivery Observation + Diagnosis ──feed──▶ Reporting & Evidence ──produces: Report / Evidence
+Delivery Observation + Diagnosis ──feed──▶ Reporting & Evidence ──produces: Report / Proof Evidence
 Delivery Observation ──feeds──▶ Readiness & Compliance ──produces: Readiness
 Business Explanation + Guidance ──feed──▶ Feedback & Learning ──returns: learning
 Identity and Access ──governs who may act (User, Role, Consent), across all of the above
@@ -217,12 +217,22 @@ A concept used across contexts must have one canonical owner and named consumers
 
 | Canonical term | Canonical owner | Consumers | Ownership rule |
 | --- | --- | --- | --- |
-| Health Signal / Health Trend | Delivery Observation | Diagnosis, Monitoring, Reporting, Readiness | the owner produces health; consumers read it. |
+| Observation Evidence | Delivery Observation | Diagnosis, Monitoring, Reporting, Readiness | the owner produces the raw factual snapshot; consumers read it and must not rewrite or mutate it. Phase 08 DNS is frozen to MX, TXT, SPF, observedAt, and identity. DKIM, DMARC, and alignment are not added. |
+| Reverse DNS Observation | Delivery Observation | Diagnosis, Monitoring, Reporting, Readiness | the owner produces the raw reverse-DNS snapshot (MX→A/AAAA→PTR); consumers read it and must not rewrite or mutate it. It is not Observation Evidence, not FCrDNS, and not Health Signal. |
+| SMTP Greeting Observation | Delivery Observation | Diagnosis, Monitoring, Reporting, Readiness | the owner produces the raw SMTP greeting/EHLO snapshot (MX from Observation Evidence → A/AAAA → SMTP); consumers read it and must not rewrite or mutate it. It is not Observation Evidence, not Reverse DNS Observation, not HELO/EHLO validation, and not Health Signal. |
+| DNS Health Observation | Delivery Observation | Diagnosis, Monitoring, Reporting, Readiness | the owner produces the raw TTL/DNSSEC/propagation snapshot; consumers read it and must not rewrite or mutate it. It is not Observation Evidence, not Health Signal, not Trust Score, and not HEALTH-001. |
+| Reputation Observation | Delivery Observation | Diagnosis, Monitoring, Reporting, Readiness | the owner produces the raw Postmaster/SNDS snapshot; consumers read it and must not rewrite or mutate it. It is not Health Signal. |
+| Blacklist Observation | Delivery Observation | Diagnosis, Monitoring, Reporting, Readiness | the owner produces the raw Spamhaus/Barracuda/SURBL/URIBL snapshot; consumers read it and must not rewrite or mutate it. It is not Health Signal. |
+| Health Signal / Health Trend | Delivery Observation | Diagnosis (Issue/root-cause when Health Signal can state healthy vs at-risk), Monitoring, Reporting, Readiness | HEALTH-001 produces Health Signal (indication assigned from V15 tokens when required snapshots exist). Diagnosis must not fabricate it. DIAG-001 Alignment is not a HEALTH-001 input. HEALTH-002 is trend derived from snapshots later. Consumers read health when it exists. |
 | Domain | Portfolio and Client Management | Delivery, Diagnosis, Reporting, Readiness | the owner holds the domain; consumers act on it. |
-| Issue / Root cause | Diagnosis | Explanation, Prioritization, Guidance, Monitoring, Reporting | the owner states the cause; consumers read it. |
+| Issue / Root cause | Diagnosis | Explanation, Prioritization, Guidance, Monitoring, Reporting | the owner states the cause; consumers read it. Alignment is not an Issue. |
+| Alignment | (derived value; no persistence owner) | Diagnosis (DIAG-001 derives it). HEALTH-001 does **not** consume Alignment VO; H2 cites DMARC Aggregate Evidence | Alignment is a derived/value concept; no Alignment table is authorized. DIAG-001 derives it from DMARC Aggregate Evidence when INT-003–006 facts exist, not from Observation Evidence DKIM/DMARC fields (those fields are not added). |
+| DMARC Report Receipt | Delivery Observation | Parse/aggregate (INT-004/005) | the owner holds the received raw aggregate payload for a registered Domain; unknown uuid is discarded. Not Observation Evidence. |
+| Parsed DMARC Report | Delivery Observation | Aggregate/Store (INT-005), DIAG-001 | the owner holds raw parsed aggregate facts; not Alignment; not OE. |
+| DMARC Aggregate Evidence | Delivery Observation | Diagnosis (DIAG-001); HEALTH-001 (H2 alignment facts) | the owner produces the append-only aggregated ingest snapshot; DIAG-001 consumes it and must not persist ingest. HEALTH-001 cites it as the authoritative persisted source for H2 alignment (not DIAG-001 memory, not an Alignment table). Not Observation Evidence. |
 | Priority | Impact and Prioritization | Guidance, Reporting | the owner sets the order once. |
 | Alert | Monitoring and Alerting | all noticing surfaces | the owner states the alert; all act on it. |
-| Report / Evidence | Reporting and Evidence | Delivery, clients, portfolio | the owner produces the proof; consumers read it. |
+| Report / Proof Evidence | Reporting and Evidence | Delivery, clients, portfolio | the owner produces the customer-facing proof; consumers read it. It is not Observation Evidence. |
 | Readiness | Readiness and Compliance | Reporting | the owner draws readiness; no other revises it. |
 | User / Role | Identity and Access | Portfolio, and all acting contexts | the identity owner manages who may; others obey. |
 
@@ -232,8 +242,8 @@ An agreed convention governs all shared concepts: **a concept is owned once, and
 
 A context starts where a business responsibility begins and ends where it must not act. The principle is that a context does not reach into another's responsibility, and a concept is owned in one place.
 
-- **Delivery Observation** starts at the first health measurement and ends before explaining or judging; it produces health and stops.
-- **Diagnosis** starts at a derived health and ends at the root cause; it does not translate into a guide.
+- **Delivery Observation** starts at the first infrastructure observation and ends before explaining or judging; it records Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, Blacklist Observation, and DMARC ingest evidence (Receipt / Parsed / Aggregate) and produces health and stops.
+- **Diagnosis** starts at a derived health **when Health Signal can state healthy vs at-risk** for Issue/root-cause, and ends at the root cause; it does not translate into a guide. An **unknown** HEALTH-001 envelope does not start DIAG-003. Alignment (DIAG-001) is Analyzer-class derivation from DMARC Aggregate Evidence, not from Health Signal, and does not start the Issue lifecycle. Diagnosis must not fabricate Health Signal and must not persist ingest.
 - **Business Explanation** starts at a finding and ends at the plain meaning; it does not decide what is next.
 - **Impact and Prioritization** starts at the explanation and ends at the priority; it does not perform the guidance.
 - **Guidance and Resolution** starts at the priority and ends at a verified fix; it does not watch over time.

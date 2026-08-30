@@ -45,13 +45,13 @@ These principles produce an architecture that survives a change of technology, b
 
 The system has the following core responsibilities, stated as what the product must do.
 
-- **Know the truth of delivery.** Observe a domain's delivery infrastructure and hold its truthful Health Signal.
+- **Know the truth of delivery.** Observe a domain's delivery infrastructure, record Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, and DNS Health Observation, and later hold its truthful Health Signal.
 - **Understand why.** Diagnose delivery at risk and find the Root cause of an Issue.
 - **Speak to the business.** Explain an issue in business language and offer the deeper technical view.
 - **Decide what matters most.** State business impact and assign a priority order of risk.
 - **Act and verify.** Guide a step-by-step fix and verify that it holds.
 - **Keep watch.** Observe over time, detect change, and alert in business language.
-- **Prove.** Produce reporting and evidence of health to a client, an auditor, or a board.
+- **Prove.** Produce reporting and Evidence / proof of health (Report / Proof Evidence) for a client, an auditor, or a board. This is not Observation Evidence.
 - **Assess readiness.** Measure a domain against the requirements of the mailbox providers that decide inbox entry.
 - **Hold the portfolio.** Manage the domains, organizations, and clients and the relationship of domains to them.
 - **Learn.** Capture feedback to improve explanation and guidance.
@@ -67,20 +67,20 @@ Each component is a logical responsibility. For each: Purpose, Responsibilities,
 ### Delivery Observation
 
 - Purpose: To establish the truth of a domain's delivery.
-- Responsibilities: add a domain to observation; record its Health Signal and its Health Trend.
-- Consumes: the domain it is asked to observe, from the portfolio.
-- Produces: Health Signal, Health Trend.
-- Owns: Health Signal, Health Trend.
-- Does Not Own: the meaning of an Issue, an explanation, or a decision.
+- Responsibilities: add a domain to observation; record Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, and Blacklist Observation as immutable factual snapshots; record DMARC Report Receipt, Parsed DMARC Report, and DMARC Aggregate Evidence from RUA ingest (INT-003–006); record its Health Signal and its Health Trend. Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, and Blacklist Observation have no public HTTP API and no independent scheduler. INF-004 does not yet re-observe DNS Health Observation or Blacklist Observation and is not extended to DMARC. DMARC ingest has no public report-list HTTP API; V1 receive is an inbound webhook on the Spring Boot application (ingest transport only). IMAP is deferred. AWS SES/Lambda is not authorized for V1. HEALTH-001 derivation is explicit in-process (`record`/`derive` by domainName); **no public HTTP API** for Health Signal; not scheduled; not INF-004; not INT-006.
+- Consumes: the domain it is asked to observe, from the portfolio; inbound RUA aggregate reports addressed to a registered Domain uuid.
+- Produces: Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, Blacklist Observation, DMARC Report Receipt, Parsed DMARC Report, DMARC Aggregate Evidence, Health Signal, Health Trend.
+- Owns: Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, Blacklist Observation, DMARC Report Receipt, Parsed DMARC Report, DMARC Aggregate Evidence, Health Signal, Health Trend.
+- Does Not Own: Report / Proof Evidence; the meaning of an Issue, an explanation, or a decision; Issues (Diagnosis / DIAG-004); Alignment as a table; Trust Score. HEALTH-001 owns Health Signal (unified indication + lineage; indication assigned from V15 tokens when required snapshots exist), not Issues. Consumers of Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, Blacklist Observation, and DMARC Aggregate Evidence must not rewrite them. DMARC ingest evidence is not Observation Evidence and not Alignment. Reverse DNS Observation is not FCrDNS and not Health Signal. SMTP Greeting Observation is not HELO/EHLO validation and not Health Signal. DNS Health Observation is not Health Signal, not Trust Score, and not HEALTH-001. Blacklist Observation is not Health Signal and not a listed/not-listed conclusion. MAP-001 remains topology/read-model only. MAP-002 G/Y/R is HEALTH, not observation availability; it **consumes** Health Signal and does not calculate or create it. HEALTH-001 does not freeze colors. No MAP-002 table, Flyway, health-calculation, HTTP API, or frontend in this freeze. MAP-003 is WF-5 click-to-detail on a MAP-001 node (identity, type, observation availability, real facts/evidence refs when they exist); it does not calculate, create, infer, or own Health Signal. No MAP-003 table, Flyway, scheduler, independent backend health service, HTTP API, or frontend in this freeze. MAP-004 is export of the Infrastructure Map visualization (PNG and SVG both frozen); it is not Phase 16 proof, not EVID-003, not Phase 15 PDF/email reporting, and must not merge into FUN-R2. MAP-004 does not calculate or create Health Signal. No MAP-004 table, Flyway, scheduler, graph database, persistence model, HTTP/API contract, rendering/export library, or frontend/backend export code in this freeze.
 
 ### Diagnosis
 
 - Purpose: to know why delivery is at risk.
-- Responsibilities: reason across the signals health reflects; identify the Issue and its Root cause.
-- Consumes: Health Signal.
-- Produces: Issue, Root cause.
+- Responsibilities: derive Analyzer-class Alignment (DIAG-001) from DMARC Aggregate Evidence when INT-003–006 facts exist; when Health Signal can state **healthy vs at-risk** (not merely **unknown**), reason across the signals health reflects and identify the Issue and its Root cause (DIAG-003). Diagnosis must not fabricate Health Signal. DIAG-001 does not create Health Signal. Diagnosis does not own or persist ingest.
+- Consumes: Health Signal for Issue/root-cause **only when healthy vs at-risk can be stated**; Observation Evidence for DNS/SPF facts; DMARC Aggregate Evidence for alignment identities. Alignment (DIAG-001) is not consumed from Health Signal. HEALTH-001 does not consume DIAG-001 in-memory Alignment.
+- Produces: Issue, Root cause. Alignment is a derived value, not a produced persisted resource.
 - Owns: Issue, Root cause.
-- Does Not Own: the business explanation or the guidance.
+- Does Not Own: Alignment as a table or API resource; Health Signal; Trust Score; DMARC Report Receipt; Parsed DMARC Report; DMARC Aggregate Evidence; the business explanation or the guidance. Alignment is not an Issue. DIAG-001 does not own Issue lifecycle.
 
 ### Business Explanation
 
@@ -122,10 +122,10 @@ Each component is a logical responsibility. For each: Purpose, Responsibilities,
 
 - Purpose: to let the customer prove, not assert.
 - Responsibilities: create a recurring summary and a grounded account of health.
-- Consumes: Health Signal and Diagnosis.
-- Produces: Report, Evidence.
-- Owns: Report, Evidence.
-- Does Not Own: the health it reports.
+- Consumes: Health Signal and Diagnosis; may read Observation Evidence and must not rewrite it.
+- Produces: Report, Evidence / proof of health (Report / Proof Evidence).
+- Owns: Report, Evidence / proof of health.
+- Does Not Own: Observation Evidence or the health it reports. MAP-004 is not Report / Proof Evidence, not Phase 16 proof, not EVID-003, and not Phase 15 PDF/email reporting; it must not merge into FUN-R2.
 
 ### Readiness and Compliance
 
@@ -168,7 +168,9 @@ Each component is a logical responsibility. For each: Purpose, Responsibilities,
 The components relate in the natural flow of the product, stated in the business knowledge that passes between them.
 
 - **Portfolio** is the source of the domains that delivery Observation is asked to watch.
-- **Observation** advances the truth to **Diagnosis**.
+- **Infrastructure → Observation → Observation Evidence / Reverse DNS Observation / SMTP Greeting Observation / DNS Health Observation / Reputation Observation / Blacklist Observation.** Observation records the facts actually returned. Later, Health Signal, Diagnosis, and Reporting consume those facts; they do not mutate them. A provider that returns nothing contributes no Reputation Observation or Blacklist Observation. Reverse DNS Observation is MX→A/AAAA→PTR raw fact only; it does not create Health Signal. SMTP Greeting Observation is MX (from Observation Evidence) → A/AAAA → SMTP greeting/EHLO raw fact only; it does not create Health Signal. DNS Health Observation is TTL/DNSSEC/propagation raw fact only; it does not create Health Signal, Trust Score, or HEALTH-001. Blacklist Observation is a raw Spamhaus/Barracuda/SURBL/URIBL fact only; it does not create Health Signal. INF-004 is unchanged.
+- **RUA ingest → DMARC Report Receipt → Parsed DMARC Report → DMARC Aggregate Evidence.** Delivery Observation receives aggregate reports on an inbound webhook (V1), parses RFC 7489 aggregate XML, and stores append-only aggregate evidence. Unknown Domain uuid is discarded. Duplicate report_id for the same Domain is idempotent. This path does not write Observation Evidence and does not create Alignment rows. IMAP is deferred; SES/Lambda is not authorized for V1.
+- **Observation** advances the truth to **Diagnosis**. Diagnosis consumes Health Signal for Issue/root-cause **when it can state healthy vs at-risk**. Alignment (DIAG-001) is Analyzer-class derivation from DMARC Aggregate Evidence, not from Health Signal. Diagnosis must not fabricate Health Signal and must not persist ingest. INT-006 triggers DIAG-001 only after successful Store; it does **not** trigger DIAG-003 or HEALTH-001. HEALTH-001 derivation is a separate explicit in-process call; it reads persisted Aggregate Evidence, not DIAG-001 memory.
 - **Diagnosis** passes the issue and its cause to **Business Explanation**.
 - **Business Explanation** passes the meaning to **Impact and Prioritization**.
 - **Impact and Prioritization** passes the priority to **Guidance and Resolution**, which acts and verifies.
