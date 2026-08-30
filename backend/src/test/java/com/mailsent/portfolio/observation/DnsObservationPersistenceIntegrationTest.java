@@ -43,6 +43,7 @@ class DnsObservationPersistenceIntegrationTest {
     @Autowired private DomainService domains;
     @Autowired private DnsObservationService observationService;
     @Autowired private com.mailsent.identity.consent.application.ConsentService consentService;
+    @Autowired private com.mailsent.identity.authentication.application.UserRepository userRepository;
 
     @TestConfiguration
     static class FakeResolverConfig {
@@ -58,9 +59,19 @@ class DnsObservationPersistenceIntegrationTest {
     @Test
     void observeRegisteredDomainThroughRealRegistry() {
         String orgId = organizationService.create("Observation " + UUID.randomUUID()).id();
+        com.mailsent.identity.authentication.domain.User user = userRepository.save(
+            com.mailsent.identity.authentication.domain.User.restore(
+                UUID.randomUUID().toString(),
+                new com.mailsent.identity.authentication.domain.Email("user-" + UUID.randomUUID() + "@example.com"),
+                "hash",
+                com.mailsent.identity.authentication.domain.Role.OWNER,
+                Instant.now(),
+                orgId
+            )
+        );
         String domainName = "it-" + UUID.randomUUID() + ".com";
         com.mailsent.portfolio.domain.domain.Domain domain = domains.register(orgId, domainName);
-        consentService.grantConsent(orgId, domain.id(), "test-user", com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+        consentService.grantConsent(orgId, domain.id(), user.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
 
         DnsObservation observation = observationService.observe(domainName);
 
@@ -79,12 +90,32 @@ class DnsObservationPersistenceIntegrationTest {
     void observeIsIsolatedToTheRegisteredDomain() {
         String orgA = organizationService.create("ObservationA " + UUID.randomUUID()).id();
         String orgB = organizationService.create("ObservationB " + UUID.randomUUID()).id();
+        com.mailsent.identity.authentication.domain.User userA = userRepository.save(
+            com.mailsent.identity.authentication.domain.User.restore(
+                UUID.randomUUID().toString(),
+                new com.mailsent.identity.authentication.domain.Email("user-a-" + UUID.randomUUID() + "@example.com"),
+                "hash",
+                com.mailsent.identity.authentication.domain.Role.OWNER,
+                Instant.now(),
+                orgA
+            )
+        );
+        com.mailsent.identity.authentication.domain.User userB = userRepository.save(
+            com.mailsent.identity.authentication.domain.User.restore(
+                UUID.randomUUID().toString(),
+                new com.mailsent.identity.authentication.domain.Email("user-b-" + UUID.randomUUID() + "@example.com"),
+                "hash",
+                com.mailsent.identity.authentication.domain.Role.OWNER,
+                Instant.now(),
+                orgB
+            )
+        );
         String domainA = "it-" + UUID.randomUUID() + "a.com";
         String domainB = "it-" + UUID.randomUUID() + "b.com";
         com.mailsent.portfolio.domain.domain.Domain domA = domains.register(orgA, domainA);
         com.mailsent.portfolio.domain.domain.Domain domB = domains.register(orgB, domainB);
-        consentService.grantConsent(orgA, domA.id(), "test-user", com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
-        consentService.grantConsent(orgB, domB.id(), "test-user", com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+        consentService.grantConsent(orgA, domA.id(), userA.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+        consentService.grantConsent(orgB, domB.id(), userB.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
 
         DnsObservation forA = observationService.observe(domainA);
         assertEquals(domainA, forA.domainName(), "observing domain A returns only domain A's observation");

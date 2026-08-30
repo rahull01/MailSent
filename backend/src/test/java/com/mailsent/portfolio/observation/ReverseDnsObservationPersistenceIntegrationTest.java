@@ -30,6 +30,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.mailsent.portfolio.domain.application.DomainService;
 import com.mailsent.portfolio.domain.domain.Domain;
+import com.mailsent.identity.consent.application.ConsentRepository;
+import com.mailsent.identity.consent.domain.ActionType;
+import com.mailsent.identity.consent.domain.Consent;
 import com.mailsent.portfolio.observation.application.DomainNotRegisteredException;
 import com.mailsent.portfolio.observation.application.ForwardAddressLookup;
 import com.mailsent.portfolio.observation.application.ObservationEvidenceRepository;
@@ -60,6 +63,7 @@ class ReverseDnsObservationPersistenceIntegrationTest {
 
     @Autowired private OrganizationService organizationService;
     @Autowired private DomainService domainService;
+    @Autowired private ConsentRepository consentRepository;
     @Autowired private ObservationEvidenceRepository evidence;
     @Autowired private ReverseDnsObservationService reverseDnsService;
     @Autowired private DataSource dataSource;
@@ -122,6 +126,9 @@ class ReverseDnsObservationPersistenceIntegrationTest {
     private Domain registeredDomainWithMx() {
         String orgId = organizationService.create("RDNS " + UUID.randomUUID()).id();
         Domain domain = domainService.register(orgId, "it-" + UUID.randomUUID() + ".com");
+        // Production semantics: observation requires the owner's consent (INV-02).
+        consentRepository.save(Consent.grant(orgId, domain.id(), "user-" + UUID.randomUUID(),
+            ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
         evidence.save(ObservationEvidence.capture(domain, DnsObservation.of(
             domain.name(), List.of(new MxRecord(10, "mail." + domain.name())), List.of(), null, BASE)));
         return domain;
@@ -205,6 +212,10 @@ class ReverseDnsObservationPersistenceIntegrationTest {
         String orgB = organizationService.create("RdnsB " + UUID.randomUUID()).id();
         Domain domainA = domainService.register(orgA, "it-" + UUID.randomUUID() + "a.com");
         Domain domainB = domainService.register(orgB, "it-" + UUID.randomUUID() + "b.com");
+        consentRepository.save(Consent.grant(orgA, domainA.id(), "user-" + UUID.randomUUID(),
+            ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
+        consentRepository.save(Consent.grant(orgB, domainB.id(), "user-" + UUID.randomUUID(),
+            ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
         evidence.save(ObservationEvidence.capture(domainA, DnsObservation.of(
             domainA.name(), List.of(new MxRecord(10, "mail." + domainA.name())), List.of(), null, BASE)));
         evidence.save(ObservationEvidence.capture(domainB, DnsObservation.of(

@@ -38,6 +38,11 @@ import com.mailsent.portfolio.domain.infrastructure.persistence.DomainJpaEntity;
 import com.mailsent.portfolio.domain.infrastructure.persistence.JpaDomainRepository;
 import com.mailsent.portfolio.domain.infrastructure.persistence.JpaDomainRepositoryAdapter;
 import com.mailsent.portfolio.organization.application.OrganizationRepository;
+import com.mailsent.portfolio.observation.application.HealthSignalService;
+import com.mailsent.portfolio.observation.infrastructure.InMemoryDmarcAggregateEvidenceRepository;
+import com.mailsent.portfolio.observation.infrastructure.InMemoryHealthSignalRepository;
+import com.mailsent.portfolio.observation.infrastructure.InMemoryObservationEvidenceRepository;
+import com.mailsent.portfolio.observation.infrastructure.InMemoryReputationObservationRepository;
 import com.mailsent.portfolio.organization.application.OrganizationService;
 import com.mailsent.portfolio.organization.domain.Organization;
 import com.mailsent.portfolio.organization.infrastructure.persistence.JpaOrganizationRepository;
@@ -46,6 +51,7 @@ import com.mailsent.portfolio.organization.infrastructure.persistence.Organizati
 import com.mailsent.portfolio.portfolio.application.PortfolioOverviewService;
 import com.mailsent.portfolio.portfolio.application.PortfolioService;
 import com.mailsent.portfolio.portfolio.domain.ClientOverview;
+import com.mailsent.portfolio.portfolio.domain.DomainOverview;
 import com.mailsent.portfolio.portfolio.domain.Portfolio;
 
 /**
@@ -125,10 +131,21 @@ class PortfolioIsolationPersistenceIntegrationTest {
         }
 
         @Bean
+        HealthSignalService healthSignalService(DomainRepository domains, Clock clock) {
+            // The hermetic in-memory adapters back every observation port; this slice never
+            // derives signals, so the overview health stays explicitly absent.
+            return new HealthSignalService(new InMemoryHealthSignalRepository(), domains,
+                new InMemoryObservationEvidenceRepository(),
+                new InMemoryDmarcAggregateEvidenceRepository(),
+                new InMemoryReputationObservationRepository(), clock);
+        }
+
+        @Bean
         PortfolioOverviewService portfolioOverviewService(ClientRelationshipRepository relationships,
                                                           DomainRepository domains,
-                                                          OrganizationRepository organizations) {
-            return new PortfolioOverviewService(relationships, domains, organizations);
+                                                          OrganizationRepository organizations,
+                                                          HealthSignalService healthSignals) {
+            return new PortfolioOverviewService(relationships, domains, organizations, healthSignals);
         }
     }
 
@@ -261,6 +278,6 @@ class PortfolioIsolationPersistenceIntegrationTest {
     }
 
     private static Set<String> domainNamesOf(ClientOverview overview) {
-        return Set.copyOf(overview.domains().stream().map(Domain::name).toList());
+        return Set.copyOf(overview.domains().stream().map(DomainOverview::name).toList());
     }
 }

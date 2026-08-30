@@ -49,6 +49,9 @@ public class DnsJavaDnsResolver implements DnsResolver {
         try {
             Lookup lookup = new Lookup(domainName, type);
             lookup.setResolver(resolver());
+            // The default dnsjava cache would serve stale records as brand-new observations;
+            // every observation must reflect the wire at observation time (INV-01 freshness).
+            lookup.setCache(null);
             Record[] records = lookup.run();
             int result = lookup.getResult();
             if (result == Lookup.HOST_NOT_FOUND || result == Lookup.TRY_AGAIN) {

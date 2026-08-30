@@ -105,7 +105,7 @@ class DmarcIngestAndIntegrationsTest {
 
     @Test
     void formatsSlackWebhookPayload() {
-        Alert alert = Alert.generate("inc-1", AlertSeverity.CRITICAL, "DMARC Failure", "Spoofed traffic detected", "Enforce p=reject", Instant.now());
+        Alert alert = Alert.generate("org-1", "inc-1", AlertSeverity.CRITICAL, "DMARC Failure", "Spoofed traffic detected", "Enforce p=reject", Instant.now());
         SlackNotificationPayload slack = SlackNotificationPayload.fromAlert("https://hooks.slack.com/services/xxx", "#sec-ops", alert);
 
         assertNotNull(slack.id());

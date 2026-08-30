@@ -58,6 +58,8 @@ class ObservationEvidencePersistenceIntegrationTest {
     @Autowired private ObservationEvidenceService evidenceService;
     @Autowired private DataSource dataSource;
     @Autowired private SequenceResolver sequenceResolver;
+    @Autowired private com.mailsent.identity.consent.application.ConsentService consentService;
+    @Autowired private com.mailsent.identity.authentication.application.UserRepository userRepository;
 
     @TestConfiguration
     static class FakeResolverConfig {
@@ -88,7 +90,19 @@ class ObservationEvidencePersistenceIntegrationTest {
 
     private Domain registeredDomain() {
         String orgId = organizationService.create("Evidence " + UUID.randomUUID()).id();
-        return domainService.register(orgId, "it-" + UUID.randomUUID() + ".com");
+        com.mailsent.identity.authentication.domain.User user = userRepository.save(
+            com.mailsent.identity.authentication.domain.User.restore(
+                UUID.randomUUID().toString(),
+                new com.mailsent.identity.authentication.domain.Email("user-" + UUID.randomUUID() + "@example.com"),
+                "hash",
+                com.mailsent.identity.authentication.domain.Role.OWNER,
+                Instant.now(),
+                orgId
+            )
+        );
+        Domain domain = domainService.register(orgId, "it-" + UUID.randomUUID() + ".com");
+        consentService.grantConsent(orgId, domain.id(), user.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+        return domain;
     }
 
     @Test
@@ -154,8 +168,30 @@ class ObservationEvidencePersistenceIntegrationTest {
     void differentOrganizationsRemainIsolated() {
         String orgA = organizationService.create("EvidenceA " + UUID.randomUUID()).id();
         String orgB = organizationService.create("EvidenceB " + UUID.randomUUID()).id();
+        com.mailsent.identity.authentication.domain.User userA = userRepository.save(
+            com.mailsent.identity.authentication.domain.User.restore(
+                UUID.randomUUID().toString(),
+                new com.mailsent.identity.authentication.domain.Email("user-a-" + UUID.randomUUID() + "@example.com"),
+                "hash",
+                com.mailsent.identity.authentication.domain.Role.OWNER,
+                Instant.now(),
+                orgA
+            )
+        );
+        com.mailsent.identity.authentication.domain.User userB = userRepository.save(
+            com.mailsent.identity.authentication.domain.User.restore(
+                UUID.randomUUID().toString(),
+                new com.mailsent.identity.authentication.domain.Email("user-b-" + UUID.randomUUID() + "@example.com"),
+                "hash",
+                com.mailsent.identity.authentication.domain.Role.OWNER,
+                Instant.now(),
+                orgB
+            )
+        );
         Domain domainA = domainService.register(orgA, "it-" + UUID.randomUUID() + "a.com");
         Domain domainB = domainService.register(orgB, "it-" + UUID.randomUUID() + "b.com");
+        consentService.grantConsent(orgA, domainA.id(), userA.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+        consentService.grantConsent(orgB, domainB.id(), userB.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
 
         ObservationEvidence forA = evidenceService.record(domainA.name());
         ObservationEvidence forB = evidenceService.record(domainB.name());

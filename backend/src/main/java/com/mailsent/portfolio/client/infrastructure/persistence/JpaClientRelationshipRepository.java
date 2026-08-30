@@ -16,6 +16,12 @@ public interface JpaClientRelationshipRepository extends JpaRepository<ClientRel
 
     List<ClientRelationshipJpaEntity> findByAgencyOrganizationId(String agencyOrganizationId);
 
-    Optional<ClientRelationshipJpaEntity> findByAgencyOrganizationIdAndClientOrganizationIdAndStatus(
+    /**
+     * Active lookup for CLIENT-002 idempotency. Duplicate ACTIVE rows are contract-legal
+     * (V7 has no uniqueness constraint), so this MUST NOT be an {@code Optional}-returning
+     * derived query — that throws {@code IncorrectResultSizeDataAccessException} the moment
+     * two ACTIVE rows exist. Deterministic first-by-formation keeps the read safe.
+     */
+    Optional<ClientRelationshipJpaEntity> findFirstByAgencyOrganizationIdAndClientOrganizationIdAndStatusOrderByFormedAtAscIdAsc(
             String agencyOrganizationId, String clientOrganizationId, ClientRelationship.Status status);
 }

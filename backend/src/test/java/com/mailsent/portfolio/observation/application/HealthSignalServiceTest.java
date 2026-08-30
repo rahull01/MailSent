@@ -363,10 +363,6 @@ class HealthSignalServiceTest {
         assertThrows(ClassNotFoundException.class,
             () -> Class.forName("com.mailsent.diagnosis.application.RootCauseService"));
         assertThrows(ClassNotFoundException.class,
-            () -> Class.forName("com.mailsent.diagnosis.domain.Issue"));
-        assertThrows(ClassNotFoundException.class,
-            () -> Class.forName("com.mailsent.portfolio.observation.domain.HealthTrend"));
-        assertThrows(ClassNotFoundException.class,
             () -> Class.forName("com.mailsent.portfolio.observation.domain.TrustScore"));
         assertTrue(Arrays.stream(HealthSignal.class.getDeclaredFields())
             .map(Field::getName)

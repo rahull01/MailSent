@@ -57,9 +57,11 @@ class ReObservationPersistenceIntegrationTest {
     @Autowired private ReObservationService reObservationService;
     @Autowired private ObservationEvidenceService evidenceService;
     @Autowired private ReputationObservationService reputationService;
+    @Autowired private com.mailsent.identity.consent.application.ConsentService consentService;
+    @Autowired private com.mailsent.identity.authentication.application.UserRepository userRepository;
 
     @TestConfiguration
-    static class FakeObservationConfig {
+    static class FakePortConfig {
         @Bean
         SequenceResolver sequenceResolver() {
             return new SequenceResolver();
@@ -72,25 +74,15 @@ class ReObservationPersistenceIntegrationTest {
         }
 
         @Bean
-        SequencePostmaster sequencePostmaster() {
+        @Primary
+        GooglePostmasterPort fakePostmaster() {
             return new SequencePostmaster();
         }
 
         @Bean
         @Primary
-        GooglePostmasterPort fakeGooglePostmasterPort(SequencePostmaster sequence) {
-            return sequence;
-        }
-
-        @Bean
-        SequenceSnds sequenceSnds() {
+        MicrosoftSndsPort fakeSnds() {
             return new SequenceSnds();
-        }
-
-        @Bean
-        @Primary
-        MicrosoftSndsPort fakeMicrosoftSndsPort(SequenceSnds sequence) {
-            return sequence;
         }
     }
 
@@ -128,7 +120,18 @@ class ReObservationPersistenceIntegrationTest {
     @Test
     void reobserveAllPersistsDnsAndReputationSnapshotsForRegisteredDomain() {
         String orgId = organizationService.create("Reobserve " + UUID.randomUUID()).id();
+        com.mailsent.identity.authentication.domain.User user = userRepository.save(
+            com.mailsent.identity.authentication.domain.User.restore(
+                UUID.randomUUID().toString(),
+                new com.mailsent.identity.authentication.domain.Email("user-" + UUID.randomUUID() + "@example.com"),
+                "hash",
+                com.mailsent.identity.authentication.domain.Role.OWNER,
+                Instant.now(),
+                orgId
+            )
+        );
         Domain domain = domainService.register(orgId, "it-reobserve-" + UUID.randomUUID() + ".com");
+        consentService.grantConsent(orgId, domain.id(), user.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
 
         reObservationService.reobserveAll();
 

@@ -29,6 +29,9 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.mailsent.portfolio.domain.application.DomainService;
+import com.mailsent.identity.consent.application.ConsentRepository;
+import com.mailsent.identity.consent.domain.ActionType;
+import com.mailsent.identity.consent.domain.Consent;
 import com.mailsent.portfolio.domain.domain.Domain;
 import com.mailsent.portfolio.observation.application.DnsHealthObservationService;
 import com.mailsent.portfolio.observation.application.DnsHealthObserver;
@@ -61,6 +64,7 @@ class DnsHealthObservationPersistenceIntegrationTest {
 
     @Autowired private OrganizationService organizationService;
     @Autowired private DomainService domainService;
+    @Autowired private ConsentRepository consentRepository;
     @Autowired private DnsHealthObservationService dnsHealthService;
     @Autowired private DataSource dataSource;
     @Autowired private SequenceObserver sequenceObserver;
@@ -103,7 +107,11 @@ class DnsHealthObservationPersistenceIntegrationTest {
 
     private Domain registeredDomain() {
         String orgId = organizationService.create("DnsHealth " + UUID.randomUUID()).id();
-        return domainService.register(orgId, "it-" + UUID.randomUUID() + ".com");
+        Domain domain = domainService.register(orgId, "it-" + UUID.randomUUID() + ".com");
+        // Production semantics: observation requires the owner's consent (INV-02).
+        consentRepository.save(Consent.grant(orgId, domain.id(), "user-" + UUID.randomUUID(),
+            ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
+        return domain;
     }
 
     @Test
@@ -189,6 +197,10 @@ class DnsHealthObservationPersistenceIntegrationTest {
         String orgB = organizationService.create("DnsHB " + UUID.randomUUID()).id();
         Domain domainA = domainService.register(orgA, "it-" + UUID.randomUUID() + "a.com");
         Domain domainB = domainService.register(orgB, "it-" + UUID.randomUUID() + "b.com");
+        consentRepository.save(Consent.grant(orgA, domainA.id(), "user-" + UUID.randomUUID(),
+            ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
+        consentRepository.save(Consent.grant(orgB, domainB.id(), "user-" + UUID.randomUUID(),
+            ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
 
         DnsHealthObservation forA = dnsHealthService.record(domainA.name());
         DnsHealthObservation forB = dnsHealthService.record(domainB.name());

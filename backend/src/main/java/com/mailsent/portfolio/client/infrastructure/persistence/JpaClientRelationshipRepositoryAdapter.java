@@ -46,7 +46,7 @@ public class JpaClientRelationshipRepositoryAdapter implements ClientRelationshi
     @Override
     @Transactional(readOnly = true)
     public Optional<ClientRelationship> findActiveByAgencyAndClient(String agencyOrganizationId, String clientOrganizationId) {
-        return jpa.findByAgencyOrganizationIdAndClientOrganizationIdAndStatus(
+        return jpa.findFirstByAgencyOrganizationIdAndClientOrganizationIdAndStatusOrderByFormedAtAscIdAsc(
                 agencyOrganizationId, clientOrganizationId, ClientRelationship.Status.ACTIVE)
                 .map(this::toDomain);
     }

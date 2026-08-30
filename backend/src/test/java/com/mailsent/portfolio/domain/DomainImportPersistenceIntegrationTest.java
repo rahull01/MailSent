@@ -5,8 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
+import com.mailsent.identity.authentication.domain.User;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -92,9 +95,22 @@ class DomainImportPersistenceIntegrationTest {
         }
 
         @Bean
-        DomainImportService domainImportService(DomainService domains, OrganizationRepository organizations) {
-            return new DomainImportService(domains, organizations);
+        DomainImportService domainImportService(DomainService domains, OrganizationRepository organizations,
+                                                com.mailsent.identity.team.application.AuthorizationService authorizationService) {
+            return new DomainImportService(domains, organizations, authorizationService);
         }
+
+        @Bean
+        com.mailsent.identity.team.application.AuthorizationService authorizationService() {
+            return new com.mailsent.identity.team.application.AuthorizationService();
+        }
+    }
+
+    private User ownerOf(String orgId) {
+        return com.mailsent.identity.authentication.domain.User.restore(
+            "owner-" + orgId,
+            new com.mailsent.identity.authentication.domain.Email("owner@" + UUID.randomUUID() + ".test"),
+            "hash", com.mailsent.identity.authentication.domain.Role.OWNER, Instant.now(), orgId);
     }
 
     private static final String PREFIX = "it-" + UUID.randomUUID() + "-";
@@ -115,7 +131,7 @@ class DomainImportPersistenceIntegrationTest {
         String d2 = PREFIX + "bulk2.example.com";
         String d3 = PREFIX + "bulk3.example.com";
 
-        DomainImportResult result = importService.importDomains(orgId, List.of(d1, d2, d3));
+        DomainImportResult result = importService.importDomains(ownerOf(orgId), orgId, List.of(d1, d2, d3));
 
         // Contract assertions:
         assertEquals(3, result.imported().size());
@@ -143,7 +159,7 @@ class DomainImportPersistenceIntegrationTest {
         String blankInvalid = "   ";
         List<String> inputBatch = List.of(existingDomain, valid1, blankInvalid, valid2);
 
-        DomainImportResult result = importService.importDomains(orgId, inputBatch);
+        DomainImportResult result = importService.importDomains(ownerOf(orgId), orgId, inputBatch);
 
         // Partial-success semantics:
         assertEquals(2, result.imported().size(), "valid entries succeeded");
@@ -172,7 +188,7 @@ class DomainImportPersistenceIntegrationTest {
         domainService.register(orgA, sharedName);
 
         // Org B attempts to bulk import the same domain:
-        DomainImportResult result = importService.importDomains(orgB, List.of(sharedName));
+        DomainImportResult result = importService.importDomains(ownerOf(orgB), orgB, List.of(sharedName));
 
         assertEquals(0, result.imported().size());
         assertEquals(1, result.failures().size());
@@ -192,7 +208,7 @@ class DomainImportPersistenceIntegrationTest {
         String variation1 = "  " + baseName.toUpperCase() + "  ";
         String variation2 = baseName.toLowerCase();
 
-        DomainImportResult result = importService.importDomains(orgId, List.of(variation1, variation2));
+        DomainImportResult result = importService.importDomains(ownerOf(orgId), orgId, List.of(variation1, variation2));
 
         // First variation succeeds, second variation is reported as duplicate failure:
         assertEquals(1, result.imported().size());
@@ -215,7 +231,7 @@ class DomainImportPersistenceIntegrationTest {
         String domainName = PREFIX + "orphan-import.example.com";
 
         assertThrows(DomainOrganizationNotFoundException.class,
-            () -> importService.importDomains(nonExistentOrg, List.of(domainName)));
+            () -> importService.importDomains(ownerOf(nonExistentOrg), nonExistentOrg, List.of(domainName)));
 
         // Direct DB verification: domain was not persisted into PostgreSQL (INV-14):
         assertTrue(domainRepository.findByName(domainName).isEmpty());
@@ -229,8 +245,8 @@ class DomainImportPersistenceIntegrationTest {
         String da = PREFIX + "domain-a.example.com";
         String db = PREFIX + "domain-b.example.com";
 
-        importService.importDomains(orgA, List.of(da));
-        importService.importDomains(orgB, List.of(db));
+        importService.importDomains(ownerOf(orgA), orgA, List.of(da));
+        importService.importDomains(ownerOf(orgB), orgB, List.of(db));
 
         // Scoped query verification in PostgreSQL:
         List<Domain> listA = domainRepository.findByOrganizationId(orgA);

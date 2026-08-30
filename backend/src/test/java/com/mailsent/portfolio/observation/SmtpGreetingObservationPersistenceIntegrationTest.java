@@ -68,6 +68,8 @@ class SmtpGreetingObservationPersistenceIntegrationTest {
     @Autowired private DataSource dataSource;
     @Autowired private SequenceForward sequenceForward;
     @Autowired private SequenceSmtp sequenceSmtp;
+    @Autowired private com.mailsent.identity.consent.application.ConsentService consentService;
+    @Autowired private com.mailsent.identity.authentication.application.UserRepository userRepository;
 
     @TestConfiguration
     static class FakeProbeConfig {
@@ -120,7 +122,18 @@ class SmtpGreetingObservationPersistenceIntegrationTest {
 
     private Domain registeredDomainWithMx() {
         String orgId = organizationService.create("SMTP " + UUID.randomUUID()).id();
+        com.mailsent.identity.authentication.domain.User user = userRepository.save(
+            com.mailsent.identity.authentication.domain.User.restore(
+                UUID.randomUUID().toString(),
+                new com.mailsent.identity.authentication.domain.Email("user-" + UUID.randomUUID() + "@example.com"),
+                "hash",
+                com.mailsent.identity.authentication.domain.Role.OWNER,
+                Instant.now(),
+                orgId
+            )
+        );
         Domain domain = domainService.register(orgId, "it-" + UUID.randomUUID() + ".com");
+        consentService.grantConsent(orgId, domain.id(), user.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
         evidence.save(ObservationEvidence.capture(domain, DnsObservation.of(
             domain.name(), List.of(new MxRecord(10, "mail." + domain.name())), List.of(), null, BASE)));
         return domain;
@@ -164,18 +177,19 @@ class SmtpGreetingObservationPersistenceIntegrationTest {
     @Test
     void secondObservationCreatesASecondRowLeavingTheFirstUnchanged() {
         Domain domain = registeredDomainWithMx();
-        sequenceSmtp.result = SmtpProbeResult.connected("220 first", "250 first");
+        sequenceSmtp.result = SmtpProbeResult.connected("220 first ESMTP", "250 HELP-1");
         SmtpGreetingObservation first = smtpGreetingService.record(domain.name()).get(0);
 
-        sequenceSmtp.result = SmtpProbeResult.connected("220 second", "250 second");
+        sequenceSmtp.result = SmtpProbeResult.connected("220 second ESMTP", "250 HELP-2");
         SmtpGreetingObservation second = smtpGreetingService.record(domain.name()).get(0);
 
         assertNotEquals(first.id(), second.id());
         assertEquals(2, smtpGreetingService.findByDomainId(domain.id()).size());
         SmtpGreetingObservation reloadedFirst = smtpGreetingService.findById(first.id()).orElseThrow();
-        assertEquals("220 first", reloadedFirst.rawGreeting());
+        assertEquals("220 first ESMTP", reloadedFirst.rawGreeting());
+        assertEquals("250 HELP-1", reloadedFirst.rawEhlo());
         assertEquals(first.observedAt(), reloadedFirst.observedAt());
-        assertEquals("220 second", second.rawGreeting());
+        assertEquals("220 second ESMTP", second.rawGreeting());
         sequenceSmtp.result = SmtpProbeResult.connected("220 mail ESMTP", "250 HELP");
     }
 
@@ -205,8 +219,30 @@ class SmtpGreetingObservationPersistenceIntegrationTest {
     void differentOrganizationsRemainIsolated() {
         String orgA = organizationService.create("SmtpA " + UUID.randomUUID()).id();
         String orgB = organizationService.create("SmtpB " + UUID.randomUUID()).id();
+        com.mailsent.identity.authentication.domain.User userA = userRepository.save(
+            com.mailsent.identity.authentication.domain.User.restore(
+                UUID.randomUUID().toString(),
+                new com.mailsent.identity.authentication.domain.Email("user-a-" + UUID.randomUUID() + "@example.com"),
+                "hash",
+                com.mailsent.identity.authentication.domain.Role.OWNER,
+                Instant.now(),
+                orgA
+            )
+        );
+        com.mailsent.identity.authentication.domain.User userB = userRepository.save(
+            com.mailsent.identity.authentication.domain.User.restore(
+                UUID.randomUUID().toString(),
+                new com.mailsent.identity.authentication.domain.Email("user-b-" + UUID.randomUUID() + "@example.com"),
+                "hash",
+                com.mailsent.identity.authentication.domain.Role.OWNER,
+                Instant.now(),
+                orgB
+            )
+        );
         Domain domainA = domainService.register(orgA, "it-" + UUID.randomUUID() + "a.com");
         Domain domainB = domainService.register(orgB, "it-" + UUID.randomUUID() + "b.com");
+        consentService.grantConsent(orgA, domainA.id(), userA.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+        consentService.grantConsent(orgB, domainB.id(), userB.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
         evidence.save(ObservationEvidence.capture(domainA, DnsObservation.of(
             domainA.name(), List.of(new MxRecord(10, "mail." + domainA.name())), List.of(), null, BASE)));
         evidence.save(ObservationEvidence.capture(domainB, DnsObservation.of(
