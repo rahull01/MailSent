@@ -1,0 +1,73 @@
+{
+  "name": "MailSent Ruflow Swarm Orchestration",
+  "version": "1.0.0",
+  "governance": {
+    "authoritative_sources": [
+      "docs/00_Foundation/MAILSENT_MASTER_WORKFLOW.md",
+      "docs/00_Foundation/PROJECT_CONSTITUTION.md",
+      "implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md"
+    ],
+    "subordination_clause": "Ruflow is a subordinate multi-agent swarm execution engine. It must never create competing architectures, requirements, or backlogs.",
+    "spec_kit_integration": {
+      "planning_engine": "Spec Kit (.specify/)",
+      "task_slice_source": "specs/<feature>/tasks.md",
+      "execution_target": "implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md"
+    }
+  },
+  "roles": {
+    "queen": {
+      "role": "Swarm Coordinator & Task Dispatcher",
+      "responsibilities": [
+        "Read tasks from specs/<feature>/tasks.md",
+        "Dispatch subtasks to specialized tactical agents",
+        "Enforce task dependency ordering and 30-90 min sizing",
+        "Synchronize completion status with implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md"
+      ]
+    },
+    "architect": {
+      "role": "Architecture & Invariants Guard",
+      "responsibilities": [
+        "Verify all proposed code matches docs/03_Architecture/",
+        "Enforce 15 Bounded Context boundaries and package structures",
+        "Guard Flyway V19+ migration sequence rule and V1-V18 immutability",
+        "Ensure Delivery Observation vs Diagnosis boundary separation"
+      ]
+    },
+    "backend_coder": {
+      "role": "Java 21 / Spring Boot Implementation Specialist",
+      "responsibilities": [
+        "Implement domain models, use cases, repositories, and controllers",
+        "Enforce multi-tenant isolation (INV-09) and deterministic lineage (INV-11)",
+        "Adhere to locked tech stack (Java 21, Spring Boot, Maven, PostgreSQL, Redis)"
+      ]
+    },
+    "frontend_coder": {
+      "role": "Next.js / TypeScript / React Implementation Specialist",
+      "responsibilities": [
+        "Implement feature components answering the 5 UX questions",
+        "Build typed API clients and React hooks adhering to design system"
+      ]
+    },
+    "tester": {
+      "role": "T-MAT QA & Verification Specialist",
+      "responsibilities": [
+        "Enforce mandatory automated tests for all production paths (N5)",
+        "Write hermetic unit tests, boundary tests, and failure-path tests",
+        "Execute mvn test and npm build verification suites"
+      ]
+    },
+    "reviewer": {
+      "role": "Quality Gate & Definition of Done Reviewer",
+      "responsibilities": [
+        "Verify all 10 criteria of Constitution §19 Definition of Done",
+        "Validate against Constitution §26 Review Checklist",
+        "Audit zero secrets (N4) and truthfulness (N2, N6)"
+      ]
+    }
+  },
+  "stack": {
+    "backend": "Java 21, Spring Boot 3.x, Maven, Spring Data JPA, PostgreSQL, Redis",
+    "frontend": "Next.js 14+ (App Router), TypeScript, Tailwind CSS, React",
+    "infrastructure": "Docker Compose, Flyway (V19+ next)"
+  }
+}
