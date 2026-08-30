@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.mailsent.portfolio.client.application.ClientRelationshipRepository;
 import com.mailsent.portfolio.domain.application.DomainRepository;
+import com.mailsent.portfolio.observation.application.HealthSignalService;
 import com.mailsent.portfolio.organization.application.OrganizationRepository;
 import com.mailsent.portfolio.portfolio.application.PortfolioOverviewService;
 import com.mailsent.portfolio.portfolio.application.PortfolioService;
@@ -29,7 +30,8 @@ public class PortfolioConfig {
 
     @Bean
     PortfolioOverviewService portfolioOverviewService(ClientRelationshipRepository clientRelationships,
-                                                      DomainRepository domains, OrganizationRepository organizations) {
-        return new PortfolioOverviewService(clientRelationships, domains, organizations);
+                                                      DomainRepository domains, OrganizationRepository organizations,
+                                                      HealthSignalService healthSignals) {
+        return new PortfolioOverviewService(clientRelationships, domains, organizations, healthSignals);
     }
 }
