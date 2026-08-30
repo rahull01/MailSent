@@ -11,6 +11,13 @@ import com.mailsent.portfolio.observation.domain.HealthSignal;
  * <p>Owned by the Business Explanation context. It translates technical
  * facts into plain language (what happened) and business impact (why it matters)
  * per FUN-E1 and FUN-E2.</p>
+ *
+ * <p><strong>Grounding rule (N2 / INV-04).</strong> Every sentence states only what the
+ * canonical indication itself means — the approved semantics are: at-risk means problems
+ * are putting delivery at risk; healthy means delivery health is in a healthy state;
+ * unknown means the current state cannot be determined reliably. Causes (which record
+ * failed or why), mechanisms, provider behaviour, and thresholds are never asserted here:
+ * they live in the cited evidence ({@link Grounding}), not in prose.</p>
  */
 public final class Explanation {
 
@@ -21,9 +28,10 @@ public final class Explanation {
     private final Grounding grounding;
     private final String whatHappened;
     private final String whyItMatters;
+    private final String technicalDetail;
 
     private Explanation(String id, String organizationId, String domainId, String domainName,
-                        Grounding grounding, String whatHappened, String whyItMatters) {
+                        Grounding grounding, String whatHappened, String whyItMatters, String technicalDetail) {
         this.id = id;
         this.organizationId = organizationId;
         this.domainId = domainId;
@@ -31,6 +39,7 @@ public final class Explanation {
         this.grounding = grounding;
         this.whatHappened = whatHappened;
         this.whyItMatters = whyItMatters;
+        this.technicalDetail = technicalDetail;
     }
 
     /**
@@ -43,16 +52,25 @@ public final class Explanation {
 
         String whatHappened;
         String whyItMatters;
+        String technicalDetail;
 
         if (signal.indication() == HealthIndication.AT_RISK) {
-            whatHappened = "Your email delivery infrastructure is currently at risk due to critical authentication or alignment failures.";
-            whyItMatters = "Emails sent from this domain may be quarantined or rejected by receiving mail servers, directly impacting your business communication and marketing reach.";
+            whatHappened = "Our latest check found problems that put email delivery for this domain at risk.";
+            whyItMatters = "While this continues, messages sent from your domain may not reach your customers' inboxes.";
+            // Technical detail stays inside the indication vocabulary: which specific
+            // check failed and why is carried by the cited evidence ids, never asserted here.
+            technicalDetail = "Recent reported checks show results consistent with delivery problems. "
+                + "The exact failing checks are listed in the evidence referenced by this explanation.";
         } else if (signal.indication() == HealthIndication.HEALTHY) {
-            whatHappened = "Your email delivery infrastructure is fully authenticated and correctly aligned.";
-            whyItMatters = "Receiving mail servers can trust emails from this domain, maximizing the likelihood that your messages reach the inbox.";
+            whatHappened = "Email delivery health for this domain checked out as healthy.";
+            whyItMatters = "A healthy state means there are no detected problems putting delivery at risk right now.";
+            technicalDetail = "All checks behind this result passed on the most recent reported data "
+                + "(see the evidence referenced by this explanation).";
         } else {
-            whatHappened = "We do not have sufficient recent data to determine the current state of your email delivery infrastructure.";
-            whyItMatters = "Without sufficient data, unseen delivery issues could be occurring, leaving your business communication vulnerable to unexpected blocking.";
+            whatHappened = "We could not reliably determine the delivery-health state of this domain from its latest reported data.";
+            whyItMatters = "While the state is unclear, delivery problems could go unnoticed until the next successful check.";
+            technicalDetail = "The latest reported data was inconclusive rather than clearly passing or failing. "
+                + "This is an explicit unknown — no health claim is being made.";
         }
 
         return new Explanation(
@@ -62,8 +80,13 @@ public final class Explanation {
             signal.domainName(),
             Grounding.from(signal),
             whatHappened,
-            whyItMatters
+            whyItMatters,
+            technicalDetail
         );
+    }
+
+    public ExplanationView renderView(ExplanationMode mode) {
+        return ExplanationView.from(this, mode);
     }
 
     public String id() { return id; }
@@ -73,4 +96,5 @@ public final class Explanation {
     public Grounding grounding() { return grounding; }
     public String whatHappened() { return whatHappened; }
     public String whyItMatters() { return whyItMatters; }
+    public String technicalDetail() { return technicalDetail; }
 }
