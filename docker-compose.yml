@@ -21,17 +21,16 @@ services:
     container_name: mailsent-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-mailsent}
-      POSTGRES_USER: ${POSTGRES_USER:-mailsent}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is required}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    # No host port: PostgreSQL is reachable only via the internal Docker network.
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - mailsent-internal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mailsent}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -61,19 +60,22 @@ services:
       redis:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
-      POSTGRES_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-mailsent}
-      POSTGRES_USER: ${POSTGRES_USER:-mailsent}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+      SPRING_PROFILES_ACTIVE: prod
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:?POSTGRES_DB is required}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      MANAGEMENT_PORT: 8081
     ports:
       - "8080:8080"
+    # Actuator (health/prometheus) listens on 8081 inside the container and is
+    # not published to the host. Compose healthcheck uses localhost:8081.
     networks:
       - mailsent
       - mailsent-internal
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8081/actuator/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10

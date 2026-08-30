@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 export interface ClientSummary {
   id: string;
@@ -24,23 +24,28 @@ export const MultiClientGrid: React.FC<MultiClientGridProps> = ({
   onBulkScanClient,
 }) => {
   const getHealthBadge = (score: number) => {
-    if (score >= 80) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-    if (score >= 50) return 'bg-amber-100 text-amber-800 border-amber-200';
-    return 'bg-rose-100 text-rose-800 border-rose-200';
+    if (score >= 80)
+      return "bg-emerald-100 text-emerald-800 border-emerald-200";
+    if (score >= 50) return "bg-amber-100 text-amber-800 border-amber-200";
+    return "bg-rose-100 text-rose-800 border-rose-200";
   };
 
   return (
-    <section 
+    <section
       aria-labelledby="client-grid-title"
       className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm space-y-4"
     >
       <div className="flex items-center justify-between">
         <div>
-          <h2 id="client-grid-title" className="text-lg font-semibold text-slate-900">
+          <h2
+            id="client-grid-title"
+            className="text-lg font-semibold text-slate-900"
+          >
             Agency Client Command Center
           </h2>
           <p className="text-sm text-slate-500">
-            Unified multi-tenant portfolio monitoring across {clients.length} active clients
+            Unified multi-tenant portfolio monitoring across {clients.length}{" "}
+            active clients
           </p>
         </div>
       </div>
@@ -56,14 +61,19 @@ export const MultiClientGrid: React.FC<MultiClientGridProps> = ({
                 <h3 className="font-bold text-slate-900 text-base leading-tight">
                   {c.name}
                 </h3>
-                <span className={`text-xs font-bold px-2 py-0.5 rounded border ${getHealthBadge(c.healthScore)}`}>
+                <span
+                  className={`text-xs font-bold px-2 py-0.5 rounded border ${getHealthBadge(c.healthScore)}`}
+                >
                   {c.healthScore}%
                 </span>
               </div>
 
               <div className="flex flex-wrap gap-1">
                 {c.tags.map((t) => (
-                  <span key={t} className="text-[10px] font-medium px-2 py-0.5 bg-slate-100 text-slate-600 rounded">
+                  <span
+                    key={t}
+                    className="text-[10px] font-medium px-2 py-0.5 bg-slate-100 text-slate-600 rounded"
+                  >
                     {t}
                   </span>
                 ))}
@@ -72,11 +82,15 @@ export const MultiClientGrid: React.FC<MultiClientGridProps> = ({
               <div className="grid grid-cols-2 gap-2 text-xs py-2 border-y border-slate-100">
                 <div>
                   <span className="text-slate-400 block">Domains</span>
-                  <span className="font-semibold text-slate-700">{c.domainCount} Monitored</span>
+                  <span className="font-semibold text-slate-700">
+                    {c.domainCount} Monitored
+                  </span>
                 </div>
                 <div>
                   <span className="text-slate-400 block">Issues</span>
-                  <span className={`font-semibold ${c.activeIssuesCount > 0 ? 'text-rose-600' : 'text-slate-700'}`}>
+                  <span
+                    className={`font-semibold ${c.activeIssuesCount > 0 ? "text-rose-600" : "text-slate-700"}`}
+                  >
                     {c.activeIssuesCount} Active
                   </span>
                 </div>
@@ -84,7 +98,9 @@ export const MultiClientGrid: React.FC<MultiClientGridProps> = ({
             </div>
 
             <div className="pt-4 flex items-center justify-between gap-2">
-              <span className="text-[11px] text-slate-400">Scanned {c.lastScanAt}</span>
+              <span className="text-[11px] text-slate-400">
+                Scanned {c.lastScanAt}
+              </span>
               <div className="flex items-center gap-2">
                 {onBulkScanClient && (
                   <button

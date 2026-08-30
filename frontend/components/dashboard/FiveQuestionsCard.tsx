@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 export interface FiveQuestionsData {
   whatHappened: string;
@@ -14,33 +14,39 @@ export interface FiveQuestionsData {
 export interface FiveQuestionsCardProps {
   data: FiveQuestionsData;
   title?: string;
-  severity?: 'CRITICAL' | 'WARNING' | 'INFO';
+  severity?: "CRITICAL" | "WARNING" | "INFO";
   onActionClick?: () => void;
   actionLabel?: string;
 }
 
 export const FiveQuestionsCard: React.FC<FiveQuestionsCardProps> = ({
   data,
-  title = 'Diagnosis & Guidance',
-  severity = 'WARNING',
+  title = "Diagnosis & Guidance",
+  severity = "WARNING",
   onActionClick,
-  actionLabel = 'Apply Recommended Fix',
+  actionLabel = "Apply Recommended Fix",
 }) => {
   const getBorderColor = () => {
     switch (severity) {
-      case 'CRITICAL': return 'border-rose-300 bg-rose-50/30';
-      case 'WARNING': return 'border-amber-300 bg-amber-50/30';
-      default: return 'border-slate-200 bg-slate-50/30';
+      case "CRITICAL":
+        return "border-rose-300 bg-rose-50/30";
+      case "WARNING":
+        return "border-amber-300 bg-amber-50/30";
+      default:
+        return "border-slate-200 bg-slate-50/30";
     }
   };
 
   return (
-    <article 
+    <article
       aria-labelledby="five-questions-title"
       className={`p-6 bg-white rounded-xl border-2 shadow-sm ${getBorderColor()} space-y-4`}
     >
       <div className="flex items-center justify-between border-b pb-3 border-slate-100">
-        <h3 id="five-questions-title" className="text-base font-bold text-slate-900">
+        <h3
+          id="five-questions-title"
+          className="text-base font-bold text-slate-900"
+        >
           {title}
         </h3>
         {data.evidenceSnapshotId && (
@@ -56,7 +62,9 @@ export const FiveQuestionsCard: React.FC<FiveQuestionsCardProps> = ({
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
             1. What happened?
           </h4>
-          <p className="font-semibold text-slate-900 mt-0.5">{data.whatHappened}</p>
+          <p className="font-semibold text-slate-900 mt-0.5">
+            {data.whatHappened}
+          </p>
         </div>
 
         {/* 2. Why? */}
@@ -72,7 +80,9 @@ export const FiveQuestionsCard: React.FC<FiveQuestionsCardProps> = ({
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
             3. Business Impact
           </h4>
-          <p className="text-rose-700 font-medium mt-0.5">{data.businessImpact}</p>
+          <p className="text-rose-700 font-medium mt-0.5">
+            {data.businessImpact}
+          </p>
         </div>
 
         {/* 4. What should I do? */}
