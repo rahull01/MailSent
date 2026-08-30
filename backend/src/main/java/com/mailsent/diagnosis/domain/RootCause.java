@@ -1,0 +1,11 @@
+package com.mailsent.diagnosis.domain;
+
+public enum RootCause {
+    DMARC_REJECT,
+    DMARC_QUARANTINE,
+    SPF_ALIGNMENT_FAILURE,
+    DKIM_ALIGNMENT_FAILURE,
+    SPF_AUTHENTICATION_FAILURE,
+    DKIM_AUTHENTICATION_FAILURE,
+    UNKNOWN_ISSUE
+}
