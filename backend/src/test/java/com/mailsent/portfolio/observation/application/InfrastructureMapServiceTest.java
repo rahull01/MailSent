@@ -21,12 +21,16 @@ import com.mailsent.portfolio.observation.domain.BlacklistObservation;
 import com.mailsent.portfolio.observation.domain.BlacklistSource;
 import com.mailsent.portfolio.observation.domain.DnsHealthObservation;
 import com.mailsent.portfolio.observation.domain.DnsObservation;
+import com.mailsent.portfolio.observation.domain.HealthIndication;
+import com.mailsent.portfolio.observation.domain.HealthSignal;
 import com.mailsent.portfolio.observation.domain.MxRecord;
 import com.mailsent.portfolio.observation.domain.ObservationEvidence;
 import com.mailsent.portfolio.observation.domain.ReputationObservation;
 import com.mailsent.portfolio.observation.domain.ReputationSource;
 import com.mailsent.portfolio.observation.infrastructure.InMemoryBlacklistObservationRepository;
+import com.mailsent.portfolio.observation.infrastructure.InMemoryDmarcAggregateEvidenceRepository;
 import com.mailsent.portfolio.observation.infrastructure.InMemoryDnsHealthObservationRepository;
+import com.mailsent.portfolio.observation.infrastructure.InMemoryHealthSignalRepository;
 import com.mailsent.portfolio.observation.infrastructure.InMemoryObservationEvidenceRepository;
 import com.mailsent.portfolio.observation.infrastructure.InMemoryReputationObservationRepository;
 import com.mailsent.portfolio.observation.infrastructure.UnavailableBarracudaAdapter;
@@ -37,9 +41,9 @@ import com.mailsent.portfolio.observation.infrastructure.UnavailableSurblAdapter
 import com.mailsent.portfolio.observation.infrastructure.UnavailableUriblAdapter;
 
 /**
- * Unit tests for {@link InfrastructureMapService} (MAP-001) — topology chain,
- * truthful unobserved nodes, tenant isolation, and no fabricated DKIM/DMARC/
- * senders/inbox facts.
+ * Unit tests for {@link InfrastructureMapService} (MAP-001 / MAP-002) — topology chain,
+ * truthful unobserved nodes, tenant isolation, no fabricated DKIM/DMARC/senders/inbox facts,
+ * and canonical HealthSignal health state projection.
  */
 class InfrastructureMapServiceTest {
 
@@ -50,6 +54,9 @@ class InfrastructureMapServiceTest {
     private InMemoryReputationObservationRepository reputationRepo;
     private InMemoryDnsHealthObservationRepository dnsHealthRepo;
     private InMemoryBlacklistObservationRepository blacklistRepo;
+    private InMemoryHealthSignalRepository healthSignalRepo;
+    private InMemoryDmarcAggregateEvidenceRepository aggregateRepo;
+    private HealthSignalService healthSignalService;
     private InfrastructureMapService service;
     private Domain example;
 
@@ -60,6 +67,8 @@ class InfrastructureMapServiceTest {
         reputationRepo = new InMemoryReputationObservationRepository();
         dnsHealthRepo = new InMemoryDnsHealthObservationRepository();
         blacklistRepo = new InMemoryBlacklistObservationRepository();
+        healthSignalRepo = new InMemoryHealthSignalRepository();
+        aggregateRepo = new InMemoryDmarcAggregateEvidenceRepository();
         DnsObservationService dns = new DnsObservationService(domainName -> {
             throw new DnsObservationException("MAP-001 must not observe DNS");
         }, domains, org.mockito.Mockito.mock(com.mailsent.identity.consent.application.ConsentService.class));
@@ -70,11 +79,14 @@ class InfrastructureMapServiceTest {
         DnsHealthObservationService dnsHealth = new DnsHealthObservationService(
             dnsHealthRepo, domains, domainName -> {
                 throw new DnsObservationException("MAP-001 must not observe DNS health");
-            });
+            }, org.mockito.Mockito.mock(com.mailsent.identity.consent.application.ConsentService.class));
         BlacklistObservationService blacklist = new BlacklistObservationService(
             blacklistRepo, domains, new UnavailableSpamhausAdapter(), new UnavailableBarracudaAdapter(),
             new UnavailableSurblAdapter(), new UnavailableUriblAdapter());
-        service = new InfrastructureMapService(domains, evidence, reputation, dnsHealth, blacklist);
+        healthSignalService = new HealthSignalService(
+            healthSignalRepo, domains, evidenceRepo, aggregateRepo, reputationRepo,
+            java.time.Clock.fixed(NOW, java.time.ZoneOffset.UTC));
+        service = new InfrastructureMapService(domains, evidence, reputation, dnsHealth, blacklist, healthSignalService);
         example = domains.save(Domain.register("org-1", "example.com", NOW));
     }
 
@@ -244,20 +256,132 @@ class InfrastructureMapServiceTest {
     }
 
     @Test
-    void readModelHasNoScoreColorHealthOrSeverity() {
-        for (Class<?> type : List.of(InfrastructureMap.class, InfrastructureMapNode.class,
+    void readModelStructureConformsToContract() {
+        for (Class<?> type : List.of(InfrastructureMap.class,
             InfrastructureMapRelationship.class, InfrastructureEvidenceRef.class)) {
             Set<String> names = Arrays.stream(type.getRecordComponents())
                 .map(RecordComponent::getName)
                 .collect(Collectors.toSet());
             assertFalse(names.contains("score"));
             assertFalse(names.contains("color"));
-            assertFalse(names.contains("health"));
             assertFalse(names.contains("severity"));
         }
-        assertEquals(Set.of("identity", "type", "availability"),
+        assertEquals(Set.of("identity", "type", "availability", "health"),
             Arrays.stream(InfrastructureMapNode.class.getRecordComponents())
                 .map(RecordComponent::getName).collect(Collectors.toSet()));
+    }
+
+    @Test
+    void missingHealthSignalDefaultsToUnknownHealthOnAllNodes() {
+        InfrastructureMap map = service.forDomain("example.com");
+        for (InfrastructureMapNode node : map.nodes()) {
+            assertEquals(HealthIndication.UNKNOWN, node.health(), "Node " + node.type() + " must have UNKNOWN health");
+        }
+    }
+
+    @Test
+    void healthySignalProjectsHealthyStatusOnObservedNodes() {
+        saveEvidence(example, "v=spf1 -all", NOW);
+        healthSignalRepo.save(HealthSignal.derive(
+            example,
+            HealthIndication.HEALTHY,
+            "oe-1",
+            List.of("dae-1"),
+            List.of("rep-1"),
+            NOW));
+
+        InfrastructureMap map = service.forDomain("example.com");
+
+        assertEquals(HealthIndication.HEALTHY, health(map, InfrastructureNodeType.DOMAIN));
+        assertEquals(HealthIndication.HEALTHY, health(map, InfrastructureNodeType.DNS));
+        assertEquals(HealthIndication.HEALTHY, health(map, InfrastructureNodeType.SPF));
+        assertEquals(HealthIndication.HEALTHY, health(map, InfrastructureNodeType.DKIM));
+        assertEquals(HealthIndication.HEALTHY, health(map, InfrastructureNodeType.DMARC));
+        assertEquals(HealthIndication.UNKNOWN, health(map, InfrastructureNodeType.SENDERS));
+        assertEquals(HealthIndication.HEALTHY, health(map, InfrastructureNodeType.INBOX));
+
+        // Observation availability remains independent
+        assertEquals(NodeAvailability.OBSERVED, availability(map, InfrastructureNodeType.DOMAIN));
+        assertEquals(NodeAvailability.OBSERVED, availability(map, InfrastructureNodeType.DNS));
+        assertEquals(NodeAvailability.OBSERVED, availability(map, InfrastructureNodeType.SPF));
+        assertEquals(NodeAvailability.NOT_OBSERVED, availability(map, InfrastructureNodeType.DKIM));
+    }
+
+    @Test
+    void atRiskSignalProjectsAtRiskStatusOnObservedNodes() {
+        saveEvidence(example, "v=spf1 -all", NOW);
+        healthSignalRepo.save(HealthSignal.derive(
+            example,
+            HealthIndication.AT_RISK,
+            "oe-1",
+            List.of("dae-1"),
+            List.of("rep-1"),
+            NOW));
+
+        InfrastructureMap map = service.forDomain("example.com");
+
+        assertEquals(HealthIndication.AT_RISK, health(map, InfrastructureNodeType.DOMAIN));
+        assertEquals(HealthIndication.AT_RISK, health(map, InfrastructureNodeType.DNS));
+        assertEquals(HealthIndication.AT_RISK, health(map, InfrastructureNodeType.SPF));
+        assertEquals(HealthIndication.AT_RISK, health(map, InfrastructureNodeType.DKIM));
+        assertEquals(HealthIndication.AT_RISK, health(map, InfrastructureNodeType.DMARC));
+        assertEquals(HealthIndication.UNKNOWN, health(map, InfrastructureNodeType.SENDERS));
+        assertEquals(HealthIndication.AT_RISK, health(map, InfrastructureNodeType.INBOX));
+    }
+
+    @Test
+    void crossTenantHealthSignalCannotLeak() {
+        Domain otherDomain = domains.save(Domain.register("org-2", "other.com", NOW));
+        healthSignalRepo.save(HealthSignal.derive(
+            otherDomain,
+            HealthIndication.HEALTHY,
+            "oe-2",
+            List.of("dae-2"),
+            List.of("rep-2"),
+            NOW));
+
+        InfrastructureMap map = service.forDomain("example.com");
+
+        for (InfrastructureMapNode node : map.nodes()) {
+            assertEquals(HealthIndication.UNKNOWN, node.health(),
+                "example.com in org-1 must NOT inherit health signal from other.com in org-2");
+        }
+    }
+
+    @Test
+    void nodeDetailExposesIdentityTypeAvailabilityAndEvidenceWithoutFabrication() {
+        ObservationEvidence oe = saveEvidence(example, "v=spf1 -all", NOW);
+        ReputationObservation rep = reputationRepo.save(
+            ReputationObservation.capture(example, ReputationSource.POSTMASTER, "raw-payload", NOW));
+
+        InfrastructureMap map = service.forDomain("example.com");
+
+        InfrastructureMapNode dnsNode = map.nodes().stream()
+            .filter(n -> n.type() == InfrastructureNodeType.DNS)
+            .findFirst()
+            .orElseThrow();
+        assertEquals(example.id() + ":DNS", dnsNode.identity());
+        assertEquals(InfrastructureNodeType.DNS, dnsNode.type());
+        assertEquals(NodeAvailability.OBSERVED, dnsNode.availability());
+        assertEquals(HealthIndication.UNKNOWN, dnsNode.health());
+
+        // DNS Evidence has only real snapshots
+        assertEquals(2, map.dnsEvidence().size());
+        assertTrue(map.dnsEvidence().stream().anyMatch(e -> e.snapshotId().equals(oe.id())));
+        assertTrue(map.dnsEvidence().stream().anyMatch(e -> e.snapshotId().equals(rep.id())));
+
+        // Unobserved nodes must have NOT_OBSERVED and no fabricated identity details
+        InfrastructureMapNode dkimNode = map.nodes().stream()
+            .filter(n -> n.type() == InfrastructureNodeType.DKIM)
+            .findFirst()
+            .orElseThrow();
+        assertEquals(NodeAvailability.NOT_OBSERVED, dkimNode.availability());
+
+        InfrastructureMapNode dmarcNode = map.nodes().stream()
+            .filter(n -> n.type() == InfrastructureNodeType.DMARC)
+            .findFirst()
+            .orElseThrow();
+        assertEquals(NodeAvailability.NOT_OBSERVED, dmarcNode.availability());
     }
 
     private ObservationEvidence saveEvidence(Domain domain, String spf, Instant observedAt) {
@@ -276,6 +400,14 @@ class InfrastructureMapServiceTest {
         return map.nodes().stream()
             .filter(node -> node.type() == type)
             .map(InfrastructureMapNode::availability)
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private static HealthIndication health(InfrastructureMap map, InfrastructureNodeType type) {
+        return map.nodes().stream()
+            .filter(node -> node.type() == type)
+            .map(InfrastructureMapNode::health)
             .findFirst()
             .orElseThrow();
     }
