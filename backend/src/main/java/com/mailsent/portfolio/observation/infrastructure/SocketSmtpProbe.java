@@ -119,9 +119,20 @@ public class SocketSmtpProbe implements SmtpProbe {
         return false;
     }
 
+    /** A hostile MX can stream replies forever; the probe reads at most this much. */
+    private static final int MAX_REPLY_CHARS = 64 * 1024;
+    private static final int MAX_REPLY_LINES = 256;
+
+    /**
+     * Reads one SMTP reply (single line, or multi-line while lines continue with
+     * {@code "NNN-"}). Returns {@code null} when the peer sent nothing or exceeded the
+     * reply bounds — an over-large or unbounded reply is treated as no usable reply,
+     * never truncated into a fabricated greeting.
+     */
     private static String readReply(BufferedReader reader) throws IOException {
         StringBuilder reply = new StringBuilder();
-        while (true) {
+        int lines = 0;
+        while (lines < MAX_REPLY_LINES) {
             String line = reader.readLine();
             if (line == null) {
                 break;
@@ -130,9 +141,17 @@ public class SocketSmtpProbe implements SmtpProbe {
                 reply.append('\n');
             }
             reply.append(line);
+            lines++;
             if (line.length() < 4 || line.charAt(3) == ' ') {
                 break;
             }
+            if (reply.length() > MAX_REPLY_CHARS) {
+                // Bound exceeded mid-multi-line reply: unusable as an observed fact.
+                return null;
+            }
+        }
+        if (!reply.isEmpty() && reply.length() > MAX_REPLY_CHARS) {
+            return null;
         }
         return reply.isEmpty() ? null : reply.toString();
     }
