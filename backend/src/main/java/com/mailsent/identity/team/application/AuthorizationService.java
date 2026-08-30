@@ -3,6 +3,8 @@ package com.mailsent.identity.team.application;
 import java.time.Clock;
 import java.time.Instant;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,8 @@ import com.mailsent.identity.team.domain.RoleCapabilityPolicy;
  */
 @Service
 public class AuthorizationService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthorizationService.class);
 
     private final AccessAuditSink auditSink;
     private final Clock clock;
@@ -126,8 +130,12 @@ public class AuthorizationService {
         if (auditSink != null) {
             try {
                 auditSink.record(record);
-            } catch (Exception ignored) {
-                // Auditing failure must not disrupt core business authorization flow (INV / N3)
+            } catch (Exception e) {
+                // Availability-over-completeness: authorization still applies, but the
+                // audit loss must be loud (N3 no-silent-loss) and carry MDC context.
+                log.error("Access audit write failed for actor '{}' homeOrg '{}' targetOrg '{}' capability '{}' decision '{}'",
+                        record.userId(), record.userOrganizationId(), record.targetOrganizationId(),
+                        record.capability(), record.decision(), e);
             }
         }
     }
