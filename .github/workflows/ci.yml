@@ -59,10 +59,10 @@ jobs:
           cache: 'npm'
       - name: Install
         working-directory: frontend
-        run: npm install
+        run: npm ci
       - name: Formatting check (Prettier)
         working-directory: frontend
-        run: npx prettier --check "src/**/*.ts" "src/**/*.tsx" "app/**/*.ts" "app/**/*.tsx"
+        run: npx prettier --check "app/**/*.{ts,tsx}" "components/**/*.{ts,tsx}"
       - name: Lint
         working-directory: frontend
         run: npm run lint

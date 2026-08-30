@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 export interface ActionQueueItem {
   id: string;
@@ -21,13 +21,16 @@ export const ActionQueueWidget: React.FC<ActionQueueWidgetProps> = ({
   onAuthorizeAction,
 }) => {
   return (
-    <section 
+    <section
       aria-labelledby="action-queue-title"
       className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm"
     >
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 id="action-queue-title" className="text-lg font-semibold text-slate-900">
+          <h2
+            id="action-queue-title"
+            className="text-lg font-semibold text-slate-900"
+          >
             Action Queue (Consent-Gated)
           </h2>
           <p className="text-sm text-slate-500">
@@ -62,7 +65,9 @@ export const ActionQueueWidget: React.FC<ActionQueueWidgetProps> = ({
                     AI Confidence: {act.confidenceScore}%
                   </span>
                 </div>
-                <h3 className="text-sm font-semibold text-slate-900">{act.actionTitle}</h3>
+                <h3 className="text-sm font-semibold text-slate-900">
+                  {act.actionTitle}
+                </h3>
               </div>
               <button
                 type="button"
@@ -70,7 +75,7 @@ export const ActionQueueWidget: React.FC<ActionQueueWidgetProps> = ({
                 onClick={() => onAuthorizeAction?.(act.id)}
                 className="shrink-0 text-xs font-bold px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-emerald-500 focus:outline-none"
               >
-                {act.isExecuting ? 'Executing...' : 'Authorize & Execute'}
+                {act.isExecuting ? "Executing..." : "Authorize & Execute"}
               </button>
             </div>
           ))}

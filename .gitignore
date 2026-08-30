@@ -66,3 +66,31 @@ tmp/
 
 # ---- Keep a placeholder example pattern visible ----
 # Add repo-specific ignore rules below this line.
+
+# Ruflo local secrets and runtime data
+.env.local
+.env.*.local
+.claude-flow/data/
+.claude-flow/logs/
+.claude-flow/sessions/
+
+# Codex local configuration
+.codex/
+# Claude Flow runtime data
+# Environment variables
+
+# ---- Local Generated / Temporary Artifacts ----
+.swarm/
+ruvector.db
+*.db-shm
+*.db-wal
+backend/causes.txt
+backend/first_130.txt
+backend/h2_test_output.txt
+jhgfd
+.claude-flow/
+.mcp.json
+.cursor/mcp.json
+.claude/settings.local.json
+backend/extract.py
+backend/extract_surefire.py

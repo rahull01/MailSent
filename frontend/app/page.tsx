@@ -7,7 +7,8 @@ export default function Home() {
         the certainty that email reaches the inbox.
       </p>
       <p className="text-sm text-slate-500">
-        Engineering Foundation baseline. Business features arrive in later phases.
+        Engineering Foundation baseline. Business features arrive in later
+        phases.
       </p>
     </main>
   );

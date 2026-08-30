@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 export interface OrganizationContext {
   id: string;
   name: string;
-  plan: 'AGENCY_PRO' | 'ENTERPRISE' | 'GROWTH';
+  plan: "AGENCY_PRO" | "ENTERPRISE" | "GROWTH";
   isCurrent: boolean;
 }
 
@@ -22,7 +22,9 @@ export const OrgSwitcher: React.FC<OrgSwitcherProps> = ({
 
   return (
     <div className="relative inline-block text-left">
-      <label htmlFor="org-select" className="sr-only">Switch Active Organization</label>
+      <label htmlFor="org-select" className="sr-only">
+        Switch Active Organization
+      </label>
       <select
         id="org-select"
         value={currentOrg?.id}

@@ -1,48 +1,81 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { AdminControlPlane, CustomerMetric } from '../../components/admin/AdminControlPlane';
+import React from "react";
+import {
+  AdminControlPlane,
+  CustomerMetric,
+} from "../../components/admin/AdminControlPlane";
 
 export default function AdminPage() {
   const sampleCustomers: CustomerMetric[] = [
     {
-      orgId: 'org-1',
-      orgName: 'Apex Growth Agency',
-      plan: 'AGENCY_PRO',
+      orgId: "org-1",
+      orgName: "Apex Growth Agency",
+      plan: "AGENCY_PRO",
+      billingCadence: "MONTHLY",
+      subscriptionStatus: "ACTIVE",
       domainsMonitored: 24,
       healthScore: 88,
       adoptionScore: 82,
-      churnRisk: 'LOW',
-      lastActive: '5m ago',
+      churnRisk: "LOW",
+      lastActive: "5m ago",
     },
     {
-      orgId: 'org-2',
-      orgName: 'Vanguard Media Group',
-      plan: 'ENTERPRISE',
+      orgId: "org-2",
+      orgName: "Vanguard Media Group",
+      plan: "ENTERPRISE",
+      billingCadence: "ANNUAL",
+      subscriptionStatus: "ACTIVE",
       domainsMonitored: 60,
       healthScore: 48,
       adoptionScore: 35,
-      churnRisk: 'HIGH',
-      lastActive: '3 days ago',
+      churnRisk: "HIGH",
+      lastActive: "3 days ago",
     },
     {
-      orgId: 'org-3',
-      orgName: 'Beacon Commerce Labs',
-      plan: 'GROWTH',
+      orgId: "org-3",
+      orgName: "Beacon Commerce Labs",
+      plan: "STARTER",
+      billingCadence: "MONTHLY",
+      subscriptionStatus: "ACTIVE",
       domainsMonitored: 8,
       healthScore: 94,
       adoptionScore: 90,
-      churnRisk: 'LOW',
-      lastActive: '12m ago',
+      churnRisk: "LOW",
+      lastActive: "12m ago",
+    },
+    {
+      orgId: "org-4",
+      orgName: "Nova Marketing Co",
+      plan: "FREE",
+      billingCadence: "MONTHLY",
+      subscriptionStatus: "ACTIVE",
+      domainsMonitored: 1,
+      healthScore: 72,
+      adoptionScore: 40,
+      churnRisk: "MEDIUM",
+      lastActive: "1h ago",
+    },
+    {
+      orgId: "org-5",
+      orgName: "Horizon Tech Partners",
+      plan: "AGENCY_PRO",
+      billingCadence: "MONTHLY",
+      subscriptionStatus: "TRIAL",
+      domainsMonitored: 12,
+      healthScore: 85,
+      adoptionScore: 65,
+      churnRisk: "LOW",
+      lastActive: "20m ago",
     },
   ];
 
   const sampleAdoption = [
-    { featureName: 'Continuous Monitoring (Cadence)', activeOrgPercent: 94 },
-    { featureName: 'Automated SPF/DMARC Diagnosis', activeOrgPercent: 88 },
-    { featureName: 'AI Explanations & Lineage Tracing', activeOrgPercent: 78 },
-    { featureName: 'Consent-Gated Action Queue', activeOrgPercent: 62 },
-    { featureName: 'Executive Branded PDF Reports', activeOrgPercent: 54 },
+    { featureName: "Continuous Monitoring (Cadence)", activeOrgPercent: 94 },
+    { featureName: "Automated SPF/DMARC Diagnosis", activeOrgPercent: 88 },
+    { featureName: "AI Explanations & Lineage Tracing", activeOrgPercent: 78 },
+    { featureName: "Consent-Gated Action Queue", activeOrgPercent: 62 },
+    { featureName: "Executive Branded PDF Reports", activeOrgPercent: 54 },
   ];
 
   return (
@@ -53,9 +86,13 @@ export default function AdminPage() {
             <span className="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">
               Admin Ops
             </span>
-            <h1 className="text-lg font-bold">MailSent Internal Operations Control Plane</h1>
+            <h1 className="text-lg font-bold">
+              MailSent Internal Operations Control Plane
+            </h1>
           </div>
-          <span className="text-xs text-slate-400">Environment: Production Internal</span>
+          <span className="text-xs text-slate-400">
+            Environment: Production Internal
+          </span>
         </div>
       </header>
 

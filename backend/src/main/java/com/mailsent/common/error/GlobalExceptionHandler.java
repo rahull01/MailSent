@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.mailsent.common.security.UnauthenticatedException;
+import com.mailsent.identity.consent.application.ConsentAlreadyExistsException;
+import com.mailsent.identity.consent.application.ConsentRequiredException;
+import com.mailsent.identity.team.domain.AccessDeniedException;
+
 /**
  * Cross-cutting error handling foundation.
  *
@@ -45,6 +50,48 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> onNotFound(NoResourceFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ApiError.simple("NOT_FOUND", "NOT_FOUND", "The requested resource was not found."));
+    }
+
+    @ExceptionHandler(UnauthenticatedException.class)
+    public ResponseEntity<ApiError> onUnauthenticated(UnauthenticatedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiError.simple("UNAUTHORIZED", "AUTH_REQUIRED", ex.getMessage()));
+    }
+
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ApiError> onSecurity(SecurityException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiError.simple("FORBIDDEN", "INSUFFICIENT_PERMISSIONS", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ConsentAlreadyExistsException.class)
+    public ResponseEntity<ApiError> onConsentAlreadyExists(ConsentAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiError.simple("CONFLICT", "CONSENT_ALREADY_EXISTS", ex.getMessage()));
+    }
+
+    /** A missing/revoked consent is a policy refusal (INV-02), never a server error. */
+    @ExceptionHandler(ConsentRequiredException.class)
+    public ResponseEntity<ApiError> onConsentRequired(ConsentRequiredException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiError.simple("FORBIDDEN", "CONSENT_REQUIRED", ex.getMessage()));
+    }
+
+    /**
+     * Tenant-boundary and capability denials across the platform surface as 403 —
+     * authorization refusals must never render as 500s.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> onAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiError.simple("FORBIDDEN", "INSUFFICIENT_PERMISSIONS", ex.getMessage()));
+    }
+
+    /** Domain-level input rejections that reach the web layer map to a client error, not 500. */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> onIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest()
+                .body(ApiError.simple("BAD_REQUEST", "INVALID_REQUEST", ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)

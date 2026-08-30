@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 
 export interface BulkActionToolbarProps {
   selectedCount: number;
@@ -20,8 +20,8 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
   if (selectedCount === 0) return null;
 
   return (
-    <div 
-      role="toolbar" 
+    <div
+      role="toolbar"
       aria-label="Bulk actions toolbar"
       className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-4 z-40 border border-slate-700 animate-in fade-in slide-in-from-bottom-4 duration-200"
     >
@@ -47,7 +47,7 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
           <button
             type="button"
             onClick={() => {
-              const tag = prompt('Enter tag name to apply to selected:');
+              const tag = prompt("Enter tag name to apply to selected:");
               if (tag) onBulkTag(tag);
             }}
             className="text-xs font-semibold px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-full transition-colors border border-slate-700"
