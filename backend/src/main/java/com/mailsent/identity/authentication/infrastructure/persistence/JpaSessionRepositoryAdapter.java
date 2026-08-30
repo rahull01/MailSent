@@ -34,6 +34,15 @@ public class JpaSessionRepositoryAdapter implements SessionRepository {
         return toSession(saved);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.Optional<Session> findByTokenHash(String tokenHash) {
+        if (tokenHash == null || tokenHash.isBlank()) {
+            return java.util.Optional.empty();
+        }
+        return jpa.findByTokenHash(tokenHash).map(this::toSession);
+    }
+
     private Session toSession(SessionJpaEntity entity) {
         return Session.restore(entity.id(), entity.userId(), entity.tokenHash(), entity.createdAt(), entity.expiresAt());
     }

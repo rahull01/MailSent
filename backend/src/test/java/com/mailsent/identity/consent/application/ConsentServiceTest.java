@@ -82,7 +82,7 @@ class ConsentServiceTest {
     @Test
     void requireConsent_MissingConsent() {
         assertThrows(ConsentRequiredException.class, () -> 
-            consentService.requireConsent("domain-1", ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
+            consentService.requireConsent("org-1", "domain-1", ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
     }
 
     @Test
@@ -90,7 +90,17 @@ class ConsentServiceTest {
         Consent consent = Consent.grant("org-1", "domain-1", "user-1", ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
         consentRepository.save(consent);
 
-        assertDoesNotThrow(() -> consentService.requireConsent("domain-1", ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
+        assertDoesNotThrow(() -> consentService.requireConsent("org-1", "domain-1", ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
+    }
+
+    @Test
+    void requireConsent_RejectsForeignTenantConsent() {
+        // INV-09: a consent granted by org-1 never satisfies org-2's gate on the same domain.
+        Consent consent = Consent.grant("org-1", "domain-1", "user-1", ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+        consentRepository.save(consent);
+
+        assertThrows(ConsentRequiredException.class, () -> 
+            consentService.requireConsent("org-2", "domain-1", ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
     }
 
     @Test
@@ -125,7 +135,7 @@ class ConsentServiceTest {
         consentRepository.save(consent);
 
         assertThrows(ConsentRequiredException.class, () -> 
-            consentService.requireConsent("domain-1", ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
+            consentService.requireConsent("org-1", "domain-1", ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE));
     }
 
     @Test

@@ -67,13 +67,14 @@ class SignUpOrganizationPersistenceIntegrationTest {
 
     @Test
     void successfulSignupPersistsExactlyOneOrganizationAndAssignsTheUser() {
-        signUpService.signUp(new SignUpCommand("persist@example.com", PWD));
+        String email = "persist-" + UUID.randomUUID() + "@example.com";
+        signUpService.signUp(new SignUpCommand(email, PWD));
 
         // Reload both aggregates ~ persistence-level proof of the atomic commit.
-        User saved = users.findByEmail(new Email("persist@example.com")).orElseThrow();
+        User saved = users.findByEmail(new Email(email)).orElseThrow();
         Organization org = organizations.findById(saved.organizationId()).orElseThrow();
 
-        assertEquals("persist@example.com", saved.email().value());
+        assertEquals(email, saved.email().value());
         assertEquals(org.id(), saved.organizationId(),
             "the reloaded User's organization matches the reloaded Organization");
         assertEquals(Organization.Status.ACTIVE, org.status());
@@ -81,11 +82,13 @@ class SignUpOrganizationPersistenceIntegrationTest {
 
     @Test
     void twoIndependentSignupsGetDistinctOrganizations() {
-        signUpService.signUp(new SignUpCommand("tenant-a@example.com", PWD));
-        signUpService.signUp(new SignUpCommand("tenant-b@example.com", PWD));
+        String emailA = "tenant-a-" + UUID.randomUUID() + "@example.com";
+        String emailB = "tenant-b-" + UUID.randomUUID() + "@example.com";
+        signUpService.signUp(new SignUpCommand(emailA, PWD));
+        signUpService.signUp(new SignUpCommand(emailB, PWD));
 
-        User userA = users.findByEmail(new Email("tenant-a@example.com")).orElseThrow();
-        User userB = users.findByEmail(new Email("tenant-b@example.com")).orElseThrow();
+        User userA = users.findByEmail(new Email(emailA)).orElseThrow();
+        User userB = users.findByEmail(new Email(emailB)).orElseThrow();
 
         assertNotEquals(userA.organizationId(), userB.organizationId(),
             "two independent signups must belong to distinct Organizations (tenant isolation)");
@@ -97,11 +100,12 @@ class SignUpOrganizationPersistenceIntegrationTest {
 
     @Test
     void duplicateSignupCreatesNoAdditionalOrganization() {
+        String email = "dup-" + UUID.randomUUID() + "@example.com";
         int orgsBefore = organizations.findAll().size();
-        signUpService.signUp(new SignUpCommand("dup@example.com", PWD));
+        signUpService.signUp(new SignUpCommand(email, PWD));
 
         assertThrows(DuplicateEmailException.class,
-            () -> signUpService.signUp(new SignUpCommand("dup@example.com", PWD)));
+            () -> signUpService.signUp(new SignUpCommand(email, PWD)));
 
         assertEquals(orgsBefore + 1, organizations.findAll().size(),
             "the only new Organization is from the successful signup; the duplicate adds none");
@@ -109,8 +113,9 @@ class SignUpOrganizationPersistenceIntegrationTest {
 
     @Test
     void failedUserWriteRollsBackCoWrittenOrganization() {
+        String email = "co-write-" + UUID.randomUUID() + "@example.com";
         // Pre-register so the email is committed and unique.
-        signUpService.signUp(new SignUpCommand("co-write@example.com", PWD));
+        signUpService.signUp(new SignUpCommand(email, PWD));
 
         String orphanId = "opkg-" + UUID.randomUUID();
         TransactionTemplate tx = new TransactionTemplate(transactionManager);
@@ -122,7 +127,7 @@ class SignUpOrganizationPersistenceIntegrationTest {
             jpaOrganizations.saveAndFlush(new OrganizationJpaEntity(
                 orphanId, "Orphan Co-write", Instant.now(), Organization.Status.ACTIVE, null));
             jpaUsers.saveAndFlush(new UserJpaEntity(
-                UUID.randomUUID().toString(), "co-write@example.com", "hash", Role.VIEWER,
+                UUID.randomUUID().toString(), email, "hash", Role.VIEWER,
                 Instant.now(), orphanId));
         }));
 

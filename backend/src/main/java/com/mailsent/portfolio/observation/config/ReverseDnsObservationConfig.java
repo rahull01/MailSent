@@ -56,7 +56,8 @@ public class ReverseDnsObservationConfig {
                                                               DomainRepository domains,
                                                               ObservationEvidenceRepository evidence,
                                                               ForwardAddressLookup forward,
-                                                              ReverseDnsLookup reverse) {
-        return new ReverseDnsObservationService(observations, domains, evidence, forward, reverse);
+                                                              ReverseDnsLookup reverse,
+                                                              com.mailsent.identity.consent.application.ConsentService consentService) {
+        return new ReverseDnsObservationService(observations, domains, evidence, forward, reverse, consentService);
     }
 }
