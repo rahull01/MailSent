@@ -1,20 +1,15 @@
 package com.mailsent.monitoring.infrastructure.persistence;
 
-import java.time.Instant;
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import com.mailsent.monitoring.application.IncidentRepository;
 import com.mailsent.monitoring.domain.Incident;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
 @Repository
+@Profile("!test")
 public class JpaIncidentRepositoryAdapter implements IncidentRepository {
 
     private final SpringDataIncidentRepository repo;
@@ -27,6 +22,7 @@ public class JpaIncidentRepositoryAdapter implements IncidentRepository {
     public Incident save(Incident incident) {
         IncidentEntity entity = new IncidentEntity();
         entity.setId(incident.id());
+        entity.setOrganizationId(incident.organizationId());
         entity.setDomainId(incident.domainId());
         entity.setOpenedAt(incident.openedAt());
         entity.setResolvedAt(incident.resolvedAt());
@@ -35,14 +31,15 @@ public class JpaIncidentRepositoryAdapter implements IncidentRepository {
     }
 
     @Override
-    public Optional<Incident> findActiveByDomainId(String domainId) {
-        return repo.findByDomainIdAndResolvedAtIsNull(domainId)
-            .map(e -> new Incident(e.getId(), e.getDomainId(), e.getOpenedAt(), e.getResolvedAt()));
+    public Optional<Incident> findActiveByOrganizationIdAndDomainId(String organizationId, String domainId) {
+        return repo.findByOrganizationIdAndDomainIdAndResolvedAtIsNull(organizationId, domainId)
+            .map(e -> new Incident(e.getId(), e.getOrganizationId(), e.getDomainId(), e.getOpenedAt(), e.getResolvedAt()));
     }
 
     @Override
-    public Optional<Incident> findById(String id) {
-        return repo.findById(id)
-            .map(e -> new Incident(e.getId(), e.getDomainId(), e.getOpenedAt(), e.getResolvedAt()));
+    public Optional<Incident> findById(String organizationId, String id) {
+        return repo.findByOrganizationIdAndId(organizationId, id)
+            .map(e -> new Incident(e.getId(), e.getOrganizationId(), e.getDomainId(), e.getOpenedAt(), e.getResolvedAt()));
     }
 }
+

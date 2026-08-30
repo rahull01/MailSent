@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SpringDataIncidentRepository extends JpaRepository<IncidentEntity, String> {
-    Optional<IncidentEntity> findByDomainIdAndResolvedAtIsNull(String domainId);
+    Optional<IncidentEntity> findByOrganizationIdAndDomainIdAndResolvedAtIsNull(String organizationId, String domainId);
+    Optional<IncidentEntity> findByOrganizationIdAndId(String organizationId, String id);
 }
+

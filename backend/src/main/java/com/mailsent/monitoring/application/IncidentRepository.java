@@ -5,6 +5,7 @@ import com.mailsent.monitoring.domain.Incident;
 
 public interface IncidentRepository {
     Incident save(Incident incident);
-    Optional<Incident> findActiveByDomainId(String domainId);
-    Optional<Incident> findById(String id);
+    Optional<Incident> findActiveByOrganizationIdAndDomainId(String organizationId, String domainId);
+    Optional<Incident> findById(String organizationId, String id);
 }
+

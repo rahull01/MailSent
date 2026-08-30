@@ -36,8 +36,8 @@ class NotificationDispatchTest {
 
     @Test
     void buildsDigestNotification() {
-        Alert a1 = Alert.generate("inc-1", AlertSeverity.CRITICAL, "SPF Limit Exceeded", "Promotional mail sent to spam", "Flatten SPF", Instant.now());
-        Alert a2 = Alert.generate("inc-2", AlertSeverity.WARNING, "DMARC Quarantine Recommended", "Impersonation risk", "Enforce p=quarantine", Instant.now());
+        Alert a1 = Alert.generate("org-1", "inc-1", AlertSeverity.CRITICAL, "SPF Limit Exceeded", "Promotional mail sent to spam", "Flatten SPF", Instant.now());
+        Alert a2 = Alert.generate("org-2", "inc-2", AlertSeverity.WARNING, "DMARC Quarantine Recommended", "Impersonation risk", "Enforce p=quarantine", Instant.now());
 
         NotificationMessage digest = DigestBuilder.buildDigest(
                 "user-1",

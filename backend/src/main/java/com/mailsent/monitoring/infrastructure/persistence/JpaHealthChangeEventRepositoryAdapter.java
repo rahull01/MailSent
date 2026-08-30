@@ -1,24 +1,16 @@
 package com.mailsent.monitoring.infrastructure.persistence;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import com.mailsent.monitoring.application.HealthChangeEventRepository;
 import com.mailsent.monitoring.domain.HealthChangeEvent;
-import com.mailsent.portfolio.observation.domain.HealthIndication;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 @Repository
+@Profile("!test")
 public class JpaHealthChangeEventRepositoryAdapter implements HealthChangeEventRepository {
 
     private final SpringDataHealthChangeEventRepository repo;
@@ -31,6 +23,7 @@ public class JpaHealthChangeEventRepositoryAdapter implements HealthChangeEventR
     public HealthChangeEvent save(HealthChangeEvent event) {
         HealthChangeEventEntity entity = new HealthChangeEventEntity();
         entity.setId(event.id());
+        entity.setOrganizationId(event.organizationId());
         entity.setDomainId(event.domainId());
         entity.setPreviousIndication(event.previousIndication());
         entity.setCurrentIndication(event.currentIndication());
@@ -40,10 +33,11 @@ public class JpaHealthChangeEventRepositoryAdapter implements HealthChangeEventR
     }
 
     @Override
-    public List<HealthChangeEvent> findByDomainId(String domainId) {
-        return repo.findByDomainIdOrderByDetectedAtDesc(domainId).stream()
+    public List<HealthChangeEvent> findByOrganizationIdAndDomainId(String organizationId, String domainId) {
+        return repo.findByOrganizationIdAndDomainIdOrderByDetectedAtDesc(organizationId, domainId).stream()
             .map(e -> new HealthChangeEvent(
                 e.getId(),
+                e.getOrganizationId(),
                 e.getDomainId(),
                 e.getPreviousIndication(),
                 e.getCurrentIndication(),
@@ -52,3 +46,4 @@ public class JpaHealthChangeEventRepositoryAdapter implements HealthChangeEventR
             .collect(Collectors.toList());
     }
 }
+
