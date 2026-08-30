@@ -26,8 +26,8 @@ class IncidentServiceTest {
 
     @Test
     void opensIncidentWhenAtRiskAndNoActiveIncidentExists() {
-        HealthChangeEvent event = HealthChangeEvent.detect("dom-1", HealthIndication.HEALTHY, HealthIndication.AT_RISK, Instant.now());
-        when(incidents.findActiveByDomainId("dom-1")).thenReturn(Optional.empty());
+        HealthChangeEvent event = HealthChangeEvent.detect("org-1", "dom-1", HealthIndication.HEALTHY, HealthIndication.AT_RISK, Instant.now());
+        when(incidents.findActiveByOrganizationIdAndDomainId("org-1", "dom-1")).thenReturn(Optional.empty());
 
         service.processHealthChange(event);
 
@@ -35,15 +35,16 @@ class IncidentServiceTest {
         verify(incidents).save(captor.capture());
         
         Incident saved = captor.getValue();
+        assertEquals("org-1", saved.organizationId());
         assertEquals("dom-1", saved.domainId());
         assertEquals(event.detectedAt(), saved.openedAt());
     }
 
     @Test
     void doesNotOpenIncidentWhenAtRiskAndActiveIncidentExists() {
-        HealthChangeEvent event = HealthChangeEvent.detect("dom-1", HealthIndication.HEALTHY, HealthIndication.AT_RISK, Instant.now());
-        Incident existing = Incident.open("dom-1", Instant.now().minusSeconds(60));
-        when(incidents.findActiveByDomainId("dom-1")).thenReturn(Optional.of(existing));
+        HealthChangeEvent event = HealthChangeEvent.detect("org-1", "dom-1", HealthIndication.HEALTHY, HealthIndication.AT_RISK, Instant.now());
+        Incident existing = Incident.open("org-1", "dom-1", Instant.now().minusSeconds(60));
+        when(incidents.findActiveByOrganizationIdAndDomainId("org-1", "dom-1")).thenReturn(Optional.of(existing));
 
         service.processHealthChange(event);
 
@@ -52,9 +53,9 @@ class IncidentServiceTest {
 
     @Test
     void resolvesIncidentWhenHealthyAndActiveIncidentExists() {
-        HealthChangeEvent event = HealthChangeEvent.detect("dom-1", HealthIndication.AT_RISK, HealthIndication.HEALTHY, Instant.now());
-        Incident existing = Incident.open("dom-1", Instant.now().minusSeconds(60));
-        when(incidents.findActiveByDomainId("dom-1")).thenReturn(Optional.of(existing));
+        HealthChangeEvent event = HealthChangeEvent.detect("org-1", "dom-1", HealthIndication.AT_RISK, HealthIndication.HEALTHY, Instant.now());
+        Incident existing = Incident.open("org-1", "dom-1", Instant.now().minusSeconds(60));
+        when(incidents.findActiveByOrganizationIdAndDomainId("org-1", "dom-1")).thenReturn(Optional.of(existing));
 
         service.processHealthChange(event);
 
@@ -65,8 +66,8 @@ class IncidentServiceTest {
 
     @Test
     void ignoresHealthyWhenNoActiveIncidentExists() {
-        HealthChangeEvent event = HealthChangeEvent.detect("dom-1", HealthIndication.AT_RISK, HealthIndication.HEALTHY, Instant.now());
-        when(incidents.findActiveByDomainId("dom-1")).thenReturn(Optional.empty());
+        HealthChangeEvent event = HealthChangeEvent.detect("org-1", "dom-1", HealthIndication.AT_RISK, HealthIndication.HEALTHY, Instant.now());
+        when(incidents.findActiveByOrganizationIdAndDomainId("org-1", "dom-1")).thenReturn(Optional.empty());
 
         service.processHealthChange(event);
 

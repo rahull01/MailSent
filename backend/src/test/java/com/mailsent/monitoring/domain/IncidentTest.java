@@ -16,9 +16,10 @@ class IncidentTest {
     @Test
     void opensNewIncident() {
         Instant now = Instant.now();
-        Incident incident = Incident.open("dom-1", now);
+        Incident incident = Incident.open("org-1", "dom-1", now);
 
         assertNotNull(incident.id());
+        assertEquals("org-1", incident.organizationId());
         assertEquals("dom-1", incident.domainId());
         assertEquals(now, incident.openedAt());
         assertNull(incident.resolvedAt());
@@ -27,7 +28,7 @@ class IncidentTest {
 
     @Test
     void resolvesIncident() {
-        Incident incident = Incident.open("dom-1", Instant.now());
+        Incident incident = Incident.open("org-1", "dom-1", Instant.now());
         Instant resolvedAt = Instant.now().plusSeconds(60);
 
         incident.resolve(resolvedAt);
@@ -38,7 +39,7 @@ class IncidentTest {
 
     @Test
     void cannotResolveAlreadyResolvedIncident() {
-        Incident incident = Incident.open("dom-1", Instant.now());
+        Incident incident = Incident.open("org-1", "dom-1", Instant.now());
         incident.resolve(Instant.now().plusSeconds(60));
 
         assertThrows(IllegalStateException.class, () -> incident.resolve(Instant.now().plusSeconds(120)));
