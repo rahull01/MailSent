@@ -11,11 +11,13 @@ import com.mailsent.portfolio.domain.application.DomainRepository;
 import com.mailsent.portfolio.domain.domain.Domain;
 import com.mailsent.portfolio.observation.domain.BlacklistObservation;
 import com.mailsent.portfolio.observation.domain.DnsHealthObservation;
+import com.mailsent.portfolio.observation.domain.HealthIndication;
+import com.mailsent.portfolio.observation.domain.HealthSignal;
 import com.mailsent.portfolio.observation.domain.ObservationEvidence;
 import com.mailsent.portfolio.observation.domain.ReputationObservation;
 
 /**
- * InfrastructureMapService — MAP-001 application topology read-model.
+ * InfrastructureMapService — MAP-001/MAP-002 application topology read-model.
  *
  * <p>Builds the frozen WF-5 chain Domain → DNS → SPF → DKIM → DMARC → Senders →
  * Inbox for one registered Domain. Observation Evidence is the primary source
@@ -23,7 +25,11 @@ import com.mailsent.portfolio.observation.domain.ReputationObservation;
  * {@link NodeAvailability#NOT_OBSERVED} (no DKIM/DMARC snapshot, no DIAG-002,
  * Inbox is a glossary destination). Reputation, DNS Health, and Blacklist
  * snapshots may appear only as optional evidence references on DNS — never as
- * extra node types. No persistence, HTTP, color, score, or Health Signal.</p>
+ * extra node types.</p>
+ *
+ * <p>MAP-002 consumes the canonical HEALTH-001 {@link HealthSignal} to project
+ * verified health indications on nodes without altering raw observation availability
+ * or multi-tenant boundaries (INV-09).</p>
  */
 public class InfrastructureMapService {
 
@@ -32,16 +38,26 @@ public class InfrastructureMapService {
     private final ReputationObservationService reputation;
     private final DnsHealthObservationService dnsHealth;
     private final BlacklistObservationService blacklist;
+    private final HealthSignalService healthSignalService;
 
     public InfrastructureMapService(DomainRepository domains, ObservationEvidenceService evidence,
                                     ReputationObservationService reputation,
                                     DnsHealthObservationService dnsHealth,
-                                    BlacklistObservationService blacklist) {
+                                    BlacklistObservationService blacklist,
+                                    HealthSignalService healthSignalService) {
         this.domains = domains;
         this.evidence = evidence;
         this.reputation = reputation;
         this.dnsHealth = dnsHealth;
         this.blacklist = blacklist;
+        this.healthSignalService = healthSignalService;
+    }
+
+    public InfrastructureMapService(DomainRepository domains, ObservationEvidenceService evidence,
+                                    ReputationObservationService reputation,
+                                    DnsHealthObservationService dnsHealth,
+                                    BlacklistObservationService blacklist) {
+        this(domains, evidence, reputation, dnsHealth, blacklist, null);
     }
 
     /**
@@ -62,15 +78,30 @@ public class InfrastructureMapService {
             ObservationEvidence::id,
             domain.organizationId());
 
+        HealthIndication domainHealth = HealthIndication.UNKNOWN;
+        if (healthSignalService != null) {
+            Optional<HealthSignal> latestSignal = latestOwned(
+                healthSignalService.findByDomainId(domain.id()),
+                HealthSignal::organizationId,
+                HealthSignal::observedAt,
+                HealthSignal::id,
+                domain.organizationId());
+            if (latestSignal.isPresent()) {
+                domainHealth = latestSignal.get().indication();
+            }
+        }
+
         List<InfrastructureMapNode> nodes = List.of(
-            node(domain, InfrastructureNodeType.DOMAIN, NodeAvailability.OBSERVED),
+            node(domain, InfrastructureNodeType.DOMAIN, NodeAvailability.OBSERVED, domainHealth),
             node(domain, InfrastructureNodeType.DNS,
-                latestEvidence.isPresent() ? NodeAvailability.OBSERVED : NodeAvailability.UNAVAILABLE),
-            node(domain, InfrastructureNodeType.SPF, spfAvailability(latestEvidence)),
-            node(domain, InfrastructureNodeType.DKIM, NodeAvailability.NOT_OBSERVED),
-            node(domain, InfrastructureNodeType.DMARC, NodeAvailability.NOT_OBSERVED),
-            node(domain, InfrastructureNodeType.SENDERS, NodeAvailability.NOT_OBSERVED),
-            node(domain, InfrastructureNodeType.INBOX, NodeAvailability.NOT_OBSERVED)
+                latestEvidence.isPresent() ? NodeAvailability.OBSERVED : NodeAvailability.UNAVAILABLE,
+                domainHealth),
+            node(domain, InfrastructureNodeType.SPF, spfAvailability(latestEvidence),
+                latestEvidence.isPresent() && latestEvidence.get().spfRecord().isPresent() ? domainHealth : HealthIndication.UNKNOWN),
+            node(domain, InfrastructureNodeType.DKIM, NodeAvailability.NOT_OBSERVED, domainHealth),
+            node(domain, InfrastructureNodeType.DMARC, NodeAvailability.NOT_OBSERVED, domainHealth),
+            node(domain, InfrastructureNodeType.SENDERS, NodeAvailability.NOT_OBSERVED, HealthIndication.UNKNOWN),
+            node(domain, InfrastructureNodeType.INBOX, NodeAvailability.NOT_OBSERVED, domainHealth)
         );
 
         List<InfrastructureMapRelationship> relationships = List.of(
@@ -143,8 +174,8 @@ public class InfrastructureMapService {
     }
 
     private static InfrastructureMapNode node(Domain domain, InfrastructureNodeType type,
-                                              NodeAvailability availability) {
-        return new InfrastructureMapNode(identity(domain, type), type, availability);
+                                              NodeAvailability availability, HealthIndication health) {
+        return new InfrastructureMapNode(identity(domain, type), type, availability, health);
     }
 
     private static InfrastructureMapRelationship edge(Domain domain, InfrastructureNodeType from,
