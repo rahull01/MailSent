@@ -74,7 +74,7 @@ public class SmtpGreetingObservationService {
         }
 
         try {
-            consentService.requireConsent(domain.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+            consentService.requireConsent(domain.organizationId(), domain.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
         } catch (com.mailsent.identity.consent.application.ConsentRequiredException e) {
             return List.of();
         }

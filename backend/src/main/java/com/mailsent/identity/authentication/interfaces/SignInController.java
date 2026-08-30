@@ -14,6 +14,7 @@ import com.mailsent.identity.authentication.application.SignInCommand;
 import com.mailsent.identity.authentication.application.SignInResult;
 import com.mailsent.identity.authentication.application.SignInService;
 import com.mailsent.identity.authentication.domain.InvalidCredentialsException;
+import com.mailsent.identity.authentication.domain.InvalidEmailException;
 
 import com.mailsent.common.error.ApiError;
 
@@ -50,5 +51,16 @@ public class SignInController {
     public ResponseEntity<ApiError> onInvalidCredentials(InvalidCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body(ApiError.simple("UNAUTHORIZED", "INVALID_CREDENTIALS", ex.getMessage()));
+    }
+
+    /**
+     * A syntactically invalid address is a client input error (400), not an authentication
+     * failure. Well-formed addresses always receive the uniform 401, so anti-enumeration
+     * semantics for real accounts are unchanged.
+     */
+    @ExceptionHandler(InvalidEmailException.class)
+    public ResponseEntity<ApiError> onInvalidEmail(InvalidEmailException ex) {
+        return ResponseEntity.badRequest()
+            .body(ApiError.simple("BAD_REQUEST", "INVALID_EMAIL", ex.getMessage()));
     }
 }

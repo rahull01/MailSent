@@ -20,6 +20,14 @@ public class InMemorySessionRepository implements SessionRepository {
         return session;
     }
 
+    @Override
+    public java.util.Optional<Session> findByTokenHash(String tokenHash) {
+        if (tokenHash == null || tokenHash.isBlank()) {
+            return java.util.Optional.empty();
+        }
+        return java.util.Optional.ofNullable(byTokenHash.get(tokenHash));
+    }
+
     /** Count of sessions, for tests and observability. */
     public int count() {
         return byTokenHash.size();

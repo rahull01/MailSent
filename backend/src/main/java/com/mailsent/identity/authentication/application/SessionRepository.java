@@ -1,20 +1,20 @@
 package com.mailsent.identity.authentication.application;
 
+import java.util.Optional;
+
 import com.mailsent.identity.authentication.domain.Session;
 
 /**
- * SessionRepository — the port for persisting sessions.
+ * SessionRepository — the port for persisting and retrieving sessions.
  *
  * <p>Owned by the application; satisfied by an infrastructure adapter. Sign-in persists a
- * session atomically. The durable PostgreSQL adapter is AUTH-002; a hermetic in-memory
- * adapter backs the module until then. Only the token hash is stored, never the raw
- * bearer value.</p>
- *
- * <p><strong>Scope.</strong> AUTH-001 only needs to create sessions. Retrieval by token
- * (session consumption) belongs to AUTH-006 and is deliberately not declared here.</p>
+ * session atomically. Only the token hash is stored, never the raw bearer value.</p>
  */
 public interface SessionRepository {
 
     /** Persists a session and returns it, assigning the storage identity if any. */
     Session save(Session session);
+
+    /** Loads a session by its token hash for authentication and session consumption. */
+    Optional<Session> findByTokenHash(String tokenHash);
 }

@@ -1,6 +1,7 @@
 package com.mailsent.portfolio.observation.application;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -37,24 +38,31 @@ public class ReverseDnsObservationService {
     private final ObservationEvidenceRepository evidence;
     private final ForwardAddressLookup forward;
     private final ReverseDnsLookup reverse;
+    private final com.mailsent.identity.consent.application.ConsentService consentService;
 
     public ReverseDnsObservationService(ReverseDnsObservationRepository observations, DomainRepository domains,
                                         ObservationEvidenceRepository evidence, ForwardAddressLookup forward,
-                                        ReverseDnsLookup reverse) {
+                                        ReverseDnsLookup reverse,
+                                        com.mailsent.identity.consent.application.ConsentService consentService) {
         this.observations = observations;
         this.domains = domains;
         this.evidence = evidence;
         this.forward = forward;
         this.reverse = reverse;
+        this.consentService = consentService;
     }
 
     /**
      * Observes reverse DNS for a registered domain from its latest Observation
      * Evidence MX hosts and persists every successful PTR snapshot.
      *
+     * <p>Consent-gated (INV-02): PTR probing of the domain's own mail infrastructure
+     * falls under {@code OBSERVE_DOMAIN_INFRASTRUCTURE}; without a granted consent the
+     * observation does not happen and nothing is persisted.</p>
+     *
      * @param domainName the domain to observe (canonicalized)
-     * @return the persisted snapshots (possibly empty — no MX to observe, or no
-     *         successful PTR)
+     * @return the persisted snapshots (possibly empty — no MX to observe, no
+     *         successful PTR, or no consent)
      * @throws DomainNotRegisteredException if the domain is not registered
      */
     public List<ReverseDnsObservation> record(String domainName) {
@@ -62,12 +70,19 @@ public class ReverseDnsObservationService {
         Domain domain = domains.findByName(canonical)
             .orElseThrow(() -> new DomainNotRegisteredException(canonical));
 
+        try {
+            consentService.requireConsent(domain.organizationId(), domain.id(),
+                com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+        } catch (com.mailsent.identity.consent.application.ConsentRequiredException e) {
+            return List.of(); // INV-02: without consent there is no observation at all.
+        }
+
         Optional<ObservationEvidence> latest = latestEvidence(domain.id());
         if (latest.isEmpty() || latest.get().mxRecords().isEmpty()) {
             return List.of();
         }
 
-        Instant observedAt = Instant.now();
+        Instant observedAt = Instant.now().truncatedTo(ChronoUnit.MICROS);
         List<ReverseDnsObservation> persisted = new ArrayList<>();
         for (MxRecord mx : latest.get().mxRecords()) {
             observeFamily(persisted, domain, mx.exchange(), IpAddressFamily.IPV4, observedAt);
