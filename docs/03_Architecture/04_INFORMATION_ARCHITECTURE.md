@@ -65,7 +65,7 @@ For each category: Purpose, Canonical Owner, Producers, Consumers, Authority Rul
 - Canonical Owner: Delivery Observation.
 - Producers: Delivery Observation.
 - Consumers: Diagnosis, Monitoring, Reporting, Readiness.
-- Authority Rule: the Health Signal is authoritative, produced by the owner and read everywhere else.
+- Authority Rule: Observation Evidence is the immutable factual snapshot of what was actually observed (Phase 08 DNS frozen to MX, TXT, SPF, observedAt, and identity; DKIM, DMARC, and alignment are not added); consumers may read it and must not rewrite it. Reverse DNS Observation is the separate immutable reverse-DNS snapshot (MX→A/AAAA→PTR); it is not Observation Evidence, not FCrDNS, and not Health Signal. SMTP Greeting Observation is the separate immutable SMTP greeting/EHLO snapshot (MX from Observation Evidence → A/AAAA → SMTP); it is not Observation Evidence, not Reverse DNS Observation, not HELO/EHLO validation, and not Health Signal. DNS Health Observation is the separate immutable TTL/DNSSEC/propagation snapshot; it is not Observation Evidence, not Health Signal, not Trust Score, and not HEALTH-001. Blacklist Observation is the separate immutable Spamhaus/Barracuda/SURBL/URIBL snapshot; it is not Health Signal and not a listed/not-listed conclusion. DMARC Report Receipt, Parsed DMARC Report, and DMARC Aggregate Evidence are observation-adjacent ingest snapshots owned here; they are not Observation Evidence and not Alignment. HEALTH-001 V1 required persisted inputs are Observation Evidence (DNS/SPF), DMARC Aggregate Evidence (H2 alignment facts), and Reputation Observation — never in-memory DIAG-001 Alignment. The Health Signal remains the later unified indication of delivery health (healthy | at-risk | unknown), produced by HEALTH-001 (the owner) as an append-only snapshot envelope with lineage; mapping healthy vs at-risk is out of scope for the HEALTH-001 freeze. Diagnosis must not fabricate Health Signal. Observation Evidence is not Report / Proof Evidence.
 
 ### 3.4 Diagnosis Information
 
@@ -73,7 +73,7 @@ For each category: Purpose, Canonical Owner, Producers, Consumers, Authority Rul
 - Canonical Owner: Diagnosis.
 - Producers: Diagnosis.
 - Consumers: Business Explanation, Impact, Guidance, Reporting.
-- Authority Rule: the Root cause is authoritative in Diagnosis; no other context revises it.
+- Authority Rule: the Root cause is authoritative in Diagnosis; no other context revises it. Diagnosis owns Issue and Root cause. Alignment is a derived/value concept, not an Issue and not a persisted Diagnosis resource. DIAG-001 Alignment derivation is Analyzer-class, from DMARC Aggregate Evidence when INT-003–006 facts exist, not from Health Signal. Diagnosis consumes ingest; it does not own or persist DMARC Report Receipt or DMARC Aggregate Evidence. Diagnosis consumes Health Signal for Issue/root-cause **only when it can state healthy vs at-risk**; an **unknown** envelope does not unblock DIAG-003. Diagnosis must not fabricate Health Signal. HEALTH-001 does not consume DIAG-001 memory.
 
 ### 3.5 Business Explanation Information
 
@@ -113,7 +113,7 @@ For each category: Purpose, Canonical Owner, Producers, Consumers, Authority Rul
 - Canonical Owner: Reporting and Evidence.
 - Producers: Reporting and Evidence.
 - Consumers: Clients, auditors, boards, the customer.
-- Authority Rule: the Report follows from what it reports and is authoritative for the proof it states.
+- Authority Rule: the Report (Evidence / proof of health, Report / Proof Evidence) follows from what it reports and is authoritative for the proof it states. It is not Observation Evidence and does not own or mutate the raw observation snapshot.
 
 ### 3.10 Readiness and Compliance Information
 
@@ -143,13 +143,13 @@ For each category: Purpose, Canonical Owner, Producers, Consumers, Authority Rul
 
 Information becomes knowledge through a flow of meaning. Each step turns one piece of information into the next.
 
-- **Observation produces truth.** Delivery Observation produces the Health Signal, a truthful fact about a domain.
-- **Diagnosis yields cause.** From that truth, Diagnosis states the Issue and the Root cause.
+- **Observation produces truth.** Delivery Observation reads infrastructure and records Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, and Blacklist Observation, records DMARC ingest evidence (Receipt / Parsed / Aggregate) from RUA, then produces the Health Signal **when HEALTH-001 persists a snapshot** (required sources present; indication healthy | at-risk | unknown per interpretation freeze). Health Signal is later interpretation of those facts, not the raw snapshot, and is not produced by Diagnosis. HEALTH-001 V1 cites OE, DMARC Aggregate Evidence, and Reputation Observation; only V15 judgment fields vote; it does not wait on Blacklist / Reverse DNS / SMTP Greeting / DNS Health Observation. DMARC ingest evidence is not Observation Evidence.
+- **Diagnosis yields cause.** Diagnosis consumes Health Signal for Issue/root-cause **when it can state healthy vs at-risk**. Alignment (DIAG-001) is Analyzer-class derivation from DMARC Aggregate Evidence, not from Health Signal. Alignment is not an Issue. Diagnosis does not persist ingest. HEALTH-001 does not take DIAG-001 Alignment as a stored input.
 - **Explanation turns cause into meaning.** Business Explanation makes the cause understood in business terms.
 - **Impact and Priority turns meaning into a decision.** The Impact and the Priority order the issues by risk.
 - **Guidance turns a decision into action.** Guidance and Resolution guide the customer to a fix and verify it.
 - **Monitoring keeps the truth current.** Monitoring holds the health a state and sends an Alert to the attention of a change.
-- **Reporting and Evidence turn state into proof.** Reporting and Evidence give the proof; Readiness measures against the reference.
+- **Reporting and Evidence turn state into proof.** Reporting and Evidence give Report / Proof Evidence; Readiness measures against the reference. That proof is not Observation Evidence.
 - **History and Feedback become knowledge.** Kept states and the customer's Feedback return as learning and become the knowledge that improves the product.
 
 In every relationship, the information flows so that the outcome is the customer's Confidence and the protection of the Trust of their clients. That is how business information becomes business knowledge.
@@ -172,8 +172,8 @@ The lifecycle makes sure that information is neither kept forever nor lost: it i
 
 Business information, classified by its role.
 
-- **Authoritative.** Ground truth the business stands on and others trust — the Domain registry, the Health Signal as produced, Consent, the Root cause.
-- **Derived.** Information assembled from authoritative sources — the Health Trend, the Impact, the Priority, the Alert, the Readiness, the Report.
+- **Authoritative.** Ground truth the business stands on and others trust — the Domain registry, the Health Signal as produced, Consent, the Root cause, Observation Evidence, DMARC Report Receipt, DMARC Aggregate Evidence.
+- **Derived.** Information assembled from authoritative sources — the Health Trend, the Impact, the Priority, the Alert, the Readiness, the Report, Alignment (DIAG-001; not persisted).
 - **Reference.** Relatively stable material used to interpret — a Provider's requirement, a sender's rule, a readiness standard.
 - **Historical.** Past states kept for context and proof — health history, past Reports, evidence of past failures and fixes.
 - **Temporary.** Transient information with little lasting value — the in-progress state of a change.

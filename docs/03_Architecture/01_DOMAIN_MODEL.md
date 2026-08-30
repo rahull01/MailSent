@@ -92,7 +92,7 @@ For each concept: Definition, Responsibility, Relationships, and Not.
 
 **Sender**
 - Definition: A recognized party (for example an email service provider) that sends on behalf of a domain.
-- Responsibility: To be identified and its authentication checked, because alignment depends on who is sending.
+- Responsibility: To be identified and its authentication checked, because alignment depends on who is sending. Sender detection is DIAG-002 (Alignment Intelligence), not DIAG-001.
 - Relationships: Sends for a domain; its alignment with the domain determines part of health.
 - Not: The domain itself.
 
@@ -104,9 +104,9 @@ For each concept: Definition, Responsibility, Relationships, and Not.
 
 **Health Signal**
 - Definition: The unified, legible indication of a domain's delivery health; the canonical measure.
-- Responsibility: To answer the customer's question, "is my email working?", in one truthful indication.
+- Responsibility: To answer the customer's question, "is my email working?", in one truthful indication (**healthy** | **at-risk** | **unknown**) assigned by HEALTH-001 from persisted DMARC Aggregate Evidence tokens when required snapshots exist.
 - Relationships: Reflects a domain's infrastructure state; carries a Health Trend; is the basis for issues, reports, and alerts.
-- Not: Trust Score, which is a deprecated alias; not a raw record.
+- Not: Trust Score, which is a deprecated alias; not a raw record; not MAP-002 color invented from observation availability. HEALTH-001 is the authoritative source of this state.
 
 **Health Trend**
 - Definition: The time-based representation of a Health Signal, showing improvement, stability, or decline.
@@ -116,23 +116,35 @@ For each concept: Definition, Responsibility, Relationships, and Not.
 
 **Reputation**
 - Definition: External signals about a domain's sending reputation, as observed where possible.
-- Responsibility: To be one input to health, reflecting how providers perceive the domain.
-- Relationships: Belongs to a domain; contributes to its Health Signal.
-- Not: A manipulated or warm-up number.
+- Responsibility: To be one later input to health, reflecting how providers perceive the domain.
+- Relationships: Belongs to a domain; contributes to its Health Signal when health is later produced. Raw provider reads are recorded as Reputation Observation, not as this concept.
+- Not: A manipulated or warm-up number; not Reputation Observation (the persisted raw snapshot).
+
+**Reputation Observation**
+- Definition: An immutable, persisted snapshot of one raw external reputation observation (Google Postmaster or Microsoft SNDS) for a registered Domain.
+- Responsibility: To hold only the facts actually returned by that provider — source identity, observation instant, and opaque raw payload — so later interpretation can be traced to a real read.
+- Relationships: Produced by observing a registered Domain; identified by organization and domain (identity and tenant isolation); owned by Delivery Observation. It is not a Reputation aggregate.
+- Not: Health Signal, Trust Score, diagnosis, Finding, Assessment, recommendation, compliance, blacklist result, scores, grades, risk, or Evidence / proof of health.
+
+**Blacklist Observation**
+- Definition: An immutable, persisted snapshot of one raw external blacklist observation (Spamhaus, Barracuda, SURBL, or URIBL) for a registered Domain.
+- Responsibility: To hold only the facts actually returned by that provider — source identity, observation instant, and opaque raw payload — so later interpretation can be traced to a real read.
+- Relationships: Produced by observing a registered Domain; identified by organization and domain (identity and tenant isolation); owned by Delivery Observation. Each provider is a separate fact.
+- Not: Health Signal, Trust Score, diagnosis, Finding, Assessment, recommendation, compliance, listed/not-listed conclusion, Reputation Observation, scores, grades, risk, or Evidence / proof of health.
 
 **Alignment**
 - Definition: The consistency between who authenticates a message and who the domain says is sending.
-- Responsibility: To determine whether a provider accepts a message as legitimate.
-- Relationships: Connects a Sender to a Domain; a misalignment is a common root cause of delivery failure.
-- Not: A configuration file.
+- Responsibility: To determine whether a provider accepts a message as legitimate. DIAG-001 derives this as Analyzer-class Alignment (Constitution Analyzer: SPF/DKIM/DMARC parsing + alignment). Real Alignment requires DMARC evidence from INT-003–006; it cannot be computed from Phase 08 DNS TXT. Alignment is a derived value, not an Issue, not a persisted table, and not a Health Signal.
+- Relationships: Connects a Sender to a Domain; a misalignment is a common root cause of delivery failure. Alignment itself is not the Issue; DIAG-003 names Root cause when HEALTH-001 exists.
+- Not: A configuration file; sender detection (DIAG-002); Root cause; Issue; Observation Evidence; Health Signal; Trust Score.
 
 ### Issues and resolution
 
 **Issue**
 - Definition: A delivery problem detected on a domain, with a root cause.
-- Responsibility: To be the unit of diagnosis and resolution — the thing a customer understands, prioritizes, and fixes.
+- Responsibility: To be the unit of diagnosis and resolution — the thing a customer understands, prioritizes, and fixes. Diagnosis owns Issue and Root cause. Alignment is not an Issue. DIAG-001 does not own Issue lifecycle.
 - Relationships: Belongs to a domain; has a root cause, a business impact, a priority, guidance, and a verification state.
-- Not: A raw technical finding without meaning.
+- Not: A raw technical finding without meaning; Alignment.
 
 **Root cause**
 - Definition: The underlying cause of an issue, not its symptom.
@@ -166,6 +178,48 @@ For each concept: Definition, Responsibility, Relationships, and Not.
 
 ### Monitoring and evidence
 
+**Observation Evidence**
+- Definition: An immutable, persisted snapshot of factual data obtained from a real infrastructure observation.
+- Responsibility: To hold only the facts actually returned by the observation, so later interpretation can be traced to a real read. Phase 08 DNS is frozen to MX, TXT, SPF, observedAt, and identity; PTR is not Observation Evidence.
+- Relationships: Produced by observing a Domain's Email Infrastructure; identified by organization and domain (identity and tenant isolation); consumed later by health, diagnosis, and reporting. Bounded-context ownership is Delivery Observation; the Domain aggregate does not own Observation Evidence.
+- Not: Health Signal, Diagnosis, Finding, Assessment, Recommendation, AI conclusion, Report, compliance conclusion, inferred health, fabricated validity, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, or Evidence / proof of health.
+
+**Reverse DNS Observation**
+- Definition: An immutable, persisted snapshot of one raw reverse-DNS (PTR) observation for an IP of an observed MX host of a registered Domain.
+- Responsibility: To hold only the facts actually returned — identity from the registered Domain, source MX hostname, IP (IPv4 and/or IPv6 when actually available), PTR values as observed, and observedAt — so later interpretation can be traced to a real MX→A/AAAA→PTR read. It does not perform FCrDNS and does not create Health Signal.
+- Relationships: Produced by observing a registered Domain; identified by organization and domain (identity and tenant isolation); owned by Delivery Observation as a snapshot separate from Observation Evidence. The caller supplies only the domain name.
+- Not: Observation Evidence, SMTP Greeting Observation, FCrDNS, pass/fail, Health Signal, diagnosis, score, deliverability, Trust Score, DNSSEC/TTL, blacklist result, or Evidence / proof of health.
+
+**SMTP Greeting Observation**
+- Definition: An immutable, persisted snapshot of one raw SMTP greeting/banner and EHLO capability observation for a resolved IP of an observed MX host of a registered Domain.
+- Responsibility: To hold only the facts actually returned — identity from the registered Domain, source MX hostname from Observation Evidence, resolved IP and address family, observedAt, connection/probe outcome, raw SMTP greeting as returned, and raw EHLO response/capabilities if EHLO was actually accepted — so later interpretation can be traced to a real MX→A/AAAA→SMTP read. It is an active probe only against registered-domain MX infrastructure; it does not send mail, authenticate, test relay or delivery, or create Health Signal.
+- Relationships: Produced by observing a registered Domain; identified by organization and domain (identity and tenant isolation); owned by Delivery Observation as a snapshot separate from Observation Evidence and Reverse DNS Observation. The caller supplies only the domain name.
+- Not: Observation Evidence, Reverse DNS Observation, HELO/EHLO validation, valid/invalid, healthy, deliverability score, open relay finding, security diagnosis, compliance, Health Signal, Trust Score, diagnosis, recommendation, report/proof, mail sending, or Evidence / proof of health.
+
+**DNS Health Observation**
+- Definition: An immutable, persisted snapshot of one raw DNS health observation (TTL, DNSSEC-related records, named-resolver propagation) for a registered Domain.
+- Responsibility: To hold only the facts actually returned — identity from the registered Domain, observedAt, per-record TTL, DNSKEY/DS presence or unavailability without cryptographic validation, and per-resolver raw answers or unavailability — so later interpretation can be traced to a real DNS-health read. It does not create Health Signal, Trust Score, or HEALTH-001.
+- Relationships: Produced by observing a registered Domain; identified by organization and domain (identity and tenant isolation); owned by Delivery Observation as a snapshot separate from Observation Evidence. The caller supplies only the domain name.
+- Not: Observation Evidence, Health Signal, Trust Score, HEALTH-001, INF-008, cryptographic DNSSEC validation, pass/fail health, diagnosis, score, recommendation, or Evidence / proof of health.
+
+**Infrastructure Map**
+- Definition: The topology read-model of a registered Domain along Domain → DNS → SPF → DKIM → DMARC → Senders → Inbox (MAP-001). MAP-001 remains topology/read-model only.
+- Responsibility: To show which of those nodes are observed, not observed, or unavailable from facts that already exist. Observation Evidence supplies DNS and SPF; nodes without a snapshot stay unobserved. It does not store, score, or color infrastructure. MAP-002 is a later color-coded view of HEALTH (not observation availability); MAP-001 OBSERVED/NOT_OBSERVED/UNAVAILABLE must never map directly to G/Y/R. MAP-002 depends on MAP-001 topology plus HEALTH-001 Health Signal and does not calculate or create Health Signal.
+- Relationships: Built for one registered Domain; tenant-bound to that Domain's organization; consumes Observation Evidence and may reference Reputation Observation, DNS Health Observation, or Blacklist Observation as evidence behind DNS. Not owned as an aggregate. MAP-002, when later authorized, consumes existing Health Signal from HEALTH-001; it does not own health. MAP-003, when later authorized, is opened by selecting or clicking a MAP-001 node; it does not own health. MAP-004, when later authorized, exports the MAP-001 topology visualization; it does not own health.
+- Not: An observation aggregate; a table or graph database; Health Signal; MAP-002–004; color, score, health, or severity. Raw INF-001–008 observations and Trust Score are not MAP-002 color sources.
+
+**MAP-003 (Node detail panel)**
+- Definition: A later panel opened by selecting or clicking a MAP-001 node (WF-5 click-to-detail). It may show node identity, type, observation availability/status, and real raw observation facts or evidence references when those facts exist.
+- Responsibility: To present raw node metadata and existing observations, not to compute health. MAP-003 must not calculate, create, infer, or own Health Signal. Health meaning and G/Y/R are owned by MAP-002 consuming HEALTH-001. OBSERVED / NOT_OBSERVED / UNAVAILABLE must never be translated into health, severity, warning, critical, or color. NOT_OBSERVED nodes must not receive fabricated details. DKIM, DMARC, Senders, and Inbox currently have no observed facts and must not display invented details. Evidence references must not automatically become arbitrary raw-payload dumps; a detailed evidence-access/API contract is frozen separately before implementation. This freeze implements nothing: no table, Flyway, scheduler, independent backend health service, HTTP API, or frontend. INF-001–008, MAP-001, MAP-002, V1–V11, and HEALTH-001 are unchanged.
+- Relationships: Opened from a MAP-001 node for one registered Domain. May read existing Observation Evidence and other raw observations when those facts exist. Depends on MAP-001 topology. Does not depend on inventing Health Signal. MAP-002 owns health color when HEALTH-001 exists.
+- Not: Health Signal; MAP-002 G/Y/R; Trust Score; diagnosis; recommendation; compliance; fabricated explanation; a translation of observation availability into health or color; a new aggregate, table, or health service.
+
+**MAP-004 (PNG/SVG export)**
+- Definition: A later export of the Infrastructure Map visualization. PNG and SVG are both frozen output formats.
+- Responsibility: To export MAP-001 topology as a visualization. MAP-004 is not Phase 16 proof and does not replace EVID-003. It is not Phase 15 PDF/email reporting and must not merge into FUN-R2. Keep it separate from Phase 15/16 reporting and proof. If health colors eventually appear in the export, they come only from MAP-002 consuming real HEALTH-001 Health Signal. Never derive G/Y/R from raw INF-001–008 observations, OBSERVED / NOT_OBSERVED / UNAVAILABLE status, Trust Score, or deprecated scoring. NOT_OBSERVED nodes must not receive fabricated health, facts, or details. MAP-004 must not calculate or create Health Signal. This freeze implements nothing: no table, Flyway, scheduler, graph database, or persistence model; no invented HTTP/API contract; no selected or added rendering/export library; no frontend or backend export code. INF-001–008, MAP-001, MAP-002, MAP-003, V1–V11, and HEALTH-001 are unchanged. MAP-004 remains ⬜.
+- Relationships: Exports the MAP-001 topology for one registered Domain. Depends on MAP-001 structure. Any later health color depends on MAP-002 consuming HEALTH-001 Health Signal. Does not depend on inventing Health Signal. Not a Reporting or Proof Evidence artifact.
+- Not: Phase 16 proof; EVID-003; Phase 15 PDF/email reporting; FUN-R2; Health Signal; a G/Y/R derivation from raw INF observations, observation availability, Trust Score, or deprecated scoring; fabricated health/facts/details for NOT_OBSERVED nodes; a new aggregate, table, graph store, scheduler, API, or export library.
+
 **Alert**
 - Definition: A notification of a change or failure, in business language, with severity and whether to act.
 - Responsibility: To keep the customer ahead of a problem, on their chosen channel.
@@ -173,10 +227,10 @@ For each concept: Definition, Responsibility, Relationships, and Not.
 - Not: A raw technical message.
 
 **Report / Evidence**
-- Definition: A grounded account of health, in business terms, that can be shown to a client, auditor, or board.
+- Definition: A grounded account of health, in business terms, that can be shown to a client, auditor, or board. This is Evidence / proof of health (Report / Proof Evidence), not Observation Evidence.
 - Responsibility: To let the customer prove health rather than assert it.
-- Relationships: Derived from Health Signals and resolved Issues; serves a client or stakeholder; is built from real observations.
-- Not: A marketing document.
+- Relationships: Derived from Health Signals and resolved Issues; serves a client or stakeholder; is built from real Observation Evidence.
+- Not: A marketing document; not Observation Evidence (the raw factual snapshot).
 
 **Readiness / Compliance**
 - Definition: Assessment of a domain against the standards set by the mailbox providers that decide inbox entry.
@@ -216,9 +270,9 @@ The concepts relate to each other in the business's natural terms.
 
 **Ownership.** An Organization owns Domains. A Client is an Organization served by an Agency. An Agency owns a Portfolio, which contains Clients and their Domains. Ownership is the spine: it tells who is responsible for what.
 
-**Observation.** A Domain has Email Infrastructure. The product reads that Infrastructure — its authentication, alignment, senders, and reputation — to produce the Domain's Health Signal and Health Trend. Observation is the spine that produces truth: without a real read of infrastructure, there is no health.
+**Observation.** A Domain has Email Infrastructure. The product reads that Infrastructure — its authentication, alignment, senders, and reputation — and records Observation Evidence, Reverse DNS Observation (MX hosts → A/AAAA → PTR), SMTP Greeting Observation (MX hosts from Observation Evidence → A/AAAA → SMTP greeting/EHLO), DNS Health Observation (TTL, DNSSEC presence, named-resolver answers), where a provider actually returns a reputation read, Reputation Observation, and where a blacklist provider actually returns a read, Blacklist Observation. These are immutable persisted snapshots of facts actually returned. Health Signal and Health Trend are produced later from those facts. Observation is the spine that produces truth: without a real read of infrastructure, there is no health. Finding and Assessment are not Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, or Blacklist Observation; they are later interpretation, not part of the observation snapshot. Reverse DNS Observation is not FCrDNS and is not Health Signal. SMTP Greeting Observation is not HELO/EHLO validation and is not Health Signal. DNS Health Observation is not Health Signal and is not Trust Score. Blacklist Observation is not Health Signal and is not a listed/not-listed conclusion.
 
-**Diagnosis.** When Health declines, an Issue arises on the Domain. The Issue has a Root Cause, a Business Impact, and a Priority. Diagnosis connects decline to understanding.
+**Diagnosis.** When Health declines (Health Signal produced by HEALTH-001), an Issue arises on the Domain. The Issue has a Root Cause, a Business Impact, and a Priority. Diagnosis connects decline to understanding. That Issue/root-cause path is DIAG-003 and consumes Health Signal **when Java can state healthy vs at-risk per the HEALTH-001 interpretation freeze**; an **unknown** indication does not start DIAG-003. DIAG-001 Alignment derivation does not start from health: it is Analyzer-class derivation from DMARC evidence (INT-003–006), not from Health Signal, and Alignment is not an Issue. Diagnosis must not fabricate Health Signal.
 
 **Resolution.** Guidance is attached to an Issue, the customer acts on it, and Fix Verification closes the issue or keeps it open honestly. Resolution connects understanding to a changed state.
 
@@ -233,7 +287,8 @@ A text map of the business relationships. It uses business concepts only; it is 
 ```
 Organization ──owns──> Domain ──has──> Email Infrastructure
      │                        │                │
-     │                        ├──has──> Health Signal ──has──> Health Trend
+     │                        ├──identified in──> Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, Blacklist Observation (Delivery Observation owns; Domain/org = identity/tenant only)
+     │                        ├──has──> Health Signal ──has──> Health Trend  (later, from Observation Evidence)
      │                        │                │
      │                        ├──has──> Issue ──has──> Root Cause
      │                        │                │          │
@@ -264,6 +319,12 @@ The business relationships in quantity, in business language — not database te
 - **Organization ↔ User:** one organization has many users; a user belongs to exactly one organization. The signup lifecycle establishes this single membership: a new user's registration creates its one Organization and assigns the user to it. The Organization is the ownership boundary (INV-09/13).
 - **Agency ↔ Client:** one agency serves many clients; a client is served by exactly one agency.
 - **Portfolio ↔ Client:** one portfolio contains many clients; a client belongs to exactly one portfolio (its agency's).
+- **Domain ↔ Observation Evidence:** a domain accumulates many Observation Evidence snapshots over time (append-only; a later observation is a new snapshot). Each snapshot is identified by one organization and one domain. Bounded-context ownership remains Delivery Observation; the Domain aggregate is not the owner.
+- **Domain ↔ Reputation Observation:** a domain may accumulate many Reputation Observation snapshots (append-only; Postmaster and SNDS are separate facts; a later read is a new snapshot). Identity and tenant isolation come from the registered Domain. Delivery Observation owns Reputation Observation; it is not a Reputation aggregate.
+- **Domain ↔ Blacklist Observation:** a domain may accumulate many Blacklist Observation snapshots (append-only; Spamhaus, Barracuda, SURBL, and URIBL are separate facts; a later read is a new snapshot). Identity and tenant isolation come from the registered Domain. Delivery Observation owns Blacklist Observation; it is not Health Signal.
+- **Domain ↔ Reverse DNS Observation:** a domain may accumulate many Reverse DNS Observation snapshots (append-only; a later read is a new snapshot). Each snapshot is identified by one organization and one domain, from the registered Domain. Delivery Observation owns Reverse DNS Observation; it is not Observation Evidence and not Health Signal.
+- **Domain ↔ SMTP Greeting Observation:** a domain may accumulate many SMTP Greeting Observation snapshots (append-only; a later read is a new snapshot). Each snapshot is identified by one organization and one domain, from the registered Domain. Delivery Observation owns SMTP Greeting Observation; it is not Observation Evidence, not Reverse DNS Observation, and not Health Signal.
+- **Domain ↔ DNS Health Observation:** a domain may accumulate many DNS Health Observation snapshots (append-only; a later read is a new snapshot). Each snapshot is identified by one organization and one domain, from the registered Domain. Delivery Observation owns DNS Health Observation; it is not Observation Evidence, not Health Signal, and not Trust Score.
 - **Domain ↔ Health Signal:** a domain has one Health Signal at a time; a Health Signal belongs to exactly one domain.
 - **Health Signal ↔ Health Trend:** a Health Signal carries one Health Trend; a Health Trend reflects exactly one Health Signal.
 - **Domain ↔ Issue:** a domain has many issues over time; an issue belongs to exactly one domain.
@@ -336,11 +397,11 @@ Each event is a change in the business that the model must keep true; it is not 
 
 The lifecycle of a Domain, from the first observation to a standing state of confidence. It is a cycle, not a line.
 
-1. **Observation begins.** The Domain is added to health observation, and the organization consents to reading its delivery infrastructure. This is the moment the Domain enters the business's care.
-2. **First health.** The Domain receives its first Health Signal and Health Trend. The customer sees their state and the next most important thing to do.
-3. **Diagnosis and guidance.** As health is understood, Issues are diagnosed, explained, prioritized, and guided; the customer acts, and the fix is verified. The loop of understanding and action is open.
+1. **Observation begins.** The Domain is added to health observation, and the organization consents to reading its delivery infrastructure. This is the moment the Domain enters the business's care. The observation produces Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, and DNS Health Observation — immutable persisted snapshots of the facts actually returned — not a Health Signal, diagnosis, FCrDNS, HELO/EHLO validation, Trust Score, or customer-facing proof.
+2. **First health.** Later, the Domain receives its first Health Signal and Health Trend. The customer sees their state and the next most important thing to do.
+3. **Diagnosis and guidance.** As health is understood (when HEALTH-001 exists), Issues are diagnosed, explained, prioritized, and guided; the customer acts, and the fix is verified. The loop of understanding and action is open. Alignment (DIAG-001) is Analyzer-class derivation from DMARC evidence when those facts exist; it does not wait on a fabricated Health Signal and does not create an Issue.
 4. **Standing confidence.** Health is maintained through continuous observation. Changes surface early, alerts reach the customer, and confidence begins to replace worry.
-5. **Evidence and trust.** Reports and readiness statements prove health to clients, auditors, and boards. Trust is held and deepened.
+5. **Evidence and trust.** Reports and readiness statements (Evidence / proof of health) prove health to clients, auditors, and boards. Trust is held and deepened. This proof is not Observation Evidence.
 6. **Continuous renewal.** The loop returns to observation: health is re-read, re-diagnosed, and re-verified. Confidence is earned each day, not achieved once.
 
 The lifecycle does not end in a finished state. It ends in a maintained state — a domain that is known, watched, and trusted — which is exactly the outcome the business sells.
@@ -361,7 +422,7 @@ Timeless business rules that must always hold.
 
 ## 9. Ubiquitous Language Preview
 
-The business uses one shared vocabulary. The authoritative definitions of every term are in the [Glossary](../00_Foundation/GLOSSARY.md) and are reused here without redefinition. The terms this model relies on — Customer, Organization, Client, Portfolio, Domain, Health Signal, Health Trend, Issue, Root Cause, Business Impact, Priority, Guidance, Fix Verification, Alert, Report, Readiness, Consent, Confidence, Trust, Sender, Alignment, Reputation, Mailbox Provider — are all defined there. Any new term must be added to the Glossary before it is used widely; a term used against the Glossary is out of compliance.
+The business uses one shared vocabulary. The authoritative definitions of every term are in the [Glossary](../00_Foundation/GLOSSARY.md) and are reused here without redefinition. The terms this model relies on — Customer, Organization, Client, Portfolio, Domain, Observation Evidence, Reverse DNS Observation, SMTP Greeting Observation, DNS Health Observation, Reputation Observation, Blacklist Observation, Infrastructure Map, MAP-003 (Node detail panel), MAP-004 (PNG/SVG export), Health Signal, Health Trend, Issue, Root Cause, Business Impact, Priority, Guidance, Fix Verification, Alert, Report, Evidence / proof of health, Readiness, Consent, Confidence, Trust, Sender, Alignment, Reputation, Mailbox Provider — are all defined there. Any new term must be added to the Glossary before it is used widely; a term used against the Glossary is out of compliance.
 
 ## Context Map Preview
 

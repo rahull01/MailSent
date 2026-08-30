@@ -32,14 +32,24 @@
 ## 2. Health Measurement
 
 - **H1. Health signal.** The product must produce a unified, legible health indication for a domain that reflects the state of its delivery infrastructure.
+
+  > **CTO freeze (HEALTH-001 interpretation, 2026-08-15):** Canonical term is **Health Signal** (not Trust Score). Unified indication: **healthy** | **at-risk** | **unknown**. No scoring model, 0–100, weights, G/Y/R, or Trust Score. Missing any V1 required snapshot (latest OE, latest DMARC Aggregate Evidence report, at least one Reputation Observation row): persist nothing. When snapshots exist, indication is assigned from cited V15 tokens only: at-risk on any `disposition` quarantine/reject or auth/alignment `fail`; healthy only when every cited row has disposition `none` and SPF+DKIM result+alignment all `pass`; otherwise unknown (including SPF-pass/DKIM-none). OE and Reputation Observation are lineage-required presence, not voters. Current Java always-unknown is insufficient vs this freeze; Java is not implemented in this docs freeze. FUN-H1 is **IMPLEMENTATION-READY** for the three values.
+
 - **H2. Health components.** The health indication must reflect the several signals that determine delivery, including authentication, the alignment of those signals, and the associated reputation.
+
+  > **CTO freeze (DIAG-001, 2026-08-15):** DIAG-001 Alignment derivation traces to Analyzer / Alignment Engine semantics and **H2** (health includes alignment of authentication signals). DIAG-001 does not create Health Signal; HEALTH-001 produces Health Signal. Alignment of authentication signals is a derived value, not an Issue.
+  > **CTO freeze (HEALTH-001 interpretation, 2026-08-15):** H2 is a **meaningful unified indication** plus **cited** persisted facts — Observation Evidence (V8 MX/TXT/SPF/observedAt/identity — lineage presence only; DNS strings are not SPF-pass), **DMARC Aggregate Evidence** (the only indication voter: stored `disposition`, `spf_result`, `dkim_result`, `spf_aligned`, `dkim_aligned`; INT-004 tokens pass/fail/none/quarantine/reject as stored), and Reputation Observation (V9 source + opaque payload — **lineage-required presence only, not an indication voter**; do not parse payload for grades). Not DIAG-001 Alignment VO / `lastDerived()`. No Alignment table. No separately persisted component scores. Conservative: SPF-pass with DKIM-none is **unknown**, not healthy.
 - **H3. Reputation signals.** The product must incorporate external reputation signals where they can be observed, as one part of health.
+
+  > **CTO freeze (HEALTH-001 interpretation, 2026-08-15):** H3 intake for HEALTH-001 is **presence** of at least one persisted Reputation Observation (V9). Opaque `payload` is not parsed into a grade. Reputation does not vote healthy/at-risk. Unavailable production adapters persist no row ⇒ persist no Health Signal.
 - **H4. Health trend.** The product must show how health changes over time, up to a historical view, so a trend (improving, stable, declining) is visible.
 - **H5. Industry context.** The product may contextualize health against a benchmark, and only when real, anonymously available data supports it; it must never present a fabricated rank.
 
 ## 3. Diagnosis and Root Cause
 
 - **X1. Cross-signal diagnosis.** The product must reason across the signals it assesses and identify the root cause of a delivery failure, not merely report each signal's state.
+
+  > **CTO freeze (DIAG-001, 2026-08-15):** **X1** belongs primarily to root-cause diagnosis (**DIAG-003**). DIAG-001 is Analyzer-class Alignment derivation, not X1, not X2 (sender detection / DIAG-002), and not X3 (root cause stated / DIAG-003). Do not invent new FUN IDs.
 - **X2. Sender recognition.** Where it affects delivery, the product must recognize which sender is involved and how that sender's authentication aligns with the domain.
 - **X3. Root cause stated.** The product must express, in concrete terms, why delivery is at risk. A stated cause that is wrong, or that names only a symptom, is a failure of this requirement.
 

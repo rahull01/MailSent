@@ -72,9 +72,9 @@ MailSent's product is one ordered, natural flow, and the order is philosophy, no
 
 The flow moves **data → understanding → meaning → decision → action → verification → communication → scale**. Each stage is the necessary foundation for the next:
 
-- **Scanner** — raw facts (DNS, DMARC ingestion, blacklists). We cannot explain what we have not observed; truth first.
-- **Analyzer** — validated signals (SPF/DKIM/DMARC parsing, alignment). We cannot reason over noise.
-- **Alignment Intelligence** — sender detection and root cause. The moat: where analysis becomes insight.
+- **Scanner** — raw facts (DNS, DMARC ingestion, blacklists). We cannot explain what we have not observed; truth first. DMARC ingest evidence (DMARC Report Receipt, Parsed DMARC Report, DMARC Aggregate Evidence) is owned by Delivery Observation and is clearly separated from Observation Evidence (OE remains MX/TXT/SPF/observedAt/identity). Diagnosis consumes ingest; it does not own ingestion.
+- **Analyzer** — validated signals (SPF/DKIM/DMARC parsing, alignment). We cannot reason over noise. DIAG-001 is this Analyzer-class Alignment derivation; it is not sender detection and not root cause.
+- **Alignment Intelligence** — sender detection and root cause. The moat: where analysis becomes insight. DIAG-002 and DIAG-003 remain here; DIAG-001 does not.
 - **AI Explanation** — business-language translation. Only after true cause is known can we speak plainly.
 - **Business Impact** — risk scoring and prioritization. Business language means nothing without a stake.
 - **AI Action Queue** — a prioritized do-now list. Unprioritized action is busywork.
