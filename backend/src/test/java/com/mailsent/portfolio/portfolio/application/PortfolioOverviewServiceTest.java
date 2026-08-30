@@ -1,8 +1,11 @@
 package com.mailsent.portfolio.portfolio.application;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -17,6 +20,9 @@ import com.mailsent.portfolio.client.domain.OrganizationNotFoundException;
 import com.mailsent.portfolio.client.infrastructure.InMemoryClientRelationshipRepository;
 import com.mailsent.portfolio.domain.domain.Domain;
 import com.mailsent.portfolio.domain.infrastructure.InMemoryDomainRepository;
+import com.mailsent.portfolio.observation.application.HealthSignalService;
+import com.mailsent.portfolio.observation.domain.HealthIndication;
+import com.mailsent.portfolio.observation.domain.HealthSignal;
 import com.mailsent.portfolio.organization.domain.Organization;
 import com.mailsent.portfolio.organization.infrastructure.InMemoryOrganizationRepository;
 import com.mailsent.portfolio.portfolio.domain.ClientOverview;
@@ -24,8 +30,9 @@ import com.mailsent.portfolio.portfolio.domain.PortfolioOverview;
 
 /**
  * Unit tests for {@link PortfolioOverviewService} (PORT-002) against the hermetic in-memory
- * repositories: the overview aggregates each client's owned domains and never crosses an
- * organization boundary (INV-09).
+ * repositories: the overview aggregates each client's owned domains with their real
+ * HEALTH-001 indication, never fabricates a state for a domain without a signal, and never
+ * crosses an organization boundary (INV-09).
  */
 class PortfolioOverviewServiceTest {
 
@@ -34,6 +41,7 @@ class PortfolioOverviewServiceTest {
     private InMemoryOrganizationRepository organizations;
     private InMemoryClientRelationshipRepository relationships;
     private InMemoryDomainRepository domains;
+    private HealthSignalService healthSignals;
     private PortfolioOverviewService service;
 
     @BeforeEach
@@ -41,7 +49,8 @@ class PortfolioOverviewServiceTest {
         organizations = new InMemoryOrganizationRepository();
         relationships = new InMemoryClientRelationshipRepository();
         domains = new InMemoryDomainRepository();
-        service = new PortfolioOverviewService(relationships, domains, organizations);
+        healthSignals = mock(HealthSignalService.class);
+        service = new PortfolioOverviewService(relationships, domains, organizations, healthSignals);
     }
 
     private String createdOrganization(String name) {
@@ -52,8 +61,14 @@ class PortfolioOverviewServiceTest {
         relationships.save(ClientRelationship.form(agency, client, CLOCK.instant()));
     }
 
-    private void domain(String orgId, String name) {
-        domains.save(Domain.register(orgId, name, CLOCK.instant()));
+    private String domain(String orgId, String name) {
+        return domains.save(Domain.register(orgId, name, CLOCK.instant())).id();
+    }
+
+    private HealthSignal signal(String id, String organizationId, String domainId,
+                                HealthIndication indication, Instant observedAt) {
+        return HealthSignal.restore(id, organizationId, domainId, "signal-domain",
+            indication, "oe-1", List.of("ae-1"), List.of("rep-1"), observedAt);
     }
 
     @Test
@@ -88,7 +103,7 @@ class PortfolioOverviewServiceTest {
         domain(clientB, "clientb.com");
 
         List<String> domainsInA = service.overviewByAgency(agencyA).clients().stream()
-            .flatMap(c -> c.domains().stream()).map(Domain::name).toList();
+            .flatMap(c -> c.domains().stream()).map(d -> d.name()).toList();
 
         assertEquals(List.of("clienta.com"), domainsInA);
         assertTrue(!domainsInA.contains("clientb.com"),
@@ -116,5 +131,83 @@ class PortfolioOverviewServiceTest {
     void overviewByAgencyRejectsUnknownAgency() {
         assertThrows(OrganizationNotFoundException.class,
             () -> service.overviewByAgency("no-such-agency"));
+    }
+
+    @Test
+    void healthySignalIsExposedVerbatim() {
+        String agency = createdOrganization("Agency");
+        String client = createdOrganization("Client");
+        relationship(agency, client);
+        String domainId = domain(client, "healthy.com");
+        when(healthSignals.findByDomainId(domainId)).thenReturn(List.of(
+            signal("s-1", client, domainId, HealthIndication.HEALTHY, CLOCK.instant())));
+
+        PortfolioOverview overview = service.overviewByAgency(agency);
+
+        assertEquals(HealthIndication.HEALTHY,
+            overview.clients().get(0).domains().get(0).healthIndication(),
+            "the canonical HEALTH-001 indication is passed through verbatim (never recalculated)");
+    }
+
+    @Test
+    void atRiskSignalIsExposedSoTheAgencySeesWhoIsAtRisk() {
+        String agency = createdOrganization("Agency");
+        String client = createdOrganization("Client");
+        relationship(agency, client);
+        String domainId = domain(client, "atrisk.com");
+        when(healthSignals.findByDomainId(domainId)).thenReturn(List.of(
+            signal("s-1", client, domainId, HealthIndication.AT_RISK, CLOCK.instant())));
+
+        PortfolioOverview overview = service.overviewByAgency(agency);
+
+        assertEquals(HealthIndication.AT_RISK,
+            overview.clients().get(0).domains().get(0).healthIndication());
+    }
+
+    @Test
+    void domainWithoutAnyPersistedSignalHasExplicitlyAbsentHealth() {
+        String agency = createdOrganization("Agency");
+        String client = createdOrganization("Client");
+        relationship(agency, client);
+        String domainId = domain(client, "unobserved.com");
+        when(healthSignals.findByDomainId(domainId)).thenReturn(List.of());
+
+        PortfolioOverview overview = service.overviewByAgency(agency);
+
+        assertNull(overview.clients().get(0).domains().get(0).healthIndication(),
+            "no signal persisted means explicit absence — never a fabricated state (N2/INV-01)");
+    }
+
+    @Test
+    void latestSignalWinsByObservedAtThenId() {
+        String agency = createdOrganization("Agency");
+        String client = createdOrganization("Client");
+        relationship(agency, client);
+        String domainId = domain(client, "changed.com");
+        Instant earlier = CLOCK.instant().minusSeconds(3600);
+        when(healthSignals.findByDomainId(domainId)).thenReturn(List.of(
+            signal("s-old", client, domainId, HealthIndication.HEALTHY, earlier),
+            signal("s-new", client, domainId, HealthIndication.AT_RISK, CLOCK.instant())));
+
+        PortfolioOverview overview = service.overviewByAgency(agency);
+
+        assertEquals(HealthIndication.AT_RISK,
+            overview.clients().get(0).domains().get(0).healthIndication(),
+            "the most recent snapshot is shown, matching the HEALTH-001 ordering convention");
+    }
+
+    @Test
+    void foreignOrganizationSignalIsIgnoredAsIfAbsent() {
+        String agency = createdOrganization("Agency");
+        String client = createdOrganization("Client");
+        relationship(agency, client);
+        String domainId = domain(client, "owned.com");
+        when(healthSignals.findByDomainId(domainId)).thenReturn(List.of(
+            signal("s-foreign", "org-someone-else", domainId, HealthIndication.HEALTHY, CLOCK.instant())));
+
+        PortfolioOverview overview = service.overviewByAgency(agency);
+
+        assertNull(overview.clients().get(0).domains().get(0).healthIndication(),
+            "a signal owned by another organization must never surface in this overview (INV-09)");
     }
 }

@@ -1,6 +1,7 @@
 package com.mailsent.portfolio.portfolio.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Instant;
@@ -8,26 +9,29 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.mailsent.portfolio.domain.domain.Domain;
+import com.mailsent.portfolio.observation.domain.HealthIndication;
 
 /**
- * Unit tests for the PORT-002 overview projections ({@link ClientOverview},
- * {@link PortfolioOverview}).
+ * Unit tests for the PORT-002 overview projections ({@link DomainOverview},
+ * {@link ClientOverview}, {@link PortfolioOverview}).
  */
 class PortfolioOverviewTest {
 
     private static final Instant NOW = Instant.parse("2026-08-08T10:00:00Z");
 
     @Test
-    void clientOverviewExposesClientIdAndDomains() {
-        Domain d1 = Domain.register("org-client", "a.com", NOW);
-        Domain d2 = Domain.register("org-client", "b.com", NOW);
+    void clientOverviewExposesClientIdAndDomainProjections() {
+        DomainOverview d1 = new DomainOverview("dom-1", "a.com", HealthIndication.HEALTHY);
+        DomainOverview d2 = new DomainOverview("dom-2", "b.com", null);
 
         ClientOverview overview = ClientOverview.of("org-client", List.of(d1, d2));
 
         assertEquals("org-client", overview.clientOrganizationId());
         assertEquals(2, overview.domainCount());
-        assertEquals(List.of("a.com", "b.com"), overview.domains().stream().map(Domain::name).toList());
+        assertEquals(List.of("a.com", "b.com"), overview.domains().stream().map(DomainOverview::name).toList());
+        assertEquals(HealthIndication.HEALTHY, overview.domains().get(0).healthIndication());
+        assertNull(overview.domains().get(1).healthIndication(),
+            "absence of a signal is an explicit state, never an invented one");
     }
 
     @Test
@@ -38,6 +42,14 @@ class PortfolioOverviewTest {
     @Test
     void clientOverviewRejectsNullDomains() {
         assertThrows(IllegalArgumentException.class, () -> ClientOverview.of("org-client", null));
+    }
+
+    @Test
+    void domainOverviewRejectsBlankIdentity() {
+        assertThrows(IllegalArgumentException.class, () -> new DomainOverview(" ", "a.com", null));
+        assertThrows(IllegalArgumentException.class, () -> new DomainOverview("dom-1", " ", null));
+        assertThrows(NullPointerException.class, () -> new DomainOverview(null, "a.com", null));
+        assertThrows(NullPointerException.class, () -> new DomainOverview("dom-1", null, null));
     }
 
     @Test
