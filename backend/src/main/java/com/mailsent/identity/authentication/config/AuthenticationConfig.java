@@ -80,9 +80,8 @@ public class AuthenticationConfig {
 
     @Bean
     SignUpService signUpService(UserRepository userRepository, OrganizationRepository organizationRepository,
-                                PasswordHasher passwordHasher, PasswordPolicy passwordPolicy,
-                                com.mailsent.identity.consent.application.ConsentRepository consentRepository) {
-        return new SignUpService(userRepository, organizationRepository, passwordHasher, passwordPolicy, consentRepository);
+                                PasswordHasher passwordHasher, PasswordPolicy passwordPolicy) {
+        return new SignUpService(userRepository, organizationRepository, passwordHasher, passwordPolicy);
     }
 
     @Bean

@@ -40,6 +40,7 @@ class ReverseDnsObservationServiceTest {
     private InMemoryReverseDnsObservationRepository observations;
     private FakeForwardAddressLookup forward;
     private FakeReverseDnsLookup reverse;
+    private com.mailsent.identity.consent.application.ConsentService consentService;
     private ReverseDnsObservationService service;
     private Domain domain;
 
@@ -50,9 +51,24 @@ class ReverseDnsObservationServiceTest {
         observations = new InMemoryReverseDnsObservationRepository();
         forward = new FakeForwardAddressLookup();
         reverse = new FakeReverseDnsLookup();
-        service = new ReverseDnsObservationService(observations, domains, evidence, forward, reverse);
+        consentService = org.mockito.Mockito.mock(com.mailsent.identity.consent.application.ConsentService.class);
+        service = new ReverseDnsObservationService(observations, domains, evidence, forward, reverse, consentService);
         domain = Domain.register("org-1", "example.com", NOW);
         domains.save(domain);
+    }
+
+    @Test
+    void recordWithoutConsentPersistsNothing() {
+        seedEvidence(List.of(new MxRecord(10, "mail.example.com")));
+        org.mockito.Mockito.doThrow(new com.mailsent.identity.consent.application.ConsentRequiredException("Consent is required for this action"))
+            .when(consentService)
+            .requireConsent("org-1", domain.id(),
+                com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+
+        List<com.mailsent.portfolio.observation.domain.ReverseDnsObservation> persisted = service.record("example.com");
+
+        assertTrue(persisted.isEmpty(), "INV-02: without consent there is no observation");
+        assertEquals(0, observations.findByOrganizationId("org-1").size());
     }
 
     @Test

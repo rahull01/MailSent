@@ -39,6 +39,11 @@ public class ConsentService {
             throw new SecurityException("User role does not have permission to grant consent");
         }
 
+        consentRepository.findByDomainIdAndActionTypeAndStatus(domainId, actionType, Status.GRANTED)
+            .ifPresent(c -> {
+                throw new ConsentAlreadyExistsException("Active consent already exists for this domain and action type");
+            });
+
         Consent consent = Consent.grant(organizationId, domainId, grantedByUserId, actionType);
         try {
             consentRepository.save(consent);
@@ -72,8 +77,14 @@ public class ConsentService {
         return consent;
     }
 
-    public void requireConsent(String domainId, ActionType actionType) {
+    /**
+     * Asserts that the domain's owning organization holds a GRANTED consent for the action
+     * (INV-02). The gate is tenant-bound (INV-09): a consent granted by another organization
+     * never satisfies the check, even for the same domainId.
+     */
+    public void requireConsent(String organizationId, String domainId, ActionType actionType) {
         consentRepository.findByDomainIdAndActionTypeAndStatus(domainId, actionType, Status.GRANTED)
+            .filter(consent -> consent.getOrganizationId().equals(organizationId))
             .orElseThrow(() -> new ConsentRequiredException("Consent is required for this action"));
     }
 }

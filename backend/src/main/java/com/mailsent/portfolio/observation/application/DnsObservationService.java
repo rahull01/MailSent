@@ -37,7 +37,7 @@ public class DnsObservationService {
     public DnsObservation observe(String domainName) {
         String canonical = Domain.normalize(domainName);
         Domain domain = domains.findByName(canonical).orElseThrow(() -> new DomainNotRegisteredException(canonical));
-        consentService.requireConsent(domain.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+        consentService.requireConsent(domain.organizationId(), domain.id(), com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
         return resolver.observe(canonical);
     }
 }

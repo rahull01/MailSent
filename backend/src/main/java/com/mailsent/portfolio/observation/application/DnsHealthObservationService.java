@@ -22,27 +22,38 @@ public class DnsHealthObservationService {
     private final DnsHealthObservationRepository observations;
     private final DomainRepository domains;
     private final DnsHealthObserver observer;
+    private final com.mailsent.identity.consent.application.ConsentService consentService;
 
     public DnsHealthObservationService(DnsHealthObservationRepository observations, DomainRepository domains,
-                                       DnsHealthObserver observer) {
+                                       DnsHealthObserver observer,
+                                       com.mailsent.identity.consent.application.ConsentService consentService) {
         this.observations = observations;
         this.domains = domains;
         this.observer = observer;
+        this.consentService = consentService;
     }
 
     /**
      * Observes a registered domain and persists the factual result as
      * DnsHealthObservation.
      *
+     * <p>Consent-gated (INV-02): reading the domain's DNS health falls under
+     * {@code OBSERVE_DOMAIN_INFRASTRUCTURE}; without a granted consent the observation
+     * does not happen and nothing is persisted.</p>
+     *
      * @param domainName the domain to observe (canonicalized)
      * @return the persisted snapshot
      * @throws DomainNotRegisteredException if the domain is not registered
      * @throws DnsObservationException      if observation fails (nothing is persisted)
+     * @throws com.mailsent.identity.consent.application.ConsentRequiredException
+     *                                      when no consent exists for the domain's owner (nothing is persisted)
      */
     public DnsHealthObservation record(String domainName) {
         String canonical = Domain.normalize(domainName);
         Domain domain = domains.findByName(canonical)
             .orElseThrow(() -> new DomainNotRegisteredException(canonical));
+        consentService.requireConsent(domain.organizationId(), domain.id(),
+            com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
         DnsHealthFacts facts = observer.observe(canonical);
         return observations.save(DnsHealthObservation.capture(domain, facts, facts.observedAt()));
     }

@@ -51,7 +51,8 @@ public class DnsHealthObservationConfig {
     @Bean
     DnsHealthObservationService dnsHealthObservationService(DnsHealthObservationRepository observations,
                                                             DomainRepository domains,
-                                                            DnsHealthObserver observer) {
-        return new DnsHealthObservationService(observations, domains, observer);
+                                                            DnsHealthObserver observer,
+                                                            com.mailsent.identity.consent.application.ConsentService consentService) {
+        return new DnsHealthObservationService(observations, domains, observer, consentService);
     }
 }

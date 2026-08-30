@@ -39,6 +39,7 @@ class DnsHealthObservationServiceTest {
     private InMemoryDomainRepository domains;
     private InMemoryDnsHealthObservationRepository observations;
     private FakeDnsHealthObserver observer;
+    private com.mailsent.identity.consent.application.ConsentService consentService;
     private DnsHealthObservationService service;
 
     @BeforeEach
@@ -46,8 +47,24 @@ class DnsHealthObservationServiceTest {
         domains = new InMemoryDomainRepository();
         observations = new InMemoryDnsHealthObservationRepository();
         observer = new FakeDnsHealthObserver();
-        service = new DnsHealthObservationService(observations, domains, observer);
+        consentService = org.mockito.Mockito.mock(com.mailsent.identity.consent.application.ConsentService.class);
+        service = new DnsHealthObservationService(observations, domains, observer, consentService);
         domains.save(Domain.register("org-1", "example.com", NOW));
+    }
+
+    @Test
+    void recordWithoutConsentPersistsNothing() {
+        org.mockito.Mockito.doThrow(new com.mailsent.identity.consent.application.ConsentRequiredException("Consent is required for this action"))
+            .when(consentService)
+            .requireConsent("org-1", domains.findByName("example.com").orElseThrow().id(),
+                com.mailsent.identity.consent.domain.ActionType.OBSERVE_DOMAIN_INFRASTRUCTURE);
+
+        org.junit.jupiter.api.Assertions.assertThrows(
+            com.mailsent.identity.consent.application.ConsentRequiredException.class,
+            () -> service.record("example.com"));
+
+        assertEquals(0, observations.findByOrganizationId("org-1").size(),
+            "INV-02: no observation without consent — nothing persisted");
     }
 
     @Test
