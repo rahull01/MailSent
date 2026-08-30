@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SpringDataHealthChangeEventRepository extends JpaRepository<HealthChangeEventEntity, String> {
-    List<HealthChangeEventEntity> findByDomainIdOrderByDetectedAtDesc(String domainId);
+    List<HealthChangeEventEntity> findByOrganizationIdAndDomainIdOrderByDetectedAtDesc(String organizationId, String domainId);
 }
+

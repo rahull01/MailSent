@@ -15,10 +15,11 @@ class HealthChangeEventTest {
     @Test
     void detectsChangeWhenIndicationsDiffer() {
         HealthChangeEvent event = HealthChangeEvent.detect(
-            "dom-1", HealthIndication.HEALTHY, HealthIndication.AT_RISK, Instant.now()
+            "org-1", "dom-1", HealthIndication.HEALTHY, HealthIndication.AT_RISK, Instant.now()
         );
 
         assertNotNull(event);
+        assertEquals("org-1", event.organizationId());
         assertEquals("dom-1", event.domainId());
         assertEquals(HealthIndication.HEALTHY, event.previousIndication());
         assertEquals(HealthIndication.AT_RISK, event.currentIndication());
@@ -27,10 +28,12 @@ class HealthChangeEventTest {
     @Test
     void detectsInitialSignal() {
         HealthChangeEvent event = HealthChangeEvent.detect(
-            "dom-1", null, HealthIndication.HEALTHY, Instant.now()
+            "org-1", "dom-1", null, HealthIndication.HEALTHY, Instant.now()
         );
 
         assertNotNull(event);
+        assertEquals("org-1", event.organizationId());
+        assertEquals("dom-1", event.domainId());
         assertNull(event.previousIndication());
         assertEquals(HealthIndication.HEALTHY, event.currentIndication());
     }
@@ -38,7 +41,7 @@ class HealthChangeEventTest {
     @Test
     void returnsNullWhenNoChange() {
         HealthChangeEvent event = HealthChangeEvent.detect(
-            "dom-1", HealthIndication.HEALTHY, HealthIndication.HEALTHY, Instant.now()
+            "org-1", "dom-1", HealthIndication.HEALTHY, HealthIndication.HEALTHY, Instant.now()
         );
 
         assertNull(event);

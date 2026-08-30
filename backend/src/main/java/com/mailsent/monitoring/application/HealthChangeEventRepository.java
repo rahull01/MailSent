@@ -6,5 +6,6 @@ import com.mailsent.monitoring.domain.HealthChangeEvent;
 
 public interface HealthChangeEventRepository {
     HealthChangeEvent save(HealthChangeEvent event);
-    List<HealthChangeEvent> findByDomainId(String domainId);
+    List<HealthChangeEvent> findByOrganizationIdAndDomainId(String organizationId, String domainId);
 }
+

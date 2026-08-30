@@ -16,19 +16,29 @@ import jakarta.persistence.Table;
 public class HealthChangeEventEntity {
     @Id
     private String id;
-    @Column(name = "domain_id", nullable = false)
+    
+    @Column(name = "organization_id", length = 36, nullable = false)
+    private String organizationId;
+    
+    @Column(name = "domain_id", length = 36, nullable = false)
     private String domainId;
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "previous_indication")
     private HealthIndication previousIndication;
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "current_indication", nullable = false)
     private HealthIndication currentIndication;
+    
     @Column(name = "detected_at", nullable = false)
     private Instant detectedAt;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+    
+    public String getOrganizationId() { return organizationId; }
+    public void setOrganizationId(String organizationId) { this.organizationId = organizationId; }
     
     public String getDomainId() { return domainId; }
     public void setDomainId(String domainId) { this.domainId = domainId; }
@@ -42,3 +52,4 @@ public class HealthChangeEventEntity {
     public Instant getDetectedAt() { return detectedAt; }
     public void setDetectedAt(Instant detectedAt) { this.detectedAt = detectedAt; }
 }
+
