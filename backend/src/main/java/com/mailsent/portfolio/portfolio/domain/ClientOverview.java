@@ -2,24 +2,21 @@ package com.mailsent.portfolio.portfolio.domain;
 
 import java.util.List;
 
-import com.mailsent.portfolio.domain.domain.Domain;
-
 /**
  * ClientOverview — one client Organization's overview within a {@link PortfolioOverview}
  * (PORT-002).
  *
- * <p>A projection over real persisted data: the client Organization's stable identity and the
- * domains it owns ({@link Domain}, the ORG-003 registry, scoped by
- * {@code Domain.organizationId}). No health/risk value is fabricated here — the delivery
- * health/risk dimension of FUN-D4 depends on the Domain Health / Observation pipeline
- * (Phases 08–16), which does not yet exist.</p>
+ * <p>A projection over real persisted data: the client Organization's stable identity and
+ * the domains it owns (the ORG-003 registry), each carrying its real HEALTH-001 indication
+ * when one has been persisted ({@link DomainOverview}). Nothing is fabricated: a domain
+ * without a Health Signal carries a {@code null} indication, never an invented state.</p>
  */
 public final class ClientOverview {
 
     private final String clientOrganizationId;
-    private final List<Domain> domains;
+    private final List<DomainOverview> domains;
 
-    private ClientOverview(String clientOrganizationId, List<Domain> domains) {
+    private ClientOverview(String clientOrganizationId, List<DomainOverview> domains) {
         this.clientOrganizationId = clientOrganizationId;
         this.domains = List.copyOf(domains);
     }
@@ -28,10 +25,10 @@ public final class ClientOverview {
      * Builds the overview of a client Organization from its owned domains.
      *
      * @param clientOrganizationId the client Organization's stable identity, required
-     * @param domains              the client's owned domains, required (may be empty)
+     * @param domains              the client's owned domain projections, required (may be empty)
      * @throws IllegalArgumentException if the client id is blank or {@code domains} is null
      */
-    public static ClientOverview of(String clientOrganizationId, List<Domain> domains) {
+    public static ClientOverview of(String clientOrganizationId, List<DomainOverview> domains) {
         if (clientOrganizationId == null || clientOrganizationId.isBlank()) {
             throw new IllegalArgumentException("A client organization id is required.");
         }
@@ -46,8 +43,8 @@ public final class ClientOverview {
         return clientOrganizationId;
     }
 
-    /** The client's owned domains (real ORG-003 registry data). */
-    public List<Domain> domains() {
+    /** The client's owned domains with their real (or explicitly absent) health. */
+    public List<DomainOverview> domains() {
         return domains;
     }
 

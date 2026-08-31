@@ -100,9 +100,9 @@ class DmarcReportReceiveControllerTest {
         assertTrue(body == null || !body.contains("payload"));
 
         mockMvc.perform(get("/ingest/dmarc/reports"))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isUnauthorized());
         mockMvc.perform(get("/api/dmarc/reports"))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -110,7 +110,7 @@ class DmarcReportReceiveControllerTest {
         mockMvc.perform(post("/ingest/dmarc/ruf/" + UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .content(PAYLOAD))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
