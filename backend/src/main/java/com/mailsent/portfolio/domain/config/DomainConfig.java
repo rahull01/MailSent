@@ -38,8 +38,9 @@ public class DomainConfig {
     }
 
     @Bean
-    DomainImportService domainImportService(DomainService domains, OrganizationRepository organizations) {
-        return new DomainImportService(domains, organizations);
+    DomainImportService domainImportService(DomainService domains, OrganizationRepository organizations,
+                                            com.mailsent.identity.team.application.AuthorizationService authorizationService) {
+        return new DomainImportService(domains, organizations, authorizationService);
     }
 
     @Bean

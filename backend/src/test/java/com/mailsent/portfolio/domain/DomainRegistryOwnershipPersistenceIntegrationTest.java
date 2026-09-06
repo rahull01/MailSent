@@ -2,6 +2,7 @@ package com.mailsent.portfolio.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,6 +43,11 @@ import com.mailsent.portfolio.domain.domain.DomainAlreadyExistsException;
 import com.mailsent.portfolio.domain.infrastructure.persistence.DomainJpaEntity;
 import com.mailsent.portfolio.domain.infrastructure.persistence.JpaDomainRepository;
 import com.mailsent.portfolio.domain.infrastructure.persistence.JpaDomainRepositoryAdapter;
+import com.mailsent.portfolio.observation.application.HealthSignalService;
+import com.mailsent.portfolio.observation.infrastructure.InMemoryDmarcAggregateEvidenceRepository;
+import com.mailsent.portfolio.observation.infrastructure.InMemoryHealthSignalRepository;
+import com.mailsent.portfolio.observation.infrastructure.InMemoryObservationEvidenceRepository;
+import com.mailsent.portfolio.observation.infrastructure.InMemoryReputationObservationRepository;
 import com.mailsent.portfolio.organization.application.OrganizationRepository;
 import com.mailsent.portfolio.organization.application.OrganizationService;
 import com.mailsent.portfolio.organization.infrastructure.persistence.JpaOrganizationRepository;
@@ -50,6 +56,7 @@ import com.mailsent.portfolio.organization.infrastructure.persistence.Organizati
 import com.mailsent.portfolio.portfolio.application.PortfolioOverviewService;
 import com.mailsent.portfolio.portfolio.application.PortfolioService;
 import com.mailsent.portfolio.portfolio.domain.ClientOverview;
+import com.mailsent.portfolio.portfolio.domain.DomainOverview;
 import com.mailsent.portfolio.portfolio.domain.Portfolio;
 import com.mailsent.portfolio.portfolio.domain.PortfolioOverview;
 
@@ -120,10 +127,21 @@ class DomainRegistryOwnershipPersistenceIntegrationTest {
         }
 
         @Bean
+        HealthSignalService healthSignalService(DomainRepository domains, Clock clock) {
+            // The hermetic in-memory adapters back every observation port; this slice never
+            // derives signals, so the overview health stays explicitly absent.
+            return new HealthSignalService(new InMemoryHealthSignalRepository(), domains,
+                new InMemoryObservationEvidenceRepository(),
+                new InMemoryDmarcAggregateEvidenceRepository(),
+                new InMemoryReputationObservationRepository(), clock);
+        }
+
+        @Bean
         PortfolioOverviewService portfolioOverviewService(ClientRelationshipRepository clientRelationships,
                                                           DomainRepository domains,
-                                                          OrganizationRepository organizations) {
-            return new PortfolioOverviewService(clientRelationships, domains, organizations);
+                                                          OrganizationRepository organizations,
+                                                          HealthSignalService healthSignals) {
+            return new PortfolioOverviewService(clientRelationships, domains, organizations, healthSignals);
         }
     }
 
@@ -202,8 +220,9 @@ class DomainRegistryOwnershipPersistenceIntegrationTest {
         assertEquals(clientOrg, clientOverview.clientOrganizationId());
         assertEquals(2, clientOverview.domainCount());
 
-        for (Domain d : clientOverview.domains()) {
-            assertEquals(clientOrg, d.organizationId(), "Client domains retain client ownership (INV-09)");
+        for (DomainOverview d : clientOverview.domains()) {
+            assertNull(d.healthIndication(),
+                "no signal was seeded: overview health stays explicitly absent (never fabricated)");
         }
 
         // Verify underlying database records in PostgreSQL remain unchanged (no ownership mutation):

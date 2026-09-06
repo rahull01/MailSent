@@ -12,6 +12,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.mailsent.identity.authentication.domain.Email;
+import com.mailsent.identity.authentication.domain.Role;
+import com.mailsent.identity.authentication.domain.User;
+import com.mailsent.identity.team.application.AuthorizationService;
+import com.mailsent.identity.team.domain.AccessDeniedException;
 import com.mailsent.portfolio.domain.domain.Domain;
 import com.mailsent.portfolio.domain.domain.DomainOrganizationNotFoundException;
 import com.mailsent.portfolio.domain.infrastructure.InMemoryDomainRepository;
@@ -30,6 +35,7 @@ class DomainImportServiceTest {
     private InMemoryOrganizationRepository organizations;
     private InMemoryDomainRepository domainRepository;
     private DomainService domainService;
+    private AuthorizationService authorizationService;
     private DomainImportService importService;
 
     @BeforeEach
@@ -37,7 +43,13 @@ class DomainImportServiceTest {
         organizations = new InMemoryOrganizationRepository();
         domainRepository = new InMemoryDomainRepository();
         domainService = new DomainService(domainRepository, organizations, CLOCK);
-        importService = new DomainImportService(domainService, organizations);
+        authorizationService = new AuthorizationService();
+        importService = new DomainImportService(domainService, organizations, authorizationService);
+    }
+
+    private User ownerOf(String orgId) {
+        return User.restore("user-1", new Email("owner@test.com"), "hash",
+            Role.OWNER, CLOCK.instant(), orgId);
     }
 
     private String createdOrganization(String name) {
@@ -47,7 +59,7 @@ class DomainImportServiceTest {
     @Test
     void importsAllValidNamesForOneOrganization() {
         String orgId = createdOrganization("Acme");
-        DomainImportResult result = importService.importDomains(orgId, List.of("a.com", "b.com", "c.com"));
+        DomainImportResult result = importService.importDomains(ownerOf(orgId), orgId, List.of("a.com", "b.com", "c.com"));
 
         assertEquals(3, result.imported().size(), "all three names imported");
         assertEquals(0, result.failures().size());
@@ -59,7 +71,7 @@ class DomainImportServiceTest {
     @Test
     void importPreservesOfferedOrder() {
         String orgId = createdOrganization("Acme");
-        DomainImportResult result = importService.importDomains(orgId, List.of("a.com", "b.com"));
+        DomainImportResult result = importService.importDomains(ownerOf(orgId), orgId, List.of("a.com", "b.com"));
         assertEquals(List.of("a.com", "b.com"),
             result.imported().stream().map(Domain::name).toList());
     }
@@ -68,7 +80,7 @@ class DomainImportServiceTest {
     void mixedBatchImportsValidAndReportsFailures() {
         String orgId = createdOrganization("Acme");
         domainService.register(orgId, "existing.com");
-        DomainImportResult result = importService.importDomains(orgId,
+        DomainImportResult result = importService.importDomains(ownerOf(orgId), orgId,
             List.of("existing.com", "new.com", "   ", "other.com"));
 
         assertEquals(List.of("new.com", "other.com"),
@@ -85,7 +97,7 @@ class DomainImportServiceTest {
     @Test
     void withinBatchDuplicateImportsOnce() {
         String orgId = createdOrganization("Acme");
-        DomainImportResult result = importService.importDomains(orgId, List.of("a.com", "a.com"));
+        DomainImportResult result = importService.importDomains(ownerOf(orgId), orgId, List.of("a.com", "a.com"));
 
         assertEquals(1, result.imported().size(), "a duplicate within the batch is imported once");
         assertEquals(1, result.failures().size());
@@ -96,8 +108,8 @@ class DomainImportServiceTest {
     void importDoesNotCrossOrganizations() {
         String orgA = createdOrganization("Acme A");
         String orgB = createdOrganization("Acme B");
-        importService.importDomains(orgA, List.of("a.com"));
-        importService.importDomains(orgB, List.of("b.com"));
+        importService.importDomains(ownerOf(orgA), orgA, List.of("a.com"));
+        importService.importDomains(ownerOf(orgB), orgB, List.of("b.com"));
 
         assertTrue(domainRepository.findByOrganizationId(orgA).stream()
             .allMatch(d -> d.organizationId().equals(orgA)));
@@ -110,14 +122,17 @@ class DomainImportServiceTest {
     @Test
     void emptyBatchImportsNothing() {
         String orgId = createdOrganization("Acme");
-        DomainImportResult result = importService.importDomains(orgId, List.of());
+        DomainImportResult result = importService.importDomains(ownerOf(orgId), orgId, List.of());
         assertTrue(result.imported().isEmpty());
         assertTrue(result.failures().isEmpty());
     }
 
     @Test
-    void importRejectsUnknownOrganization() {
-        assertThrows(DomainOrganizationNotFoundException.class,
-            () -> importService.importDomains("no-such-org", List.of("a.com")));
+    void importIntoUnknownOrganizationIsDeniedBeforeExistenceLeak() {
+        // Authorization evaluates BEFORE organization existence, so this operation cannot
+        // be used to probe whether arbitrary organization ids exist (INV-09-first).
+        String orgId = createdOrganization("Acme");
+        assertThrows(AccessDeniedException.class,
+            () -> importService.importDomains(ownerOf(orgId), "no-such-org", List.of("a.com")));
     }
 }

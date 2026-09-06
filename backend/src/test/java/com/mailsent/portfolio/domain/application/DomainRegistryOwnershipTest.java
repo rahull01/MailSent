@@ -2,8 +2,10 @@ package com.mailsent.portfolio.domain.application;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.lang.reflect.Method;
 import java.time.Clock;
@@ -18,17 +20,20 @@ import org.junit.jupiter.api.Test;
 import com.mailsent.identity.authentication.domain.Email;
 import com.mailsent.identity.authentication.domain.Role;
 import com.mailsent.identity.authentication.domain.User;
+import com.mailsent.identity.team.application.AuthorizationService;
 import com.mailsent.portfolio.client.application.ClientRelationshipService;
 import com.mailsent.portfolio.client.infrastructure.InMemoryClientRelationshipRepository;
 import com.mailsent.portfolio.domain.domain.Domain;
 import com.mailsent.portfolio.domain.domain.DomainAlreadyExistsException;
 import com.mailsent.portfolio.domain.domain.DomainOrganizationNotFoundException;
 import com.mailsent.portfolio.domain.infrastructure.InMemoryDomainRepository;
+import com.mailsent.portfolio.observation.application.HealthSignalService;
 import com.mailsent.portfolio.organization.domain.Organization;
 import com.mailsent.portfolio.organization.infrastructure.InMemoryOrganizationRepository;
 import com.mailsent.portfolio.portfolio.application.PortfolioOverviewService;
 import com.mailsent.portfolio.portfolio.application.PortfolioService;
 import com.mailsent.portfolio.portfolio.domain.ClientOverview;
+import com.mailsent.portfolio.portfolio.domain.DomainOverview;
 import com.mailsent.portfolio.portfolio.domain.Portfolio;
 import com.mailsent.portfolio.portfolio.domain.PortfolioOverview;
 
@@ -55,10 +60,11 @@ class DomainRegistryOwnershipTest {
         domains = new InMemoryDomainRepository();
         clientRelationships = new InMemoryClientRelationshipRepository();
         domainService = new DomainService(domains, organizations, CLOCK);
-        importService = new DomainImportService(domainService, organizations);
+        importService = new DomainImportService(domainService, organizations, new AuthorizationService());
         relationshipService = new ClientRelationshipService(clientRelationships, organizations, CLOCK);
         portfolioService = new PortfolioService(clientRelationships, organizations);
-        overviewService = new PortfolioOverviewService(clientRelationships, domains, organizations);
+        overviewService = new PortfolioOverviewService(clientRelationships, domains, organizations,
+            mock(HealthSignalService.class));
     }
 
     private String createOrg(String name) {
@@ -103,7 +109,7 @@ class DomainRegistryOwnershipTest {
     @Test
     void domainImportPreservesTargetOrganizationOwnership() {
         String orgId = createOrg("ImportOrg");
-        DomainImportResult result = importService.importDomains(orgId, List.of("one.com", "two.com"));
+        DomainImportResult result = importService.importDomains(userWithRole(orgId, Role.OWNER), orgId, List.of("one.com", "two.com"));
 
         assertEquals(2, result.imported().size());
         assertTrue(result.imported().stream().allMatch(d -> d.organizationId().equals(orgId)),
@@ -149,9 +155,10 @@ class DomainRegistryOwnershipTest {
         assertEquals(clientOrg, clientOverview.clientOrganizationId());
         assertEquals(2, clientOverview.domainCount());
 
-        // Domain ownership remains ClientOrg (NOT AgencyOrg):
-        for (Domain dom : clientOverview.domains()) {
-            assertEquals(clientOrg, dom.organizationId(), "Portfolio read preserves client domain ownership (INV-09)");
+        // Domain ownership remains ClientOrg (NOT AgencyOrg); no signal seeded → absent health:
+        for (DomainOverview dom : clientOverview.domains()) {
+            assertNull(dom.healthIndication(),
+                "no Health Signal was seeded: overview health is explicitly absent (never fabricated)");
         }
 
         // Confirm database/repository domain records were NOT mutated:
