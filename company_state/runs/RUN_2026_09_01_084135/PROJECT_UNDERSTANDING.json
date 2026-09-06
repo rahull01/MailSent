@@ -1,0 +1,324 @@
+{
+  "run_id": "RUN_2026_09_01_084135",
+  "project_mission": "MailSent is a deliverability and email infrastructure intelligence product focused on DMARC, trust, and guided fixes.",
+  "product_priorities": [
+    "deliverability health",
+    "DMARC insight",
+    "guided remediation",
+    "agency workflow"
+  ],
+  "technical_architecture": {
+    "company_model": "CEO/CTO/Architect/specialist loop with shared state and run history",
+    "concerns": [
+      "fresh evidence required before acceptance",
+      "risk of unverified completion claims"
+    ]
+  },
+  "constraints": [
+    "The company must operate from fresh evidence each run.",
+    "All completion claims require tests, security review, and QA evidence.",
+    "The repository and checklist are authoritative sources; prior completion markers are untrusted until verified."
+  ],
+  "known_risks": [
+    "Checklist data may be stale if source files or docs change.",
+    "No task should be marked VERIFIED_DONE without a structured evidence record.",
+    "Projects without real validation are still not production-ready."
+  ],
+  "implementation_status": {
+    "startup_runtime": "implemented",
+    "fresh_run_state": "implemented",
+    "checklist_verification": "implemented",
+    "task_contract": "pending",
+    "security_gate": "pending",
+    "qa_gate": "pending",
+    "stale_change_invalidation": "pending",
+    "resume_engine": "partial"
+  },
+  "disagreements": [
+    {
+      "source_a": ".agents\\skills\\speckit-checklist\\SKILL.md",
+      "source_b": "docs\\00_Foundation\\PROJECT_CONSTITUTION.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": ".agents\\skills\\speckit-checklist\\SKILL.md",
+      "source_b": "docs\\01_Product\\PRODUCT_VISION.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": ".agents\\skills\\speckit-checklist\\SKILL.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": ".specify\\memory\\constitution.md",
+      "source_b": "docs\\00_Foundation\\PROJECT_CONSTITUTION.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": ".specify\\memory\\constitution.md",
+      "source_b": "docs\\01_Product\\PRODUCT_VISION.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": ".specify\\memory\\constitution.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\00_Foundation\\GLOSSARY.md",
+      "source_b": "docs\\00_Foundation\\PROJECT_CONSTITUTION.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\00_Foundation\\GLOSSARY.md",
+      "source_b": "docs\\01_Product\\PRODUCT_VISION.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\00_Foundation\\GLOSSARY.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\00_Foundation\\PROJECT_CONSTITUTION.md",
+      "source_b": "docs\\01_Product\\PRODUCT_VISION.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\00_Foundation\\PROJECT_CONSTITUTION.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\01_Product\\PRODUCT_VISION.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\02_Product_Design\\NON_FUNCTIONAL_REQUIREMENTS.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\02_Product_Design\\PRODUCT_REQUIREMENTS.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\03_Architecture\\01_DOMAIN_MODEL.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\03_Architecture\\05_SYSTEM_ARCHITECTURE.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\03_Architecture\\07_DATA_MODEL.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    },
+    {
+      "source_a": "docs\\03_Architecture\\09_SECURITY_ARCHITECTURE.md",
+      "source_b": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "issue": "security mandate differs",
+      "resolution": "CTO recommendation to preserve both sources until evidence resolves the conflict; CEO resolves product-scope conflicts."
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    },
+    {
+      "decision": "security mandate differs",
+      "authority": "CTO/CEO",
+      "rationale": "Two authoritative sources disagree; preserve both and escalate for evidence-based resolution."
+    }
+  ],
+  "sources": [
+    ".agents\\README.md",
+    ".agents\\rules\\agent.md",
+    ".agents\\skills\\speckit-checklist\\SKILL.md",
+    ".agents\\skills\\speckit-constitution\\SKILL.md",
+    ".claude\\commands\\agents\\README.md",
+    ".claude\\commands\\analysis\\README.md",
+    ".claude\\commands\\automation\\README.md",
+    ".claude\\commands\\automation\\workflow-select.md",
+    ".claude\\commands\\coordination\\README.md",
+    ".claude\\commands\\github\\README.md",
+    ".claude\\commands\\github\\workflow-automation.md",
+    ".claude\\commands\\hive-mind\\README.md",
+    ".claude\\commands\\hooks\\README.md",
+    ".claude\\commands\\memory\\README.md",
+    ".claude\\commands\\monitoring\\README.md",
+    ".claude\\commands\\optimization\\README.md",
+    ".claude\\commands\\sparc\\docs-writer.md",
+    ".claude\\commands\\sparc\\workflow-manager.md",
+    ".claude\\commands\\swarm\\README.md",
+    ".claude\\commands\\workflows\\development.md",
+    ".claude\\commands\\workflows\\README.md",
+    ".claude\\commands\\workflows\\research.md",
+    ".claude\\commands\\workflows\\workflow-create.md",
+    ".claude\\commands\\workflows\\workflow-execute.md",
+    ".claude\\commands\\workflows\\workflow-export.md",
+    ".claude\\helpers\\README.md",
+    ".claude\\skills\\github-workflow-automation\\SKILL.md",
+    ".github\\workflows\\ci.yml",
+    ".specify\\memory\\constitution.md",
+    ".specify\\specs\\client-002-assign-client-to-agency\\checklist.md",
+    ".specify\\specs\\comp-003-compliance-pdf\\checklist.md",
+    ".specify\\specs\\diag-002-sender-detection\\checklist.md",
+    ".specify\\specs\\diag-003-root-cause-determination\\checklist.md",
+    ".specify\\specs\\diag-004-issue-entity-lifecycle\\checklist.md",
+    ".specify\\specs\\dom-001-add-domain-manual\\checklist.md",
+    ".specify\\specs\\dom-001-add-domain-manual\\plan.md",
+    ".specify\\specs\\dom-001-add-domain-manual\\spec.md",
+    ".specify\\specs\\dom-001-add-domain-manual\\tasks.md",
+    ".specify\\specs\\dom-003-domain-list-state\\checklist.md",
+    ".specify\\specs\\dom-004-registry-ownership\\checklist.md",
+    ".specify\\specs\\expl-003-explanation-toggle\\checklist.md",
+    ".specify\\specs\\health-002-health-trend\\checklist.md",
+    ".specify\\specs\\p0-1-spring-jpa-test-context\\checklist.md",
+    ".specify\\specs\\rem-sec-001-session-filter-consent-hardening\\checklist.md",
+    ".specify\\specs\\res-003-match-by-dns-provider\\checklist.md",
+    ".specify\\specs\\team-002-role-capability-map\\checklist.md",
+    ".specify\\specs\\team-003-access-audit-record\\checklist.md",
+    ".specify\\specs\\team-004-team-list-query\\checklist.md",
+    ".specify\\templates\\checklist-template.md",
+    ".specify\\templates\\constitution-template.md",
+    ".specify\\workflows\\speckit\\workflow.yml",
+    ".specify\\workflows\\workflow-registry.json",
+    "AGENT.md",
+    "CLAUDE.md",
+    "company_state\\runs\\RUN_2026_08_31_102215\\checklist_snapshot.json",
+    "docs\\00_Foundation\\GLOSSARY.md",
+    "docs\\00_Foundation\\MAILSENT_MASTER_WORKFLOW.md",
+    "docs\\00_Foundation\\PROJECT_CONSTITUTION.md",
+    "docs\\00_Foundation\\SPEC_KIT_INTEGRATION_AUDIT.md",
+    "docs\\01_Product\\CUSTOMER_JOURNEY.md",
+    "docs\\01_Product\\CUSTOMER_PROBLEMS.md",
+    "docs\\01_Product\\PRODUCT_POSITIONING.md",
+    "docs\\01_Product\\PRODUCT_VISION.md",
+    "docs\\01_Product\\VALUE_PROPOSITION.md",
+    "docs\\02_Product_Design\\AI_REQUIREMENTS.md",
+    "docs\\02_Product_Design\\FUNCTIONAL_REQUIREMENTS.md",
+    "docs\\02_Product_Design\\NON_FUNCTIONAL_REQUIREMENTS.md",
+    "docs\\02_Product_Design\\PRODUCT_REQUIREMENTS.md",
+    "docs\\02_Product_Design\\RELEASE_STRATEGY.md",
+    "docs\\02_Product_Design\\REQUIREMENTS_TRACEABILITY_MATRIX.md",
+    "docs\\03_Architecture\\01_DOMAIN_MODEL.md",
+    "docs\\03_Architecture\\02_UBIQUITOUS_LANGUAGE.md",
+    "docs\\03_Architecture\\03_BOUNDED_CONTEXTS.md",
+    "docs\\03_Architecture\\04_INFORMATION_ARCHITECTURE.md",
+    "docs\\03_Architecture\\05_SYSTEM_ARCHITECTURE.md",
+    "docs\\03_Architecture\\06_AI_ARCHITECTURE.md",
+    "docs\\03_Architecture\\07_DATA_MODEL.md",
+    "docs\\03_Architecture\\08_API_PHILOSOPHY.md",
+    "docs\\03_Architecture\\09_SECURITY_ARCHITECTURE.md",
+    "docs\\03_Architecture\\10_DEPLOYMENT_ARCHITECTURE.md",
+    "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+    "implementation\\README.md",
+    "README.md"
+  ]
+}

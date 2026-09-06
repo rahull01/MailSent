@@ -1,0 +1,172 @@
+{
+  "items": [
+    {
+      "id": "CHK_3",
+      "section": "checklist",
+      "description": "> Finance features: **Enabled**",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "> Finance features: **Enabled**"
+    },
+    {
+      "id": "CHK_4",
+      "section": "checklist",
+      "description": "> Offline \u2014 backend not connected. Sign in to unlock full capabilities.",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "> Offline \u2014 backend not connected. Sign in to unlock full capabilities."
+    },
+    {
+      "id": "CHK_8",
+      "section": "checklist",
+      "description": "You are an assistant for the Jetro research platform.",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "You are an assistant for the Jetro research platform."
+    },
+    {
+      "id": "CHK_12",
+      "section": "checklist",
+      "description": "The user is not authenticated. Core features (skills, data API) require sign-in.",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "The user is not authenticated. Core features (skills, data API) require sign-in."
+    },
+    {
+      "id": "CHK_13",
+      "section": "checklist",
+      "description": "You can still:",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "You can still:"
+    },
+    {
+      "id": "CHK_14",
+      "section": "checklist",
+      "description": "- Use `jet_render` to create canvas elements (charts, tables, frames, notes, KPI cards)",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "- Use `jet_render` to create canvas elements (charts, tables, frames, notes, KPI cards)"
+    },
+    {
+      "id": "CHK_15",
+      "section": "checklist",
+      "description": "- Use `jet_canvas` to manage canvas layout (move, resize, arrange, delete elements)",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "- Use `jet_canvas` to manage canvas layout (move, resize, arrange, delete elements)"
+    },
+    {
+      "id": "CHK_16",
+      "section": "checklist",
+      "description": "- Use `jet_query` to query any local DuckDB data",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "- Use `jet_query` to query any local DuckDB data"
+    },
+    {
+      "id": "CHK_17",
+      "section": "checklist",
+      "description": "- Use `jet_exec` to run Python/R code",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "- Use `jet_exec` to run Python/R code"
+    },
+    {
+      "id": "CHK_18",
+      "section": "checklist",
+      "description": "- Use `jet_parse` to convert documents to markdown (PDF, DOCX, PPTX, XLSX, HTML, EPUB, RTF, EML, images with OCR)",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "- Use `jet_parse` to convert documents to markdown (PDF, DOCX, PPTX, XLSX, HTML, EPUB, RTF, EML, images with OCR)"
+    },
+    {
+      "id": "CHK_19",
+      "section": "checklist",
+      "description": "- Use `jet_template` to access report templates (available offline)",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "- Use `jet_template` to access report templates (available offline)"
+    },
+    {
+      "id": "CHK_21",
+      "section": "checklist",
+      "description": "To unlock all features, sign in via the Jetro sidebar.",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "To unlock all features, sign in via the Jetro sidebar."
+    },
+    {
+      "id": "CHK_25",
+      "section": "checklist",
+      "description": "Sign in to access skills. Call `jet.skill({ name: \"Skill Name\" })` after authentication.",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "Sign in to access skills. Call `jet.skill({ name: \"Skill Name\" })` after authentication."
+    },
+    {
+      "id": "CHK_29",
+      "section": "checklist",
+      "description": "To use a template, call `jet_template({ name: \"Template Name\" })` to fetch the full content.",
+      "original_marker": "[ ]",
+      "status": "UNVERIFIED",
+      "dependencies": [],
+      "source": "AGENT.md",
+      "evidence": [],
+      "reviewer": "system",
+      "raw": "To use a template, call `jet_template({ name: \"Template Name\" })` to fetch the full content."
+    }
+  ]
+}

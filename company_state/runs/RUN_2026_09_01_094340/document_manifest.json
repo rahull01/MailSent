@@ -1,0 +1,805 @@
+{
+  "files": [
+    {
+      "path": ".agents\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.agents\\README.md",
+      "hash": "1006037d9a7ac7cb4ac1d6682fc424871f11856908f807e5f088ff18843ad641",
+      "modified_at": "2026-09-01T09:43:41.576082",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# .agents Directory\n\nThis directory contains agent configuration and skills for OpenAI Codex CLI.\n\n## Structure\n\n```\n.agents/\n  config.toml     # Main configuration file\n  skills/         # Skill definitions\n    skill-name/\n      SKILL.md    # Skill instructions\n      scripts/    # Optional scripts\n      docs/       # Optional documentation\n  README.md       # This file\n```\n\n## Configuration\n\nThe `config.toml` file controls:\n- Model selection\n- Approval policies\n- Sandbox modes\n- MCP server connections\n- Skills configuration\n\n## Skills\n\nSkills are invoked using `$skill-name` syntax. Each skill has:\n- YAML frontmatter with metadata\n- Trigger and skip conditions\n- Commands and examples\n\n## Documentation\n\n- Main instructions: `AGENTS.md` (project root)\n- Local overrides: `.codex/AGENTS.override.md` (gitignored)\n- Ruflo: https://github.com/ruvnet/ruflo"
+    },
+    {
+      "path": ".agents\\rules\\agent.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.agents\\rules\\agent.md",
+      "hash": "5e4c201ab0e277af6ae437380238976f7c574bdb40318ff9935994ef9a8f2040",
+      "modified_at": "2026-09-01T09:43:41.576082",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "---\ntrigger: always_on\n---\n\n# Jetro Agent Context\n\n> Finance features: **Enabled**\n> Offline \u2014 backend not connected. Sign in to unlock full capabilities.\n\n---\n\nYou are an assistant for the Jetro research platform.\n\n## Getting Started\n\nThe user is not authenticated. Core features (skills, data API) require sign-in.\nYou can still:\n- Use `jet_render` to create canvas elements (charts, tables, frames, notes, KPI cards)\n- Use `jet_canvas` to manage canvas layout (move, resize, arrange, delete elements)\n- Use `jet_query` to query any local DuckDB data\n- Use `jet_exec` to run Python/R code\n- Use `jet_parse` to convert documents to markdown (PDF, DOCX, PPTX, XLSX, HTML, EPUB, RTF, EML, images with OCR)\n- Use `jet_template` to access report templates (available offline)\n\nTo unlock all features, sign in via the Jetro sidebar.\n\n## Available Skills\n\nSign in to access skills. Call `jet.skill({ name: \"Skill Name\" })` after authentication.\n\n## Available Templates\n\nTo use a template, call `jet_template({ name: \"Template Name\" })` to fetch the full content."
+    },
+    {
+      "path": ".agents\\skills\\speckit-checklist\\SKILL.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.agents\\skills\\speckit-checklist\\SKILL.md",
+      "hash": "e1c10a06ce66a72b549344b207d08d3956156c878876556fd6fa99c1b461730f",
+      "modified_at": "2026-09-01T09:43:41.578220",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "---\nname: \"speckit-checklist\"\ndescription: \"Generate a custom checklist for the current feature based on user requirements.\"\ncompatibility: \"Requires spec-kit project structure with .specify/ directory\"\nmetadata:\n  author: \"github-spec-kit\"\n  source: \"templates/commands/checklist.md\"\n---\n\n\n## Checklist Purpose: \"Unit Tests for English\"\n\n**CRITICAL CONCEPT**: Checklists are **UNIT TESTS FOR REQUIREMENTS WRITING** - they validate the quality, clarity, and completeness of requirements in a given domain.\n\n**NOT for verification/testing**:\n\n- \u274c NOT \"Verify the button clicks correctly\"\n- \u274c NOT \"Test error handling works\"\n- \u274c NOT \"Confirm the API returns 200\"\n- \u274c NOT checking if code/implementation matches the spec\n\n**FOR requirements quality validation**:\n\n- \u2705 \"Are visual hierarchy requirements defined for all card types?\" (completeness)\n- \u2705 \"Is 'prominent display' quantified with specific sizing/positioning?\" (clarity)\n- \u2705 \"Are hover state requirements consistent across all interactive elements?\" (consistency)\n- \u2705 \"Are accessibility requirements defined for keyboard navigation?\" (coverage)\n- \u2705 \"Does the spec define what happens when logo image fails to load?\" (edge cases)\n\n**Metaphor**: If your spec is code written in English, the checklist is its unit test suite. You're testing whether the requirements are well-written, complete, unambiguous, and ready for implementation - NOT whether the implementation works.\n\n**Ownership and checkbox lifecycle**:\n\n- Custom checklists generated"
+    },
+    {
+      "path": ".agents\\skills\\speckit-constitution\\SKILL.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.agents\\skills\\speckit-constitution\\SKILL.md",
+      "hash": "2183232e974bc92fb99cb9495c9a416bc02ceae9ed750876e09841b46a6e68ef",
+      "modified_at": "2026-09-01T09:43:41.579304",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "---\nname: \"speckit-constitution\"\ndescription: \"Create or update the project constitution from interactive or provided principle inputs.\"\ncompatibility: \"Requires spec-kit project structure with .specify/ directory\"\nmetadata:\n  author: \"github-spec-kit\"\n  source: \"templates/commands/constitution.md\"\n---\n\n\n## User Input\n\n```text\n$ARGUMENTS\n```\n\nYou **MUST** consider the user input before proceeding (if not empty).\n\n## Scope Guard\n\nThis command's own work is limited to updating the project constitution itself. Dependent templates\nand commands read the constitution at runtime and are not modified here.\n\n- Classify every part of the user input as either constitution content or a separate,\n  non-governance intent.\n- If the input includes feature implementation, code generation, refactoring, building, or\n  deployment requests, you **MUST NOT** execute them. Extract them as deferred intents instead.\n- You **MUST NOT** create, modify, or delete application source files, feature routes,\n  components, tests, deployment files, or other artifacts unrelated to the constitution\n  workflow.\n- If it is unclear whether an instruction is constitution content, ask for clarification before\n  making changes.\n- After completing the constitution update, include a `Next Actions` section for each deferred\n  intent. List the original intent and suggest the appropriate follow-up Spec Kit command, such\n  as `/speckit-specify`, without invoking it.\n- If there are no non-governance intents, omit the `Next"
+    },
+    {
+      "path": ".claude\\commands\\agents\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\agents\\README.md",
+      "hash": "e284bce195279e199b432e8f86603b15f7ca2f6309b69c5e52314319f76e2f57",
+      "modified_at": "2026-09-01T09:43:41.585303",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Agents Commands\n\nComplete agent management commands for Claude Flow V3.\n\n## Available Commands\n\n| Command | Description |\n|---------|-------------|\n| [spawn](./spawn.md) | Spawn new agents with V3 capabilities |\n| [list](./list.md) | List all active agents |\n| [status](./status.md) | Show detailed agent status |\n| [stop](./stop.md) | Stop running agents |\n| [metrics](./metrics.md) | View performance metrics |\n| [pool](./pool.md) | Manage agent pool scaling |\n| [health](./health.md) | Monitor agent health |\n| [logs](./logs.md) | View agent activity logs |\n\n## Reference\n\n| Reference | Description |\n|-----------|-------------|\n| [agent-types](./agent-types.md) | All 87 available agent types |\n| [agent-capabilities](./agent-capabilities.md) | Capability matrix by agent |\n| [agent-coordination](./agent-coordination.md) | Multi-agent coordination patterns |\n| [agent-spawning](./agent-spawning.md) | Best practices for spawning |\n\n## Quick Start\n\n```bash\n# Spawn a coder agent\nnpx @claude-flow/cli@latest agent spawn -t coder --name my-coder\n\n# List all active agents\nnpx @claude-flow/cli@latest agent list\n\n# Check agent health\nnpx @claude-flow/cli@latest agent health\n\n# View metrics\nnpx @claude-flow/cli@latest agent metrics --period 24h\n```\n\n## V3 Agent Categories\n\n- **Core**: coder, reviewer, tester, planner, researcher\n- **V3 Specialized**: security-architect, memory-specialist, performance-engineer\n- **Swarm**: hierarchical-coordinator, mesh-coordinator, adaptive-coordinator\n- **C"
+    },
+    {
+      "path": ".claude\\commands\\analysis\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\analysis\\README.md",
+      "hash": "e65e139f07695b2a92e14dc07bf63bd9a915006bb66b0e624c9cebb5d17ca0cf",
+      "modified_at": "2026-09-01T09:43:41.586319",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Analysis Commands\n\nCommands for analysis operations in Claude Flow.\n\n## Available Commands\n\n- [bottleneck-detect](./bottleneck-detect.md)\n- [token-usage](./token-usage.md)\n- [performance-report](./performance-report.md)"
+    },
+    {
+      "path": ".claude\\commands\\automation\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\automation\\README.md",
+      "hash": "21aaf8198cc8675d5dc87b355f269507c6cf41d82f3d8cc993b1388cc5957731",
+      "modified_at": "2026-09-01T09:43:41.587312",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Automation Commands\n\nCommands for automation operations in Claude Flow.\n\n## Available Commands\n\n- [auto-agent](./auto-agent.md)\n- [smart-spawn](./smart-spawn.md)\n- [workflow-select](./workflow-select.md)"
+    },
+    {
+      "path": ".claude\\commands\\automation\\workflow-select.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\automation\\workflow-select.md",
+      "hash": "de843594ee49f30a9844ef9232e0e50e3d9e6acf1545f1a951fa6e8df0b794a4",
+      "modified_at": "2026-09-01T09:43:41.588313",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# workflow-select\n\nAutomatically select optimal workflow based on task type.\n\n## Usage\n```bash\nnpx @claude-flow/cli@latest automation workflow-select [options]\n```\n\n## Options\n- `--task <description>` - Task description\n- `--constraints <list>` - Workflow constraints\n- `--preview` - Preview without executing\n\n## Examples\n```bash\n# Select workflow for task\nnpx @claude-flow/cli@latest automation workflow-select --task \"Deploy to production\"\n\n# With constraints\nnpx @claude-flow/cli@latest automation workflow-select --constraints \"no-downtime,rollback\"\n\n# Preview mode\nnpx @claude-flow/cli@latest automation workflow-select --task \"Database migration\" --preview\n```"
+    },
+    {
+      "path": ".claude\\commands\\coordination\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\coordination\\README.md",
+      "hash": "29aa91173843abe596cf754984aa5622df1fb01beada6e6f3a6a3acc3eaa06b8",
+      "modified_at": "2026-09-01T09:43:41.589313",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Coordination Commands\n\nCommands for coordination operations in Claude Flow.\n\n## Available Commands\n\n- [swarm-init](./swarm-init.md)\n- [agent-spawn](./agent-spawn.md)\n- [task-orchestrate](./task-orchestrate.md)"
+    },
+    {
+      "path": ".claude\\commands\\github\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\github\\README.md",
+      "hash": "4fb6c4348f6f8c2d5c252203115942a770743e5e7eb4c696e2d359916050948c",
+      "modified_at": "2026-09-01T09:43:41.592314",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Github Commands\n\nCommands for github operations in Claude Flow.\n\n## Available Commands\n\n- [github-swarm](./github-swarm.md)\n- [repo-analyze](./repo-analyze.md)\n- [pr-enhance](./pr-enhance.md)\n- [issue-triage](./issue-triage.md)\n- [code-review](./code-review.md)"
+    },
+    {
+      "path": ".claude\\commands\\github\\workflow-automation.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\github\\workflow-automation.md",
+      "hash": "409fd383f327a893cd44192706a0d9ef9f2bc55f55ac7967f769918a19e7e359",
+      "modified_at": "2026-09-01T09:43:41.593828",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Workflow Automation - GitHub Actions Integration\n\n## Overview\nIntegrate AI swarms with GitHub Actions to create intelligent, self-organizing CI/CD pipelines that adapt to your codebase.\n\n## Core Features\n\n### 1. Swarm-Powered Actions\n```yaml\n# .github/workflows/swarm-ci.yml\nname: Intelligent CI with Swarms\non: [push, pull_request]\n\njobs:\n  swarm-analysis:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      \n      - name: Initialize Swarm\n        uses: ruvnet/swarm-action@v1\n        with:\n          topology: mesh\n          max-agents: 6\n          \n      - name: Analyze Changes\n        run: |\n          npx ruv-swarm actions analyze \\\n            --commit ${{ github.sha }} \\\n            --suggest-tests \\\n            --optimize-pipeline\n```\n\n### 2. Dynamic Workflow Generation\n```bash\n# Generate workflows based on code analysis\nnpx ruv-swarm actions generate-workflow \\\n  --analyze-codebase \\\n  --detect-languages \\\n  --create-optimal-pipeline\n```\n\n### 3. Intelligent Test Selection\n```yaml\n# Smart test runner\n- name: Swarm Test Selection\n  run: |\n    npx ruv-swarm actions smart-test \\\n      --changed-files ${{ steps.files.outputs.all }} \\\n      --impact-analysis \\\n      --parallel-safe\n```\n\n## Workflow Templates\n\n### Multi-Language Detection\n```yaml\n# .github/workflows/polyglot-swarm.yml\nname: Polyglot Project Handler\non: push\n\njobs:\n  detect-and-build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      \n      - name: Detect Lan"
+    },
+    {
+      "path": ".claude\\commands\\hive-mind\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\hive-mind\\README.md",
+      "hash": "fa9fd39a53ee30b6ca4e9ea9a2242006ceeee8b0c05150a099a5761ceda5bfd7",
+      "modified_at": "2026-09-01T09:43:41.594829",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Hive-mind Commands\n\nCommands for hive-mind operations in Claude Flow.\n\n## Available Commands\n\n- [hive-mind](./hive-mind.md)\n- [hive-mind-init](./hive-mind-init.md)\n- [hive-mind-spawn](./hive-mind-spawn.md)\n- [hive-mind-status](./hive-mind-status.md)\n- [hive-mind-resume](./hive-mind-resume.md)\n- [hive-mind-stop](./hive-mind-stop.md)\n- [hive-mind-sessions](./hive-mind-sessions.md)\n- [hive-mind-consensus](./hive-mind-consensus.md)\n- [hive-mind-memory](./hive-mind-memory.md)\n- [hive-mind-metrics](./hive-mind-metrics.md)\n- [hive-mind-wizard](./hive-mind-wizard.md)"
+    },
+    {
+      "path": ".claude\\commands\\hooks\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\hooks\\README.md",
+      "hash": "d9812b07a1884271dbb1615642f3047d3624c879fb997455869e75220a31feb9",
+      "modified_at": "2026-09-01T09:43:41.594829",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Hooks Commands\n\nCommands for hooks operations in Claude Flow.\n\n## Available Commands\n\n- [pre-task](./pre-task.md)\n- [post-task](./post-task.md)\n- [pre-edit](./pre-edit.md)\n- [post-edit](./post-edit.md)\n- [session-end](./session-end.md)"
+    },
+    {
+      "path": ".claude\\commands\\memory\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\memory\\README.md",
+      "hash": "1df3b5a0470191642b944e01966deb3662facce5cd88ecbf5ed89a9d29d2e0fd",
+      "modified_at": "2026-09-01T09:43:41.595829",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Memory Commands\n\nCommands for memory operations in Claude Flow.\n\n## Available Commands\n\n- [memory-usage](./memory-usage.md)\n- [memory-persist](./memory-persist.md)\n- [memory-search](./memory-search.md)"
+    },
+    {
+      "path": ".claude\\commands\\monitoring\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\monitoring\\README.md",
+      "hash": "49fcdc033edfc65b136363ceca63323c5069c9c64b54b8ba5c814fb3631363b7",
+      "modified_at": "2026-09-01T09:43:41.596830",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Monitoring Commands\n\nCommands for monitoring operations in Claude Flow.\n\n## Available Commands\n\n- [swarm-monitor](./swarm-monitor.md)\n- [agent-metrics](./agent-metrics.md)\n- [real-time-view](./real-time-view.md)"
+    },
+    {
+      "path": ".claude\\commands\\optimization\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\optimization\\README.md",
+      "hash": "e398abe1a335dba3501ca730388aa77de2392492bd7173d495ceaab309a5f423",
+      "modified_at": "2026-09-01T09:43:41.597829",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Optimization Commands\n\nCommands for optimization operations in Claude Flow.\n\n## Available Commands\n\n- [topology-optimize](./topology-optimize.md)\n- [parallel-execute](./parallel-execute.md)\n- [cache-manage](./cache-manage.md)"
+    },
+    {
+      "path": ".claude\\commands\\sparc\\docs-writer.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\sparc\\docs-writer.md",
+      "hash": "eec63c3aeeb0c1f3eb918c3d4cd800e61ae381978197baf1b92b3e4e8c6c4980",
+      "modified_at": "2026-09-01T09:43:41.598830",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "---\nname: sparc-docs-writer\ndescription: \ud83d\udcda Documentation Writer - You write concise, clear, and modular Markdown documentation that explains usage, integration, se...\n---\n\n# \ud83d\udcda Documentation Writer\n\n## Role Definition\nYou write concise, clear, and modular Markdown documentation that explains usage, integration, setup, and configuration.\n\n## Custom Instructions\nOnly work in .md files. Use sections, examples, and headings. Keep each file under 500 lines. Do not leak env values. Summarize what you wrote using `attempt_completion`. Delegate large guides with `new_task`.\n\n## Available Tools\n- **read**: File reading and viewing\n- **edit**: Markdown files only (Files matching: \\.md$)\n\n## Usage\n\n### Option 1: Using MCP Tools (Preferred in Claude Code)\n```javascript\nmcp__claude-flow__sparc_mode {\n  mode: \"docs-writer\",\n  task_description: \"create API documentation\",\n  options: {\n    namespace: \"docs-writer\",\n    non_interactive: false\n  }\n}\n```\n\n### Option 2: Using NPX CLI (Fallback when MCP not available)\n```bash\n# Use when running from terminal or MCP tools unavailable\nnpx @claude-flow/cli@latest sparc run docs-writer \"create API documentation\"\n\n# For alpha features\nnpx claude-flow@alpha sparc run docs-writer \"create API documentation\"\n\n# With namespace\nnpx @claude-flow/cli@latest sparc run docs-writer \"your task\" --namespace docs-writer\n\n# Non-interactive mode\nnpx @claude-flow/cli@latest sparc run docs-writer \"your task\" --non-interactive\n```\n\n### Option 3: Local Installation\n```bas"
+    },
+    {
+      "path": ".claude\\commands\\sparc\\workflow-manager.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\sparc\\workflow-manager.md",
+      "hash": "589fc9509f4fbcfaa79ecae13ee29a278f101d21d2dd43bfa2fa8c58727d7670",
+      "modified_at": "2026-09-01T09:43:41.602883",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# SPARC Workflow Manager Mode\n\n## Purpose\nProcess automation with TodoWrite planning and Task execution.\n\n## Activation\n\n### Option 1: Using MCP Tools (Preferred in Claude Code)\n```javascript\nmcp__claude-flow__sparc_mode {\n  mode: \"workflow-manager\",\n  task_description: \"automate deployment\",\n  options: {\n    pipeline: \"ci-cd\",\n    rollback_enabled: true\n  }\n}\n```\n\n### Option 2: Using NPX CLI (Fallback when MCP not available)\n```bash\n# Use when running from terminal or MCP tools unavailable\nnpx @claude-flow/cli@latest sparc run workflow-manager \"automate deployment\"\n\n# For alpha features\nnpx claude-flow@alpha sparc run workflow-manager \"automate deployment\"\n```\n\n### Option 3: Local Installation\n```bash\n# If claude-flow is installed locally\n./claude-flow sparc run workflow-manager \"automate deployment\"\n```\n\n## Core Capabilities\n- Workflow design\n- Process automation\n- Pipeline creation\n- Event handling\n- State management\n\n## Workflow Patterns\n- Sequential flows\n- Parallel branches\n- Conditional logic\n- Loop iterations\n- Error handling\n\n## Automation Features\n- Trigger management\n- Task scheduling\n- Progress tracking\n- Result validation\n- Rollback capability"
+    },
+    {
+      "path": ".claude\\commands\\swarm\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\swarm\\README.md",
+      "hash": "65d2dd1c95927398fead599831008e721e4c00600f2a3d0a8c52d780daaf42e6",
+      "modified_at": "2026-09-01T09:43:41.604879",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Swarm Commands\n\nCommands for swarm operations in Claude Flow.\n\n## Available Commands\n\n- [swarm](./swarm.md)\n- [swarm-init](./swarm-init.md)\n- [swarm-spawn](./swarm-spawn.md)\n- [swarm-status](./swarm-status.md)\n- [swarm-monitor](./swarm-monitor.md)\n- [swarm-strategies](./swarm-strategies.md)\n- [swarm-modes](./swarm-modes.md)\n- [swarm-background](./swarm-background.md)\n- [swarm-analysis](./swarm-analysis.md)"
+    },
+    {
+      "path": ".claude\\commands\\workflows\\development.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\workflows\\development.md",
+      "hash": "80c23e2a355485d1df5d0de831a805b79dddb232b0d40e00efcfcfb0cf2b5ea6",
+      "modified_at": "2026-09-01T09:43:41.605876",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Development Workflow Coordination\n\n## Purpose\nStructure Claude Code's approach to complex development tasks for maximum efficiency.\n\n## Step-by-Step Coordination\n\n### 1. Initialize Development Framework\n```\nTool: mcp__claude-flow__swarm_init\nParameters: {\"topology\": \"hierarchical\", \"maxAgents\": 8, \"strategy\": \"specialized\"}\n```\nCreates hierarchical structure for organized, top-down development.\n\n### 2. Define Development Perspectives\n```\nTool: mcp__claude-flow__agent_spawn\nParameters: {\n  \"type\": \"architect\",\n  \"name\": \"System Design\",\n  \"capabilities\": [\"api-design\", \"database-schema\"]\n}\n```\n```\nTool: mcp__claude-flow__agent_spawn\nParameters: {\n  \"type\": \"coder\",\n  \"name\": \"Implementation Focus\",\n  \"capabilities\": [\"nodejs\", \"typescript\", \"express\"]\n}\n```\n```\nTool: mcp__claude-flow__agent_spawn\nParameters: {\n  \"type\": \"tester\",\n  \"name\": \"Quality Assurance\",\n  \"capabilities\": [\"unit-testing\", \"integration-testing\"]\n}\n```\nSets up architectural and implementation thinking patterns.\n\n### 3. Coordinate Implementation\n```\nTool: mcp__claude-flow__task_orchestrate\nParameters: {\n  \"task\": \"Build REST API with authentication\",\n  \"strategy\": \"parallel\",\n  \"priority\": \"high\",\n  \"dependencies\": [\"database setup\", \"auth system\"]\n}\n```\n\n### 4. Monitor Progress\n```\nTool: mcp__claude-flow__task_status\nParameters: {\"taskId\": \"api-build-task-123\"}\n```\n\n## What Claude Code Actually Does\n1. Uses **Write** tool to create new files\n2. Uses **Edit/MultiEdit** tools for code modifications\n3. Uses"
+    },
+    {
+      "path": ".claude\\commands\\workflows\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\workflows\\README.md",
+      "hash": "56e0d34aaebbcd89b0c7ff8c9959c9de9364fc76f06b1d487bd9e3968141b197",
+      "modified_at": "2026-09-01T09:43:41.606880",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Workflows Commands\n\nCommands for workflows operations in Claude Flow.\n\n## Available Commands\n\n- [workflow-create](./workflow-create.md)\n- [workflow-execute](./workflow-execute.md)\n- [workflow-export](./workflow-export.md)"
+    },
+    {
+      "path": ".claude\\commands\\workflows\\research.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\workflows\\research.md",
+      "hash": "115a247db641fd38fa2457bfdb7cd99a9892dc5e02ab078c5f1dd1b5a5455c25",
+      "modified_at": "2026-09-01T09:43:41.607564",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Research Workflow Coordination\n\n## Purpose\nCoordinate Claude Code's research activities for comprehensive, systematic exploration.\n\n## Step-by-Step Coordination\n\n### 1. Initialize Research Framework\n```\nTool: mcp__claude-flow__swarm_init\nParameters: {\"topology\": \"mesh\", \"maxAgents\": 5, \"strategy\": \"balanced\"}\n```\nCreates a mesh topology for comprehensive exploration from multiple angles.\n\n### 2. Define Research Perspectives\n```\nTool: mcp__claude-flow__agent_spawn\nParameters: {\"type\": \"researcher\", \"name\": \"Literature Review\"}\n```\n```\nTool: mcp__claude-flow__agent_spawn  \nParameters: {\"type\": \"analyst\", \"name\": \"Data Analysis\"}\n```\nSets up different analytical approaches for Claude Code to use.\n\n### 3. Execute Coordinated Research\n```\nTool: mcp__claude-flow__task_orchestrate\nParameters: {\n  \"task\": \"Research modern web frameworks performance\",\n  \"strategy\": \"adaptive\",\n  \"priority\": \"medium\"\n}\n```\n\n### 4. Store Research Findings\n```\nTool: mcp__claude-flow__memory_usage\nParameters: {\n  \"action\": \"store\",\n  \"key\": \"research_findings\",\n  \"value\": \"framework performance analysis results\",\n  \"namespace\": \"research\"\n}\n```\n\n## What Claude Code Actually Does\n1. Uses **WebSearch** tool for finding resources\n2. Uses **Read** tool for analyzing documentation\n3. Uses **Task** tool for parallel exploration\n4. Synthesizes findings using coordination patterns\n5. Stores insights in memory for future reference\n\nRemember: The swarm coordinates HOW Claude Code researches, not WHAT it finds.\n\n#"
+    },
+    {
+      "path": ".claude\\commands\\workflows\\workflow-create.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\workflows\\workflow-create.md",
+      "hash": "e2e365f0f91c6bad49d760b070db25c235c4977b9cf95d55a0f4d9a2ff44a23c",
+      "modified_at": "2026-09-01T09:43:41.608112",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# workflow-create\n\nCreate reusable workflow templates.\n\n## Usage\n```bash\nnpx @claude-flow/cli@latest workflow create [options]\n```\n\n## Options\n- `--name <name>` - Workflow name\n- `--from-history` - Create from history\n- `--interactive` - Interactive creation\n\n## Examples\n```bash\n# Create workflow\nnpx @claude-flow/cli@latest workflow create --name \"deploy-api\"\n\n# From history\nnpx @claude-flow/cli@latest workflow create --name \"test-suite\" --from-history\n\n# Interactive mode\nnpx @claude-flow/cli@latest workflow create --interactive\n```"
+    },
+    {
+      "path": ".claude\\commands\\workflows\\workflow-execute.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\workflows\\workflow-execute.md",
+      "hash": "c55e027e4d7096c07e6dc732e61c8a1a6b0d7c0b038e421819e8fdadfb958b4f",
+      "modified_at": "2026-09-01T09:43:41.608688",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# workflow-execute\n\nExecute saved workflows.\n\n## Usage\n```bash\nnpx @claude-flow/cli@latest workflow execute [options]\n```\n\n## Options\n- `--name <name>` - Workflow name\n- `--params <json>` - Workflow parameters\n- `--dry-run` - Preview execution\n\n## Examples\n```bash\n# Execute workflow\nnpx @claude-flow/cli@latest workflow execute --name \"deploy-api\"\n\n# With parameters\nnpx @claude-flow/cli@latest workflow execute --name \"test-suite\" --params '{\"env\": \"staging\"}'\n\n# Dry run\nnpx @claude-flow/cli@latest workflow execute --name \"deploy-api\" --dry-run\n```"
+    },
+    {
+      "path": ".claude\\commands\\workflows\\workflow-export.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\commands\\workflows\\workflow-export.md",
+      "hash": "36c91f2ccdb8511a40140733ffbee543e9eb054c1d5aa72227c650cb4d4377bd",
+      "modified_at": "2026-09-01T09:43:41.609836",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# workflow-export\n\nExport workflows for sharing.\n\n## Usage\n```bash\nnpx @claude-flow/cli@latest workflow export [options]\n```\n\n## Options\n- `--name <name>` - Workflow to export\n- `--format <type>` - Export format\n- `--include-history` - Include execution history\n\n## Examples\n```bash\n# Export workflow\nnpx @claude-flow/cli@latest workflow export --name \"deploy-api\"\n\n# As YAML\nnpx @claude-flow/cli@latest workflow export --name \"test-suite\" --format yaml\n\n# With history\nnpx @claude-flow/cli@latest workflow export --name \"deploy-api\" --include-history\n```"
+    },
+    {
+      "path": ".claude\\helpers\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\helpers\\README.md",
+      "hash": "07f45c553280087cf178ab5755b3ddec2ad7d049386ddca26b0c213d1873168b",
+      "modified_at": "2026-09-01T09:43:41.614081",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Claude Flow V3 Helpers\n\nThis directory contains helper scripts and utilities for V3 development.\n\n## \ud83d\ude80 Quick Start\n\n```bash\n# Initialize V3 development environment\n.claude/helpers/v3.sh init\n\n# Quick status check\n.claude/helpers/v3.sh status\n\n# Update progress metrics\n.claude/helpers/v3.sh update domain 3\n.claude/helpers/v3.sh update agent 8\n.claude/helpers/v3.sh update security 2\n```\n\n## Available Helpers\n\n### \ud83c\udf9b\ufe0f V3 Master Tool\n- **`v3.sh`** - Main command-line interface for all V3 operations\n  ```bash\n  .claude/helpers/v3.sh help           # Show all commands\n  .claude/helpers/v3.sh status         # Quick development status\n  .claude/helpers/v3.sh update domain 3 # Update specific metrics\n  .claude/helpers/v3.sh validate       # Validate configuration\n  .claude/helpers/v3.sh full-status    # Complete status overview\n  ```\n\n### \ud83d\udcca V3 Progress Management\n- **`update-v3-progress.sh`** - Update V3 development metrics\n  ```bash\n  # Usage examples:\n  .claude/helpers/update-v3-progress.sh domain 3      # Mark 3 domains complete\n  .claude/helpers/update-v3-progress.sh agent 8       # 8 agents active\n  .claude/helpers/update-v3-progress.sh security 2    # 2 CVEs fixed\n  .claude/helpers/update-v3-progress.sh performance 2.5x # Performance boost\n  .claude/helpers/update-v3-progress.sh status        # Show current status\n  ```\n\n### \ud83d\udd0d Configuration Validation\n- **`validate-v3-config.sh`** - Comprehensive environment validation\n  - Checks all required directories and files\n  - Validates"
+    },
+    {
+      "path": ".claude\\skills\\github-workflow-automation\\SKILL.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.claude\\skills\\github-workflow-automation\\SKILL.md",
+      "hash": "6e2d7b7865411209e7c20fe38dbdc77decd4b022bff4b1f8fb69a24661c1c24f",
+      "modified_at": "2026-09-01T09:43:41.618417",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "---\nname: github-workflow-automation\ndescription: |\n  Advanced GitHub Actions workflow automation with AI swarm coordination, intelligent CI/CD pipelines, and comprehensive repository management\n---\n\n# GitHub Workflow Automation Skill\n\n## Overview\n\nThis skill provides comprehensive GitHub Actions automation with AI swarm coordination. It integrates intelligent CI/CD pipelines, workflow orchestration, and repository management to create self-organizing, adaptive GitHub workflows.\n\n## Quick Start\n\n<details>\n<summary>\ud83d\udca1 Basic Usage - Click to expand</summary>\n\n### Initialize GitHub Workflow Automation\n```bash\n# Start with a simple workflow\nnpx ruv-swarm actions generate-workflow \\\n  --analyze-codebase \\\n  --detect-languages \\\n  --create-optimal-pipeline\n```\n\n### Common Commands\n```bash\n# Optimize existing workflow\nnpx ruv-swarm actions optimize \\\n  --workflow \".github/workflows/ci.yml\" \\\n  --suggest-parallelization\n\n# Analyze failed runs\ngh run view <run-id> --json jobs,conclusion | \\\n  npx ruv-swarm actions analyze-failure \\\n    --suggest-fixes\n```\n\n</details>\n\n## Core Capabilities\n\n### \ud83e\udd16 Swarm-Powered GitHub Modes\n\n<details>\n<summary>Available GitHub Integration Modes</summary>\n\n#### 1. gh-coordinator\n**GitHub workflow orchestration and coordination**\n- **Coordination Mode**: Hierarchical\n- **Max Parallel Operations**: 10\n- **Batch Optimized**: Yes\n- **Best For**: Complex GitHub workflows, multi-repo coordination\n\n```bash\n# Usage example\nnpx claude-flow@alpha github gh-coordina"
+    },
+    {
+      "path": ".github\\workflows\\ci.yml",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.github\\workflows\\ci.yml",
+      "hash": "15431745559974b4af51f55076234084bfde7b14ce0812b579bc52e21a2773a8",
+      "modified_at": "2026-09-01T09:43:41.653689",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# MailSent \u2014 CI foundation (ENG-001) \u2014 hardened\n# Secrets + repository health guard, backend build/test/coverage (Maven),\n# frontend lint/build (Next.js), with dependency caching and artifact upload.\n\nname: CI\n\non:\n  push:\n    branches: [main]\n  pull_request:\n\njobs:\n  foundation-guard:\n    name: Secrets & repository health\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - name: Run secrets guard\n        run: bash scripts/guard-secrets.sh\n      - name: Run repository health check\n        run: bash scripts/repo-health.sh\n\n  backend:\n    name: Backend (Maven)\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-java@v4\n        with:\n          distribution: temurin\n          java-version: '21'\n          cache: 'maven'\n      - name: Build, test, coverage\n        working-directory: backend\n        run: mvn -B verify\n      - name: Upload test reports\n        if: always()\n        uses: actions/upload-artifact@v4\n        with:\n          name: backend-test-reports\n          path: |\n            backend/target/surefire-reports\n            backend/target/site/jacoco\n      - name: Upload coverage report\n        if: always()\n        uses: actions/upload-artifact@v4\n        with:\n          name: backend-coverage\n          path: backend/target/site/jacoco/index.html\n\n  frontend:\n    name: Frontend (Next.js)\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4"
+    },
+    {
+      "path": ".specify\\memory\\constitution.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\memory\\constitution.md",
+      "hash": "4b34a6c2040ae768202f27f90795afbf94329d39a9994b222f2e76e5b3783207",
+      "modified_at": "2026-09-01T09:43:41.660362",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "<!--\nSYNC IMPACT REPORT:\n- Version change: Uninitialized Template -> v3.1-speckit-sync\n- Synchronized from authoritative sources:\n  1. docs/00_Foundation/PROJECT_CONSTITUTION.md (v3.1)\n  2. docs/00_Foundation/MAILSENT_MASTER_WORKFLOW.md (V1 Final)\n  3. implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\n- Removed: Generic template placeholder principles (Library-First, CLI Interface, etc.)\n- Retained: 100% of MailSent ratified principles, invariants, non-negotiable rules, and authority hierarchy.\n-->\n\n# MailSent \u2014 Spec Kit Constitution Memory\n\n> **AUTHORITY DECLARATION & GOVERNANCE STATUS: DERIVED EXECUTION MEMORY**\n>\n> This document is a **derived execution-memory representation** of MailSent's supreme governing engineering constitution. It exists solely to guide Spec Kit agents, subagents, and skills during execution.\n>\n> **The supreme, authoritative governing documents of MailSent are:**\n> 1. [`docs/00_Foundation/MAILSENT_MASTER_WORKFLOW.md`](file:///C:/Users/Pradeep%20Singh/Desktop/MailSent/docs/00_Foundation/MAILSENT_MASTER_WORKFLOW.md) \u2014 Operational & Product Source of Truth.\n> 2. [`docs/00_Foundation/PROJECT_CONSTITUTION.md`](file:///C:/Users/Pradeep%20Singh/Desktop/MailSent/docs/00_Foundation/PROJECT_CONSTITUTION.md) \u2014 Engineering Truth & Supreme Philosophy (v3.1).\n> 3. [`implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md`](file:///C:/Users/Pradeep%20Singh/Desktop/MailSent/implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md) \u2014 Engineering Execution System.\n>\n> **S"
+    },
+    {
+      "path": ".specify\\specs\\client-002-assign-client-to-agency\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\client-002-assign-client-to-agency\\checklist.md",
+      "hash": "6f68238be120e85fab9e84cc0429f793c5ff779e486f29b4fa42cf5d9ca2423c",
+      "modified_at": "2026-09-01T09:43:41.662925",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Quality & Verification Checklist: CLIENT-002 \u2014 Assign Client to Agency (Revised)\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  This Checklist is subordinate to MailSent's Engineering Standards:\n  - Quality Review: docs/00_Foundation/PROJECT_CONSTITUTION.md (\u00a719 DoD, \u00a726 Review Checklist)\n  - Testing & Verification: implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md (Standard Matrices)\n-->\n\n**Feature**: `CLIENT-002 \u2014 Assign Client to Agency` | **Branch**: `client-002-assign-client-to-agency`  \n**Master Checklist Task ID**: `CLIENT-002` (P0)  \n**Review Ownership**: Reviewer-owned quality and verification gate.  \n\n---\n\n## 1. Testing & Verification Matrix (T-MAT)\n\n- [ ] `CHK-T01` **Happy Path**: Agency Owner successfully assigns an existing client organization.\n- [ ] `CHK-T02` **Idempotency**: Attempting to assign an already-active client returns the existing relationship without duplication.\n- [ ] `CHK-T03` **Multi-Tenant Isolation (`INV-09`)**: Cross-tenant or non-member caller throws `AccessDeniedException`.\n- [ ] `CHK-T04` **Least Authority**: Non-owner roles (`ANALYST`, `VIEWER`) cannot execute client assignments.\n- [ ] `CHK-T05` **Entity Validation**: Missing agency/client throws `OrganizationNotFoundException`; self-assignment throws `IllegalArgumentException`.\n- [ ] `CHK-T06` **Regression Suite**: All existing tests pass cleanly (`mvn test`).\n\n---\n\n## 2. Security & Compliance Matrix (S-MAT)\n\n- [ ] `CHK-S01` **Multi-Tenant Isolation (`INV-09`)**: Caller's home organization must"
+    },
+    {
+      "path": ".specify\\specs\\comp-003-compliance-pdf\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\comp-003-compliance-pdf\\checklist.md",
+      "hash": "5e76e228d7902b66323458446d5a16f791b95fee369f5665d3e557c998f8f153",
+      "modified_at": "2026-09-01T09:43:41.663937",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Checklist: COMP-003 \u2014 Compliance Statement / PDF Report Generation\n\n## Definition of Done (Constitution \u00a719 & Task Criteria)\n\n- [ ] **1. Statement Compilation & Invariants**\n  - [x] Structured sections defined: Executive Summary, Provider Matrix, Itemized Requirements, Audit Evidence Lineage.\n  - [x] `N2` Never Fabricate Truth: Statement constructed strictly from real `ProviderRequirementChecklist` and `ReadinessBadge` snapshots.\n  - [x] `INV-09` Multi-Tenant Isolation: Statement generation queries strictly scoped to `organization_id`.\n  - [x] `INV-11` Deterministic Lineage: Output cites the originating `badgeId`, `checklistIds`, and underlying evidence references.\n\n- [ ] **2. Architectural & Bounded Context Integrity**\n  - [x] Sits strictly within `Readiness and Compliance` Bounded Context (`com.mailsent.compliance`).\n  - [x] Zero new database tables, zero Flyway migrations (`V1\u2013V19` remain frozen).\n  - [x] Unit test coverage for all compliance tiers (`COMPLIANT`, `NEEDS_ATTENTION`, `NON_COMPLIANT`) and tenant boundaries."
+    },
+    {
+      "path": ".specify\\specs\\diag-002-sender-detection\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\diag-002-sender-detection\\checklist.md",
+      "hash": "48135e59cd618afde6f07d7821630c6fd0dbdc06d331f95095a28faed941a0c5",
+      "modified_at": "2026-09-01T09:43:41.665933",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Checklist: DIAG-002 \u2014 Sender Detection (Recognized Providers)\n\n## Definition of Done (Constitution \u00a719 & Task Criteria)\n\n- [ ] **1. Frozen Provider Catalog Supported**\n  - [x] Google Workspace (`google_workspace`)\n  - [x] Microsoft 365 (`microsoft_365`)\n  - [x] Salesforce (`salesforce`)\n  - [x] Mailchimp (`mailchimp`)\n\n- [ ] **2. Invariant Conformance**\n  - [x] **`N2` Never Fabricate Truth**: Unrecognized senders return `Optional.empty()`; no guessing.\n  - [x] **`INV-09` Multi-Tenant Isolation**: Scoped strictly to provided domain evidence snapshot.\n  - [x] **`INV-11` Deterministic Lineage**: Derived strictly from cited DKIM/envelope facts.\n  - [x] **Zero Health Scoring**: No health states or trust scores generated.\n\n- [ ] **3. Matching Semantics**\n  - [x] Primary evaluation on `dkimDomains`.\n  - [x] Secondary evaluation on `envelopeFrom`.\n  - [x] Case-insensitive domain and envelope matching.\n  - [x] Handling of multiple DKIM domains.\n  - [x] Null / missing evidence handling.\n\n- [ ] **4. Architectural & Migration Boundaries**\n  - [x] Pure in-memory analyzer service.\n  - [x] No database table created.\n  - [x] No Flyway migrations created (`V1\u2013V18` 100% frozen).\n  - [x] Unrelated contexts (`HEALTH-001`, `DIAG-003`, `MAP-002`) untouched."
+    },
+    {
+      "path": ".specify\\specs\\diag-003-root-cause-determination\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\diag-003-root-cause-determination\\checklist.md",
+      "hash": "aaba633aa8d7c4b25742aa2805590beb1b10faedd667137cae30e1108fb18a35",
+      "modified_at": "2026-09-01T09:43:41.667451",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Checklist: DIAG-003 \u2014 Root Cause Determination\n\n## Definition of Done (Constitution \u00a719 & Task Criteria)\n\n- [ ] **1. Taxonomy & Classification**\n  - [x] `DMARC_REJECT`\n  - [x] `DMARC_QUARANTINE`\n  - [x] `SPF_ALIGNMENT_FAILURE`\n  - [x] `DKIM_ALIGNMENT_FAILURE`\n  - [x] `SPF_AUTHENTICATION_FAILURE`\n  - [x] `DKIM_AUTHENTICATION_FAILURE`\n  - [x] `UNKNOWN_ISSUE`\n\n- [ ] **2. Invariant Conformance**\n  - [x] **`N2` Never Fabricate Truth**: Returns `Optional.empty()` for non-at-risk signals (`HEALTHY`/`UNKNOWN`).\n  - [x] **`INV-09` Multi-Tenant Isolation**: Operates exclusively over cited lineage evidence of the target domain.\n  - [x] **`INV-11` Deterministic Lineage**: Derived strictly from cited `dmarcAggregateEvidenceIds`.\n  - [x] **Deterministic Precedence**: Disposition $\\rightarrow$ Alignment $\\rightarrow$ Authentication $\\rightarrow$ Unknown.\n\n- [ ] **3. Architectural Boundaries**\n  - [x] Pure in-memory analyzer service.\n  - [x] No database table created.\n  - [x] No Flyway migrations created (`V1\u2013V18` 100% frozen).\n  - [x] Clean bounded context separation from `HEALTH-001` and `EXPL-001`."
+    },
+    {
+      "path": ".specify\\specs\\diag-004-issue-entity-lifecycle\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\diag-004-issue-entity-lifecycle\\checklist.md",
+      "hash": "3e9db6e26a8b61f3dd7a18a886e10e8ea7220efb73fb285a1020c6e2bd84a1c0",
+      "modified_at": "2026-09-01T09:43:41.669451",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Checklist: DIAG-004 \u2014 Issue Entity Lifecycle (Hardened Persistence Model)\n\n## Definition of Done (Constitution \u00a719 & Task Criteria)\n\n- [ ] **1. Issue Domain Model & State Machine**\n  - [x] State transitions formally frozen: `DISCOVERED` $\\rightarrow$ `DIAGNOSED` $\\rightarrow$ `RESOLVED` $\\rightarrow$ `CLOSED` (with `REOPENED`).\n  - [x] Clear semantics: `RESOLVED` (awaiting verification, active index) vs `CLOSED` (verified terminal, leaves active index).\n  - [x] Reopen vs New: `RESOLVED` reopens on same failure; `CLOSED` spawns a new `Issue` for a fresh historical incident.\n\n- [ ] **2. Invariant Conformance**\n  - [x] **`N2` Never Fabricate Truth**: Issues created exclusively on `AT_RISK` signals with concrete `RootCause`.\n  - [x] **`INV-09` Multi-Tenant Isolation**: Strict organization partition on all operations.\n  - [x] **`INV-11` Deterministic Lineage**: Clear separation of immutable origin snapshot (`originHealthSignalId`, `originDmarcAggregateEvidenceIds`) from mutable ongoing state (`latestHealthSignalId`, `latestDmarcAggregateEvidenceIds`).\n  - [x] **`INV-14` Referential Integrity**: Foreign keys enforce valid `organizations(id)` and `domains(id)`.\n\n- [ ] **3. Persistence & Concurrency Strategy**\n  - [x] Flyway `V19__create_issues.sql` schema defined.\n  - [x] Partial unique index `uk_issues_active_fingerprint` prevents duplicate active issues on repeated observations.\n  - [x] Evidence stored as standard serialized JSON arrays in `TEXT` columns.\n\n- [ ] **4. Architectur"
+    },
+    {
+      "path": ".specify\\specs\\dom-001-add-domain-manual\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\dom-001-add-domain-manual\\checklist.md",
+      "hash": "b45bdbb64d93ae194d95850effc8986183eb3e4637b44ad4775449aa6cada811",
+      "modified_at": "2026-09-01T09:43:41.670451",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Quality Checklist: DOM-001 \u2014 Add Domain (Manual)\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  Subordinate to .specify/specs/dom-001-add-domain-manual/spec.md.\n-->\n\n## Quality & Governance Criteria\n\n- [ ] **Authority**: Solves validated customer problem with 12+ month subscription value (The Golden Rule).\n- [ ] **No Fabrication (`N2`)**: No placeholder health/status indicators generated during domain registration.\n- [ ] **No Silent Loss (`N3`)**: Invalid syntax, nonexistent orgs, and duplicate registrations fail loudly with explicit exceptions.\n- [ ] **Zero Secrets in Code/Logs (`N4`)**: No credentials or sensitive data logged or stored.\n- [ ] **Mandatory Automated Tests (`N5`)**: 100% test coverage over success and failure/security paths in `DomainServiceTest`.\n- [ ] **Multi-Tenant Isolation (`INV-09`)**: Caller cannot register a domain into an organization they do not own or belong to.\n- [ ] **Global Uniqueness (`INV-10`)**: No duplicate domain registration allowed across the entire system.\n- [ ] **Referential Integrity (`INV-14`)**: Domain always references an existing organization; verified by schema FK `fk_domains_organization`.\n- [ ] **Schema Immobility**: Zero changes to Flyway migrations `V1\u2013V18`; zero new migrations added.\n- [ ] **Definition of Done**: All 10 points in Constitution \u00a719 satisfied."
+    },
+    {
+      "path": ".specify\\specs\\dom-001-add-domain-manual\\plan.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\dom-001-add-domain-manual\\plan.md",
+      "hash": "47b5512cc4b54a0fb3a6a5adbcc6a0c3d91ecdee4dcee5b117da147ffb1e2d4f",
+      "modified_at": "2026-09-01T09:43:41.671785",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Implementation Plan: DOM-001 \u2014 Add Domain (Manual)\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  Subordinate to .specify/specs/dom-001-add-domain-manual/spec.md,\n  docs/00_Foundation/MAILSENT_MASTER_WORKFLOW.md, and docs/00_Foundation/PROJECT_CONSTITUTION.md.\n-->\n\n## 1. Technical Context & Scope\n\n- **Bounded Context**: `Portfolio and Client Management` (Domain sub-context) collaborating with `Identity and Access`.\n- **Target Operations**: Domain registration application service with `Capability.DOMAIN_MANAGE` caller authorization.\n- **Persistence Target**: Existing PostgreSQL table `domains` (`V5__create_domains.sql`).\n- **Dependencies**: `DomainRepository`, `OrganizationRepository`, `AuthorizationService`, `Clock`.\n\n---\n\n## 2. Architecture & Design Decisions\n\n1. **Service Boundary**:\n   - Enhance `DomainService` (or add authorized overload `register(User caller, String organizationId, String domainName)`) that:\n     a. Checks caller authorization via `AuthorizationService.isAuthorized(caller, organizationId, Capability.DOMAIN_MANAGE)`.\n     b. If false, throws `AccessDeniedException`.\n     c. Verifies organization exists in `OrganizationRepository`.\n     d. Validates domain name syntax (length <= 253, non-blank, valid hostname structure).\n     e. Normalizes domain name (trimmed, lowercased).\n     f. Checks `DomainRepository.existsByName(normalizedName)` and throws `DomainAlreadyExistsException` if duplicate.\n     g. Persists domain to `DomainRepository.save(...)`.\n2. **Persistence"
+    },
+    {
+      "path": ".specify\\specs\\dom-001-add-domain-manual\\spec.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\dom-001-add-domain-manual\\spec.md",
+      "hash": "59a3ed21649cbbb127276c0657621b828dda0a01e0aa760313c4552ddc96de17",
+      "modified_at": "2026-09-01T09:43:41.672568",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Feature Specification: DOM-001 \u2014 Add Domain (Manual)\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  This Feature Specification is a scoped operational slice subordinate to MailSent's authoritative documents:\n  - Operational & Product Source of Truth: docs/00_Foundation/MAILSENT_MASTER_WORKFLOW.md\n  - Engineering Truth: docs/00_Foundation/PROJECT_CONSTITUTION.md\n  - Requirements Baseline: docs/02_Product_Design/FUNCTIONAL_REQUIREMENTS.md\n  - Security Architecture: docs/03_Architecture/09_SECURITY_ARCHITECTURE.md\n  - Bounded Contexts: docs/03_Architecture/03_BOUNDED_CONTEXTS.md\n  - Data Model: docs/03_Architecture/07_DATA_MODEL.md\n  - Preceding Implementation: ORG-003, TEAM-002, TEAM-003 (Domain Aggregate, Service, Repo, & Capability Model)\n-->\n\n**Feature Branch**: `dom-001-add-domain-manual`  \n**Created**: 2026-08-18  \n**Status**: Draft (Ready for CTO Review)  \n**Input**: DOM-001 \u2014 Add domain (manual) contract specification.  \n\n---\n\n## 1. Governance & Traceability Anchors *(mandatory)*\n\n- **Master Workflow Module**: WF-1 Agency Control Center & WF-2 Onboarding / Phase 07 Domains\n- **Parent Requirement**: `FUN-D1` (\"Add a sending domain manually (single domain input). Validates domain format; associates with authenticated user's organization; enforces uniqueness within the platform\").\n- **Security Baseline**: `09_SECURITY_ARCHITECTURE.md` \u00a72 (Least authority, Separation of responsibility `INV-09`, `INV-10`), `09_SECURITY_ARCHITECTURE.md` \u00a74 (Ownership principles: \"The customer owns the"
+    },
+    {
+      "path": ".specify\\specs\\dom-001-add-domain-manual\\tasks.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\dom-001-add-domain-manual\\tasks.md",
+      "hash": "ca2115fe13cbd5a183e0b8a57eb5b88a06273917693dbc6edb4fd44204ba7339",
+      "modified_at": "2026-09-01T09:43:41.673568",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Tasks: DOM-001 \u2014 Add Domain (Manual)\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  Subordinate to .specify/specs/dom-001-add-domain-manual/spec.md and plan.md.\n-->\n\n## Task Group 1: Domain Service Authorization & Validation Enhancement\n- [ ] Task 1.1: Wire `AuthorizationService` into `DomainService` and `DomainConfig`.\n- [ ] Task 1.2: Implement `DomainService.register(User caller, String organizationId, String domainName)` checking `Capability.DOMAIN_MANAGE` via `AuthorizationService`.\n- [ ] Task 1.3: Validate domain syntax constraints (RFC 1035 / length / format) before creation.\n- [ ] Task 1.4: Enforce `INV-09` (tenant match) and `INV-10` (global uniqueness via `DomainAlreadyExistsException`).\n\n## Task Group 2: Unit Testing & Verification\n- [ ] Task 2.1: Add unit tests in `DomainServiceTest` for `Role.OWNER` success path.\n- [ ] Task 2.2: Add unit tests in `DomainServiceTest` for `Role.ANALYST` and `Role.VIEWER` denials.\n- [ ] Task 2.3: Add unit tests in `DomainServiceTest` for cross-tenant registration denial (`INV-09`).\n- [ ] Task 2.4: Add unit tests in `DomainServiceTest` for duplicate domain name conflict (`INV-10`).\n- [ ] Task 2.5: Add unit tests in `DomainServiceTest` for invalid domain name syntax and nonexistent organization (`INV-14`).\n\n## Task Group 3: Regression & Integration Verification\n- [ ] Task 3.1: Execute full regression suite across identity, team, client, portfolio, and domain modules.\n- [ ] Task 3.2: Verify zero Flyway `V1\u2013V18` changes and zero new migrations."
+    },
+    {
+      "path": ".specify\\specs\\dom-003-domain-list-state\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\dom-003-domain-list-state\\checklist.md",
+      "hash": "6cd78509d520d21dd8c8ddff5e44c4a69336e430516ba01726e0a2f8085061e3",
+      "modified_at": "2026-09-01T09:43:41.674569",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Quality Checklist: DOM-003 \u2014 Domain List/State\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  Subordinate to .specify/specs/dom-003-domain-list-state/spec.md.\n-->\n\n## Quality & Governance Criteria\n\n- [ ] **Authority**: Grounded in `FUN-D3` and solves validated domain visibility need without speculative features.\n- [ ] **No Fabrication (`N2`)**: Projections contain strictly grounded persisted metadata; zero fake health/risk indicators.\n- [ ] **No Silent Loss (`N3`)**: Query boundaries and error cases fail loudly or return explicit typed `Optional.empty()`.\n- [ ] **Zero Secrets in Code/Logs (`N4`)**: No credential leaks or sensitive data exposure.\n- [ ] **Mandatory Automated Tests (`N5`)**: 100% unit and PostgreSQL integration test coverage.\n- [ ] **Multi-Tenant Isolation (`INV-09`)**: Queries are strictly organization-scoped; cross-tenant discovery is impossible.\n- [ ] **Global Uniqueness (`INV-10`)**: Supported by canonical normalization in lookups.\n- [ ] **Referential Integrity (`INV-14`)**: Organization existence validated; domain foreign keys preserved.\n- [ ] **Schema Immobility**: Zero changes to Flyway migrations `V1\u2013V18`; zero new migrations added.\n- [ ] **Definition of Done**: All 10 points in Constitution \u00a719 satisfied."
+    },
+    {
+      "path": ".specify\\specs\\dom-004-registry-ownership\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\dom-004-registry-ownership\\checklist.md",
+      "hash": "3b1c1ca06b2bbf91aa8bde03eb65dac37c10e7b9a79287820ef87c7f6b2553e6",
+      "modified_at": "2026-09-01T09:43:41.676568",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Quality Checklist: DOM-004 \u2014 Registry Ownership\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  Subordinate to .specify/specs/dom-004-registry-ownership/spec.md.\n-->\n\n## Quality & Governance Criteria\n\n- [ ] **Authority**: Grounded strictly in `FUN-D4`, `INV-09`, `INV-10`, and `INV-14`.\n- [ ] **No Fabrication (`N2`)**: Registry ownership relies strictly on persisted relations; zero synthetic metrics.\n- [ ] **No Silent Loss (`N3`)**: Invalid ownership attempts and missing organizations fail loudly.\n- [ ] **Zero Secrets in Code/Logs (`N4`)**: No credentials or sensitive data exposure.\n- [ ] **Mandatory Automated Tests (`N5`)**: Unit and live PostgreSQL integration tests fully verify all ownership rules.\n- [ ] **Multi-Tenant Isolation (`INV-09`)**: Every domain belongs to exactly one organization; no cross-agency leakage.\n- [ ] **Global Uniqueness (`INV-10`)**: Enforced at application and database schema levels.\n- [ ] **Referential Integrity (`INV-14`)**: Domain `organization_id` foreign key constraint prevents orphan domains.\n- [ ] **Schema Immobility**: Flyway migrations `V1\u2013V18` remain 100% frozen; zero new migrations created.\n- [ ] **Definition of Done**: All 10 points in Constitution \u00a719 satisfied."
+    },
+    {
+      "path": ".specify\\specs\\expl-003-explanation-toggle\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\expl-003-explanation-toggle\\checklist.md",
+      "hash": "a2eea621c1cfa866969b34641e20330cb7c3f8c7f760d61b811530f892e81cc5",
+      "modified_at": "2026-09-01T09:43:41.678569",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Checklist: EXPL-003 \u2014 Simpler Toggle\n\n## Definition of Done (Constitution \u00a719 & Task Criteria)\n\n- [ ] **1. Mode Definitions & Invariants**\n  - [x] Canonical modes defined: `BUSINESS_SUMMARY`, `TECHNICAL_DEEP_DIVE`.\n  - [x] Identical underlying truth and evidence across both modes (`N2`).\n  - [x] `INV-09` Multi-Tenant Isolation: Queries strictly partitioned by `organizationId` and `domainId`.\n  - [x] `INV-11` Deterministic Lineage: Output retains immutable `Grounding` citing source snapshots.\n\n- [ ] **2. Architectural & Bounded Context Integrity**\n  - [x] Sits strictly within `Business Explanation` Bounded Context (`com.mailsent.explanation`).\n  - [x] Zero new database tables, zero Flyway migrations.\n  - [x] Backward compatible with existing `ExplanationService` consumers.\n  - [x] Unit test coverage for all modes, indications, and tenant isolation paths."
+    },
+    {
+      "path": ".specify\\specs\\health-002-health-trend\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\health-002-health-trend\\checklist.md",
+      "hash": "39303c09bea8fa0ad9e04aeeec1dbeecabf2f14018bc6877b8478723a596be69",
+      "modified_at": "2026-09-01T09:43:41.679568",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Checklist: HEALTH-002 \u2014 Health Trend Series\n\n## Definition of Done (Constitution \u00a719 & Task Criteria)\n\n- [ ] **1. Domain Model & Invariants**\n  - [x] Canonical trend directions frozen: `IMPROVING`, `STABLE`, `DECLINING`, `INSUFFICIENT_DATA`.\n  - [x] Zero numeric scoring / Zero Trust Score (strictly operates on discrete `HealthIndication` transitions).\n  - [x] `N2` Never Fabricate Truth: Trend derived strictly from historical `HealthSignal` snapshots.\n  - [x] `INV-09` Multi-Tenant Isolation: Queries strictly partitioned by `organizationId` and `domainId`.\n  - [x] `INV-11` Deterministic Lineage: Output cites the exact sequence of `evaluatedHealthSignalIds`.\n\n- [ ] **2. Algorithm & Transition Rules**\n  - [x] Minimum 2 distinct snapshots required for directional trend.\n  - [x] `[AT_RISK, HEALTHY]` $\\rightarrow$ `IMPROVING`.\n  - [x] `[HEALTHY, AT_RISK]` $\\rightarrow$ `DECLINING`.\n  - [x] `[HEALTHY, HEALTHY]` or `[AT_RISK, AT_RISK]` $\\rightarrow$ `STABLE`.\n  - [x] Unresolved `UNKNOWN` or insufficient historical snapshots $\\rightarrow$ `INSUFFICIENT_DATA`.\n\n- [ ] **3. Architectural & Bounded Context Integrity**\n  - [x] Sits strictly within `Delivery Observation` Bounded Context (`com.mailsent.portfolio.observation`).\n  - [x] Does not create unnecessary tables or Flyway migrations (derived on-the-fly from `health_signal` table).\n  - [x] Does not mutate existing `HEALTH-001` or `DIAG-001..004` code."
+    },
+    {
+      "path": ".specify\\specs\\p0-1-spring-jpa-test-context\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\p0-1-spring-jpa-test-context\\checklist.md",
+      "hash": "c9447beb8f2afd7090002b42adb1daf37c39a596f62c1c75dbf2241b39b4e4b7",
+      "modified_at": "2026-09-01T09:43:41.680568",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Checklist: P0-1 \u2014 Spring Boot Test Context, Multi-Tenant Monitoring Hardening & Persistence Alignment\n\n- [ ] Architecture review complete against PROJECT_CONSTITUTION.md, 01_DOMAIN_MODEL.md, 03_BOUNDED_CONTEXTS.md, and 07_DATA_MODEL.md.\n- [ ] No changes made to frozen database migrations (V1-V18).\n- [ ] `V19__create_issues.sql` is present and clean.\n- [ ] `V20__create_monitoring_tables.sql` is created with strict foreign keys to `organizations(id)` and `domains(id)`, tenant-scoped composite indexes, and partial unique active incident index.\n- [ ] `Incident` and `HealthChangeEvent` domain entities enforce `organizationId` invariant (`INV-09`, `INV-13`).\n- [ ] `IncidentRepository` and `HealthChangeEventRepository` methods enforce `organizationId` scoping.\n- [ ] `IncidentEntity` and `HealthChangeEventEntity` contain `@Column(name = \"organization_id\")`.\n- [ ] All JPA repository adapters carry `@Repository @Profile(\"!test\")`.\n- [ ] In-memory test repositories mirror concurrent thread-safety and unique constraint semantics under `@Profile(\"test\")`.\n- [ ] `MailSentApplication.java` has no top-level `@EnableJpaRepositories` / `@EntityScan`.\n- [ ] Full regression run (`mvn test`) passes with 0 errors and 0 failures across 981+ tests.\n- [ ] Real PostgreSQL integration verification (`mvn verify -Dmailsent.it.postgres=true`) applies migrations V1\u2013V20 and satisfies `ddl-auto: validate`."
+    },
+    {
+      "path": ".specify\\specs\\rem-sec-001-session-filter-consent-hardening\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\rem-sec-001-session-filter-consent-hardening\\checklist.md",
+      "hash": "36b21f0028c7981a3fcc094dd263a77bd15e7aedfacb378469757b62f3158bbc",
+      "modified_at": "2026-09-01T09:43:41.684083",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Pre-Implementation Checklist: REM-SEC-001 \u2014 SessionAuthenticationFilter & ConsentController Hardening\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  Subordinate to PROJECT_CONSTITUTION.md \u00a719 (Definition of Done) & \u00a726 (Review Checklist)\n-->\n\n**Feature**: `REM-SEC-001`  \n**Status**: Pre-Implementation Review Complete  \n\n---\n\n## 1. Constitutional Compliance Checklist\n- [x] **Rule N1 (The Golden Rule)**: Solves real multi-tenant security vulnerability protecting enterprise clients.\n- [x] **Rule N2 (Never Fabricate Truth)**: Sessions and tenants are validated against durable database records; no synthetic tokens.\n- [x] **Rule N3 (No Silent Loss)**: All authentication/authorization failures produce structured `ApiError` responses with MDC correlation IDs.\n- [x] **Rule N4 (Zero Secrets in Logs/Code)**: Raw bearer tokens are never logged or stored; only SHA-256 hashes are processed.\n- [x] **Rule N5 (Mandatory Automated Tests)**: Complete suite of unit and MockMvc integration tests planned.\n- [x] **Rule N6 (No Lying to the User)**: Zero mock state.\n- [x] **Invariant INV-09 (Multi-Tenant Isolation)**: Eliminates BOLA/IDOR by deriving tenant context exclusively from the verified database session.\n- [x] **Invariant INV-10 (Deterministic Stable Identity)**: Preserves immutable User and Session identities.\n- [x] **NFR-S1 (Least Authority)**: Enforces `Role.canChange()` so `Role.VIEWER` cannot perform mutations.\n\n---\n\n## 2. Architecture & Design Alignment\n- [x] **No Parallel Auth System**: Reuses"
+    },
+    {
+      "path": ".specify\\specs\\res-003-match-by-dns-provider\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\res-003-match-by-dns-provider\\checklist.md",
+      "hash": "461c57824326775b57e3fc588c8b349b1ddc7520ff86a395bae08605d5f62841",
+      "modified_at": "2026-09-01T09:43:41.685084",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Checklist: RES-003 \u2014 Match by DNS Provider\n\n## Definition of Done (Constitution \u00a719 & Task Criteria)\n\n- [ ] **1. DNS Provider Matching & Invariants**\n  - [x] Supported DNS providers modeled: `CLOUDFLARE`, `ROUTE53`, `GODADDY`, `GOOGLE_CLOUD_DNS`, `NAMECHEAP`, `GENERIC_DNS`.\n  - [x] Automatic fallback to `GENERIC_DNS` on unrecognized nameservers.\n  - [x] `N2` Never Fabricate Truth: Guidance steps and record values derived deterministically from diagnosed issue facts.\n  - [x] `INV-09` Multi-Tenant Isolation: Action generation queries strictly scoped to `organization_id`.\n  - [x] `INV-11` Deterministic Lineage: Output cites the originating `issueId` and `rootCause`.\n\n- [ ] **2. Architectural & Bounded Context Integrity**\n  - [x] Sits strictly within `Guidance and Resolution` Bounded Context (`com.mailsent.resolution`).\n  - [x] Zero new database tables, zero Flyway migrations (`V1\u2013V19` remain frozen).\n  - [x] Backward compatible with existing `ResolutionService` consumers.\n  - [x] Unit test coverage for all provider permutations, fallback rules, and tenant boundaries."
+    },
+    {
+      "path": ".specify\\specs\\team-002-role-capability-map\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\team-002-role-capability-map\\checklist.md",
+      "hash": "ce802092a9815bfed219d1e9d56bc0bb6cea28f92682bd7ac7d3daca328ea714",
+      "modified_at": "2026-09-01T09:43:41.686083",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Quality & Verification Checklist: TEAM-002 \u2014 Role\u2192Capability Map (Least-Authority)\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  This Checklist is subordinate to MailSent's Engineering Standards:\n  - Quality Review: docs/00_Foundation/PROJECT_CONSTITUTION.md (\u00a719 DoD, \u00a726 Review Checklist)\n  - Testing & Verification: implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md (Standard Matrices)\n-->\n\n**Feature**: `TEAM-002 \u2014 Role\u2192Capability Map` | **Branch**: `team-002-role-capability-map`  \n**Master Checklist Task ID**: `TEAM-002` (P0)  \n**Review Ownership**: Reviewer-owned quality and verification gate.  \n\n---\n\n## 1. Testing & Verification Matrix (T-MAT)\n\n- [ ] `CHK-T01` **Happy Path**: `OWNER` has full capabilities; `ANALYST` has read + operational mutation; `VIEWER` has read only.\n- [ ] `CHK-T02` **Edge Cases**: Unmapped capability tokens, empty strings, null user/role, or missing organization IDs fail securely with Deny.\n- [ ] `CHK-T03` **Negative & Failure Paths**: Unauthorized capability invocations raise `AccessDeniedException` and log with MDC without crashing.\n- [ ] `CHK-T04` **Diagnostic Accuracy**: Truthful evaluation; no implicit role escalation.\n- [ ] `CHK-T05` **Regression Suite**: All existing unit tests pass cleanly (`mvn test`).\n\n---\n\n## 2. Security & Compliance Matrix (S-MAT)\n\n- [ ] `CHK-S01` **Multi-Tenant Isolation (`INV-09`)**: A user in Organization A cannot exercise permissions in Organization B, regardless of role.\n- [ ] `CHK-S02` **Secrets Guard (`N4`)**: Zero cre"
+    },
+    {
+      "path": ".specify\\specs\\team-003-access-audit-record\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\team-003-access-audit-record\\checklist.md",
+      "hash": "be7d44cd5fa4f2dadb89b8b695ed5d6d85eea0b65c0460f60bedb284725cea0b",
+      "modified_at": "2026-09-01T09:43:41.688083",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Quality & Verification Checklist: TEAM-003 \u2014 Access Audit Record\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  This Checklist is subordinate to MailSent's Engineering Standards:\n  - Quality Review: docs/00_Foundation/PROJECT_CONSTITUTION.md (\u00a719 DoD, \u00a726 Review Checklist)\n  - Testing & Verification: implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md (Standard Matrices)\n-->\n\n**Feature**: `TEAM-003 \u2014 Access Audit Record` | **Branch**: `team-003-access-audit-record`  \n**Master Checklist Task ID**: `TEAM-003` (P1)  \n**Review Ownership**: Reviewer-owned quality and verification gate.  \n\n---\n\n## 1. Testing & Verification Matrix (T-MAT)\n\n- [ ] `CHK-T01` **Happy Path**: Authorized capability checks emit `AccessDecision.GRANTED` audit records with complete context.\n- [ ] `CHK-T02` **Denial Logging**: Unauthorized capability attempts and tenant mismatches emit `AccessDecision.DENIED` with specific reason strings.\n- [ ] `CHK-T03` **Edge Cases**: Null users, null capabilities, or blank organization IDs emit `DENIED` audit records with `\"anonymous\"` / `\"none\"` placeholders without throwing unexpected runtime exceptions.\n- [ ] `CHK-T04` **Zero Logic Mutation**: Auditing does NOT alter or interfere with `AuthorizationService` default-deny or `INV-09` decisions.\n- [ ] `CHK-T05` **Regression Suite**: All existing tests pass cleanly (`mvn test`).\n\n---\n\n## 2. Security & Compliance Matrix (S-MAT)\n\n- [ ] `CHK-S01` **Multi-Tenant Isolation (`INV-09`)**: Cross-tenant attempts are explicitly identified i"
+    },
+    {
+      "path": ".specify\\specs\\team-004-team-list-query\\checklist.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\specs\\team-004-team-list-query\\checklist.md",
+      "hash": "28a36ec094cbba80c445d56d0725e17c56058a475dc10efc97b12b39c784a869",
+      "modified_at": "2026-09-01T09:43:41.689083",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Quality & Verification Checklist: TEAM-004 \u2014 Team List Query (Revised)\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  This Checklist is subordinate to MailSent's Engineering Standards:\n  - Quality Review: docs/00_Foundation/PROJECT_CONSTITUTION.md (\u00a719 DoD, \u00a726 Review Checklist)\n  - Testing & Verification: implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md (Standard Matrices)\n-->\n\n**Feature**: `TEAM-004 \u2014 Team List Query` | **Branch**: `team-004-team-list-query`  \n**Master Checklist Task ID**: `TEAM-004` (P1)  \n**Review Ownership**: Reviewer-owned quality and verification gate.  \n\n---\n\n## 1. Testing & Verification Matrix (T-MAT)\n\n- [ ] `CHK-T01` **Happy Path**: Any authenticated member (`OWNER`, `ANALYST`, `VIEWER`) can query their own organization's team member list.\n- [ ] `CHK-T02` **Multi-Tenant Isolation (`INV-09`)**: A user in Organization A querying Organization B throws `AccessDeniedException`.\n- [ ] `CHK-T03` **Edge Cases**: Empty organization returns empty list; unauthenticated user throws `AccessDeniedException`.\n- [ ] `CHK-T04` **Deterministic Ordering**: Team member list is ordered chronologically by `createdAt ASC, id ASC`.\n- [ ] `CHK-T05` **Regression Suite**: All existing tests pass cleanly (`mvn test`).\n\n---\n\n## 2. Security & Compliance Matrix (S-MAT)\n\n- [ ] `CHK-S01` **Multi-Tenant Isolation (`INV-09`)**: Queries strictly partitioned by `organization_id`.\n- [ ] `CHK-S02` **Secrets Guard (`N4`)**: Password hashes and sensitive tokens are strictly excluded from DTOs."
+    },
+    {
+      "path": ".specify\\templates\\checklist-template.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\templates\\checklist-template.md",
+      "hash": "a55fca1edf4e15ad185cbf9a9b9d3bc0966dea555fd6e41b6f2aa997df901c3a",
+      "modified_at": "2026-09-01T09:43:41.690084",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# Quality & Verification Checklist: [FEATURE NAME]\n\n<!--\n  AUTHORITY & SUBORDINATION:\n  This Checklist is subordinate to MailSent's Engineering Standards:\n  - Quality Review: docs/00_Foundation/PROJECT_CONSTITUTION.md (\u00a719 DoD, \u00a726 Review Checklist)\n  - Testing & Verification: implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md (Standard Matrices)\n-->\n\n**Feature**: `[FEATURE NAME]` | **Branch**: `[###-feature-name]`  \n**Master Checklist Task ID**: `[e.g., MAP-002, DIAG-002, COMP-001]`  \n**Review Ownership**: Reviewer-owned quality and verification gate.  \n\n---\n\n## 1. Testing & Verification Matrix (T-MAT)\n\n- [ ] `CHK-T01` **Happy Path**: Core user scenarios function strictly per acceptance criteria.\n- [ ] `CHK-T02` **Edge Cases**: Boundary inputs, nulls, and unusual formats handled predictably.\n- [ ] `CHK-T03` **Negative & Failure Paths**: System degrades gracefully on DB/adapter failures without crash (N3).\n- [ ] `CHK-T04` **Diagnostic Accuracy**: Truthful reporting without guessed or fabricated states (N2).\n- [ ] `CHK-T05` **Regression Suite**: All existing unit and integration tests pass (`mvn test`).\n\n---\n\n## 2. Security & Compliance Matrix (S-MAT)\n\n- [ ] `CHK-S01` **Multi-Tenant Isolation (`INV-09`)**: Queries and cache keys strictly partitioned by `organization_id`.\n- [ ] `CHK-S02` **Secrets Guard (`N4`)**: Zero credentials, tokens, or PII in source, logs, or test fixtures.\n- [ ] `CHK-S03` **Input Validation**: All incoming REST payloads validated at boundary (`@Valid`,"
+    },
+    {
+      "path": ".specify\\templates\\constitution-template.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\templates\\constitution-template.md",
+      "hash": "e82c02bf850186fcf070d2725ec1536998c9edf26e6398fd86ba1c2aff65423b",
+      "modified_at": "2026-09-01T09:43:41.691083",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "<!--\n  AUTHORITY & SUBORDINATION:\n  This Constitution Template represents MailSent's supreme engineering and operational principles.\n  Authoritative base:\n  1. docs/00_Foundation/MAILSENT_MASTER_WORKFLOW.md (Product Truth)\n  2. docs/00_Foundation/PROJECT_CONSTITUTION.md (Engineering Truth, v3.1)\n-->\n\n# MailSent \u2014 Constitution\n\n## Core Principles\n\n### I. The Golden Rule (Supreme Governing Rule)\n\"No feature is approved because it is technically impressive. Every feature must solve a validated customer problem and create recurring value. (Will a customer pay a monthly subscription for this for 12+ months? If NO -> REJECT).\"\n\n### II. Sell Confidence, Never Fabricate Truth\nMailSent is an AI Email Infrastructure Intelligence Platform selling confidence. We never guess delivery states (INV-01, INV-05), never lie in errors, and report only verifiable facts.\n\n### III. The Natural Flow (Product DNA)\nThe product follows an ordered, non-negotiable flow:\nScanner -> Analyzer -> Alignment Intelligence -> AI Explanation -> Business Impact -> AI Action Queue -> Guided Fix -> Continuous Monitoring -> Alerts -> Reports -> Agency Dashboard.\n\n### IV. Non-Negotiable Engineering Rules (N1 - N8)\n- N1: No unvalidated feature.\n- N2: No fabricated or guessed delivery state.\n- N3: No silent data loss.\n- N4: No secrets in code or repos.\n- N5: No untested production path.\n- N6: No lying to the user.\n- N7: No bypassing the approval framework.\n- N8: No security review shortcuts.\n\n### V. Direction of Truth\nI"
+    },
+    {
+      "path": ".specify\\workflows\\speckit\\workflow.yml",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\workflows\\speckit\\workflow.yml",
+      "hash": "b9a2a3c3d1e5f022d0369be7c83802a656c64e2d95306a7870a1f59b90c0e307",
+      "modified_at": "2026-09-01T09:43:41.693597",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "schema_version: \"1.0\"\nworkflow:\n  id: \"speckit\"\n  name: \"Full SDD Cycle\"\n  version: \"1.0.0\"\n  author: \"GitHub\"\n  description: \"Runs specify \u2192 plan \u2192 tasks \u2192 implement with review gates\"\n\nrequires:\n  # 0.8.5 is the first release with engine-side resolution of the\n  # ``integration: \"auto\"`` default. Older versions would treat \"auto\"\n  # as a literal integration key and fail at dispatch.\n  speckit_version: \">=0.8.5\"\n  integrations:\n    # The four commands below (specify, plan, tasks, implement) are core\n    # spec-kit commands provided by every integration. The list here is an\n    # advisory, non-exhaustive compatibility hint following the documented\n    # ``any: [...]`` schema -- it is NOT a closed set. The workflow runs\n    # against any integration the project was initialized with, including\n    # ones not listed below, as long as that integration provides the four\n    # core commands referenced in ``steps``.\n    any:\n      - \"alquimia\"\n      - \"claude\"\n      - \"copilot\"\n      - \"gemini\"\n      - \"opencode\"\n\ninputs:\n  spec:\n    type: string\n    required: true\n    prompt: \"Describe what you want to build\"\n  integration:\n    type: string\n    default: \"auto\"\n    prompt: \"Integration to use (e.g. claude, copilot, gemini; 'auto' uses the project's initialized integration)\"\n  scope:\n    type: string\n    default: \"full\"\n    enum: [\"full\", \"backend-only\", \"frontend-only\"]\n\nsteps:\n  - id: specify\n    command: speckit.specify\n    integration: \"{{ inputs.integration }}\"\n    input:"
+    },
+    {
+      "path": ".specify\\workflows\\workflow-registry.json",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\.specify\\workflows\\workflow-registry.json",
+      "hash": "cf70226ab193e9a45c85d5f093622851ab7d283ebc5519a27ff1df14fd2aa486",
+      "modified_at": "2026-09-01T09:43:41.693597",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "{\n  \"schema_version\": \"1.0\",\n  \"workflows\": {\n    \"speckit\": {\n      \"name\": \"Full SDD Cycle\",\n      \"version\": \"1.0.0\",\n      \"description\": \"Runs specify \\u2192 plan \\u2192 tasks \\u2192 implement with review gates\",\n      \"source\": \"bundled\",\n      \"installed_at\": \"2026-08-18T05:45:47.291387+00:00\",\n      \"updated_at\": \"2026-08-18T05:45:47.291407+00:00\"\n    }\n  }\n}"
+    },
+    {
+      "path": "AGENT.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\AGENT.md",
+      "hash": "3b6486e79c98e95b031a5ea995a63051e26fd654076cd8c59ece9470faaa2855",
+      "modified_at": "2026-09-01T09:43:41.696598",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Jetro Agent Context\n\n> Finance features: **Enabled**\n> Offline \u2014 backend not connected. Sign in to unlock full capabilities.\n\n---\n\nYou are an assistant for the Jetro research platform.\n\n## Getting Started\n\nThe user is not authenticated. Core features (skills, data API) require sign-in.\nYou can still:\n- Use `jet_render` to create canvas elements (charts, tables, frames, notes, KPI cards)\n- Use `jet_canvas` to manage canvas layout (move, resize, arrange, delete elements)\n- Use `jet_query` to query any local DuckDB data\n- Use `jet_exec` to run Python/R code\n- Use `jet_parse` to convert documents to markdown (PDF, DOCX, PPTX, XLSX, HTML, EPUB, RTF, EML, images with OCR)\n- Use `jet_template` to access report templates (available offline)\n\nTo unlock all features, sign in via the Jetro sidebar.\n\n## Available Skills\n\nSign in to access skills. Call `jet.skill({ name: \"Skill Name\" })` after authentication.\n\n## Available Templates\n\nTo use a template, call `jet_template({ name: \"Template Name\" })` to fetch the full content."
+    },
+    {
+      "path": "CLAUDE.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\CLAUDE.md",
+      "hash": "3b6486e79c98e95b031a5ea995a63051e26fd654076cd8c59ece9470faaa2855",
+      "modified_at": "2026-09-01T09:43:41.869655",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# Jetro Agent Context\n\n> Finance features: **Enabled**\n> Offline \u2014 backend not connected. Sign in to unlock full capabilities.\n\n---\n\nYou are an assistant for the Jetro research platform.\n\n## Getting Started\n\nThe user is not authenticated. Core features (skills, data API) require sign-in.\nYou can still:\n- Use `jet_render` to create canvas elements (charts, tables, frames, notes, KPI cards)\n- Use `jet_canvas` to manage canvas layout (move, resize, arrange, delete elements)\n- Use `jet_query` to query any local DuckDB data\n- Use `jet_exec` to run Python/R code\n- Use `jet_parse` to convert documents to markdown (PDF, DOCX, PPTX, XLSX, HTML, EPUB, RTF, EML, images with OCR)\n- Use `jet_template` to access report templates (available offline)\n\nTo unlock all features, sign in via the Jetro sidebar.\n\n## Available Skills\n\nSign in to access skills. Call `jet.skill({ name: \"Skill Name\" })` after authentication.\n\n## Available Templates\n\nTo use a template, call `jet_template({ name: \"Template Name\" })` to fetch the full content."
+    },
+    {
+      "path": "company_state\\runs\\RUN_2026_08_31_102215\\checklist_snapshot.json",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\company_state\\runs\\RUN_2026_08_31_102215\\checklist_snapshot.json",
+      "hash": "897c16a300b5252755acd87a7cce2f7033421a06307e3487796188ea540f34b6",
+      "modified_at": "2026-09-01T09:43:41.870657",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "{\n  \"items\": [\n    {\n      \"id\": \"CHK_3\",\n      \"section\": \"checklist\",\n      \"description\": \"> Finance features: **Enabled**\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"AGENT.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \"> Finance features: **Enabled**\"\n    },\n    {\n      \"id\": \"CHK_4\",\n      \"section\": \"checklist\",\n      \"description\": \"> Offline \\u2014 backend not connected. Sign in to unlock full capabilities.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"AGENT.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \"> Offline \\u2014 backend not connected. Sign in to unlock full capabilities.\"\n    },\n    {\n      \"id\": \"CHK_8\",\n      \"section\": \"checklist\",\n      \"description\": \"You are an assistant for the Jetro research platform.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"AGENT.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \"You are an assistant for the Jetro research platform.\"\n    },\n    {\n      \"id\": \"CHK_12\",\n      \"section\": \"checklist\",\n      \"description\": \"The user is not authenticated. Core features (skills, data API) require sign-in.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"AGENT.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \"The user"
+    },
+    {
+      "path": "company_state\\runs\\RUN_2026_09_01_084135\\checklist_snapshot.json",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\company_state\\runs\\RUN_2026_09_01_084135\\checklist_snapshot.json",
+      "hash": "4c9b76ed9c3c44aadb5114d0d18b93c5c6b1304a91c0c7c5004651e9e76b4fa5",
+      "modified_at": "2026-09-01T09:43:41.872655",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "{\n  \"items\": [\n    {\n      \"id\": \"CHK_3\",\n      \"section\": \"checklist\",\n      \"description\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\"\n    },\n    {\n      \"id\": \"CHK_4\",\n      \"section\": \"checklist\",\n      \"description\": \">\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \">\"\n    },\n    {\n      \"id\": \"CHK_5\",\n      \"section\": \"checklist\",\n      \"description\": \"> **Source of truth (frozen).** The approved documentation is immutable. On any conflict: **STOP and report**; never modify the documentation yourself.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNV"
+    },
+    {
+      "path": "company_state\\runs\\RUN_2026_09_01_090258\\checklist_snapshot.json",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\company_state\\runs\\RUN_2026_09_01_090258\\checklist_snapshot.json",
+      "hash": "4c9b76ed9c3c44aadb5114d0d18b93c5c6b1304a91c0c7c5004651e9e76b4fa5",
+      "modified_at": "2026-09-01T09:43:41.874657",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "{\n  \"items\": [\n    {\n      \"id\": \"CHK_3\",\n      \"section\": \"checklist\",\n      \"description\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\"\n    },\n    {\n      \"id\": \"CHK_4\",\n      \"section\": \"checklist\",\n      \"description\": \">\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \">\"\n    },\n    {\n      \"id\": \"CHK_5\",\n      \"section\": \"checklist\",\n      \"description\": \"> **Source of truth (frozen).** The approved documentation is immutable. On any conflict: **STOP and report**; never modify the documentation yourself.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNV"
+    },
+    {
+      "path": "company_state\\runs\\RUN_2026_09_01_090612\\checklist_snapshot.json",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\company_state\\runs\\RUN_2026_09_01_090612\\checklist_snapshot.json",
+      "hash": "4c9b76ed9c3c44aadb5114d0d18b93c5c6b1304a91c0c7c5004651e9e76b4fa5",
+      "modified_at": "2026-09-01T09:43:41.876657",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "{\n  \"items\": [\n    {\n      \"id\": \"CHK_3\",\n      \"section\": \"checklist\",\n      \"description\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\"\n    },\n    {\n      \"id\": \"CHK_4\",\n      \"section\": \"checklist\",\n      \"description\": \">\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \">\"\n    },\n    {\n      \"id\": \"CHK_5\",\n      \"section\": \"checklist\",\n      \"description\": \"> **Source of truth (frozen).** The approved documentation is immutable. On any conflict: **STOP and report**; never modify the documentation yourself.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNV"
+    },
+    {
+      "path": "company_state\\runs\\RUN_2026_09_01_093138\\checklist_snapshot.json",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\company_state\\runs\\RUN_2026_09_01_093138\\checklist_snapshot.json",
+      "hash": "4c9b76ed9c3c44aadb5114d0d18b93c5c6b1304a91c0c7c5004651e9e76b4fa5",
+      "modified_at": "2026-09-01T09:43:41.878657",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "{\n  \"items\": [\n    {\n      \"id\": \"CHK_3\",\n      \"section\": \"checklist\",\n      \"description\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\"\n    },\n    {\n      \"id\": \"CHK_4\",\n      \"section\": \"checklist\",\n      \"description\": \">\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \">\"\n    },\n    {\n      \"id\": \"CHK_5\",\n      \"section\": \"checklist\",\n      \"description\": \"> **Source of truth (frozen).** The approved documentation is immutable. On any conflict: **STOP and report**; never modify the documentation yourself.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNV"
+    },
+    {
+      "path": "company_state\\runs\\RUN_2026_09_01_093701\\checklist_snapshot.json",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\company_state\\runs\\RUN_2026_09_01_093701\\checklist_snapshot.json",
+      "hash": "4c9b76ed9c3c44aadb5114d0d18b93c5c6b1304a91c0c7c5004651e9e76b4fa5",
+      "modified_at": "2026-09-01T09:43:41.880655",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "{\n  \"items\": [\n    {\n      \"id\": \"CHK_3\",\n      \"section\": \"checklist\",\n      \"description\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\"\n    },\n    {\n      \"id\": \"CHK_4\",\n      \"section\": \"checklist\",\n      \"description\": \">\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \">\"\n    },\n    {\n      \"id\": \"CHK_5\",\n      \"section\": \"checklist\",\n      \"description\": \"> **Source of truth (frozen).** The approved documentation is immutable. On any conflict: **STOP and report**; never modify the documentation yourself.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNV"
+    },
+    {
+      "path": "company_state\\runs\\RUN_2026_09_01_094054\\checklist_snapshot.json",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\company_state\\runs\\RUN_2026_09_01_094054\\checklist_snapshot.json",
+      "hash": "4c9b76ed9c3c44aadb5114d0d18b93c5c6b1304a91c0c7c5004651e9e76b4fa5",
+      "modified_at": "2026-09-01T09:43:41.910655",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "{\n  \"items\": [\n    {\n      \"id\": \"CHK_3\",\n      \"section\": \"checklist\",\n      \"description\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \"> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\"\n    },\n    {\n      \"id\": \"CHK_4\",\n      \"section\": \"checklist\",\n      \"description\": \">\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNVERIFIED\",\n      \"dependencies\": [],\n      \"source\": \"implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md\",\n      \"evidence\": [],\n      \"reviewer\": \"system\",\n      \"raw\": \">\"\n    },\n    {\n      \"id\": \"CHK_5\",\n      \"section\": \"checklist\",\n      \"description\": \"> **Source of truth (frozen).** The approved documentation is immutable. On any conflict: **STOP and report**; never modify the documentation yourself.\",\n      \"original_marker\": \"[ ]\",\n      \"status\": \"UNV"
+    },
+    {
+      "path": "docs\\00_Foundation\\GLOSSARY.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\00_Foundation\\GLOSSARY.md",
+      "hash": "491ef3e528d3b25a0457f37293993237ccd0e6238e4173ea00fb24a8cb49e96e",
+      "modified_at": "2026-09-01T09:43:41.912655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Glossary\n\n> The single authoritative vocabulary of MailSent.\n>\n> This document assigns one official meaning to every important word the company uses, so that engineers, product managers, AI agents, and every future document share the same language. It prevents terminology drift.\n>\n> It is subordinate to the [Project Constitution](PROJECT_CONSTITUTION.md) and the [Master Workflow](MAILSENT_MASTER_WORKFLOW.md), and is consistent with every document in `docs/01_Product/` and `docs/02_Product_Design/`. Every definition is grounded in those documents; nothing here is invented.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nAfter founder approval, update to **Status: Approved** and **Review Status: \ud83d\udd12 Frozen**. Only the founders may freeze this document.\n\n**Next review trigger:**\n- Product philosophy changes\n- Terminology changes\n- Category changes\n\n---\n\n## 1. Purpose\n\nThe purpose of this glossary is to give every term one meaning and to bind every future document to it. Language is how a company stays coherent: when two documents use the same word for different things, or different words for the same thing, the product and the customer's understanding both suffer.\n\nThis glossary is the arbiter. When a future document needs a term, it uses the definition here. When a term is missing, it is added here before it is used. When two sources conflict over a term, that conflict is recorde"
+    },
+    {
+      "path": "docs\\00_Foundation\\MAILSENT_MASTER_WORKFLOW.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\00_Foundation\\MAILSENT_MASTER_WORKFLOW.md",
+      "hash": "30e2034d485dd4a7ea6247a5928cdaff1c26c34251edbb71ea743e5b90b1ff8c",
+      "modified_at": "2026-09-01T09:43:41.913656",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "\ud83d\udcd6 MAILSENT MASTER WORKFLOW (V1 FINAL \u2014 10/10 EDITION)\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\n\ud83d\udd34 THE NON-NEGOTIABLE RULE (Pinned at the top of every decision)\n\n\"No feature is approved because it is technically impressive. \nEvery feature must solve a validated customer problem and create recurring value.\"\n\nIf a feature violates this \u2192 INSTANT REJECT. No debate.\n\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\n\ud83c\udfaf IDENTITY\n\nMailSent = AI Email Infrastructure Intelligence Platform\nNOT a DMARC checker. NOT a warmup tool.\nWe sell CONFIDENCE to agencies and businesses.\n\nCustomer Promise:\n\"Know exactly what's breaking your email delivery, why it matters to your \nbusiness, and how to fix it before customers notice.\"\n\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\n\ud83c\udfd7\ufe0f SYSTEM ARCHITECTURE (The Natural Flow)\n\nMailSent\n    \u2193\nScanner (DNS + DMARC Ingestion + Blacklist)\n    \u2193\nAnalyzer (SPF/DKIM/DMARC Parsing + Alignment Engine)\n    \u2193\nAlignment Intelligence (Sender Detection + Root Cause)\n    \u2193\nAI Explanation (Business Language Translation)\n    \u2193\nBusiness Impact (Risk Scoring + Action Prioritization)\n    \u2193\nAI Action Queue (Prioritized To-Do List)\n    \u2193\nGuided Fix (Step-by-Step Resolution)\n    \u2193\nContinuous Monitoring (24/7 Health Tracking)\n    \u2193\nAlerts (Slack/Email/In-App)\n    \u2193\nReports (Weekly Executive Summary)\n    \u2193\nAgency Dashboard (Multi-Client Command Center)\n\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550"
+    },
+    {
+      "path": "docs\\00_Foundation\\PROJECT_CONSTITUTION.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\00_Foundation\\PROJECT_CONSTITUTION.md",
+      "hash": "47a278a72963a665ee90ee2aff04aa3ccdc54d278a956e063106f7284d64e4de",
+      "modified_at": "2026-09-01T09:43:41.914655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Project Constitution\n\n> **Authority: Highest.** This is the supreme governing text of MailSent. Every human and AI agent must read it before writing a line of code and must treat it as the final arbiter when requirements, conventions, or instincts conflict. Where a specific instruction contradicts this constitution, the constitution wins \u2014 and the conflict must be surfaced, not silently resolved.\n>\n> **Version:** 3.1 \u00b7 **Status:** Ratified by the Founding Principal Software Architect, Chief Product Architect, and Engineering Culture Designer \u00b7 **Audience:** All humans and AI agents on MailSent, now and for the next decade.\n>\n> **Companion.** This document defines *culture and philosophy* \u2014 the principles that endure. [MAILSENT_MASTER_WORKFLOW](MAILSENT_MASTER_WORKFLOW.md) defines *product and execution* \u2014 modules, pricing, feature scoring and version gates, the development pipeline, timelines, and V1 exclusions live there and may evolve freely. The workflow is the source of **product truth**; this constitution is the source of **engineering truth**. Where they appear to conflict, resolve by [Section 3.5](#35-identity-and-conflict-resolution).\n\n---\n\n## The Golden Rule \u2014 The First Governing Rule\n\n> **\"No feature is approved because it is technically impressive. Every feature must solve a validated customer problem and create recurring value. If not \u2014 reject.\"**\n\nThis is the first and highest governing rule of MailSent. It outranks every other consideration in this"
+    },
+    {
+      "path": "docs\\00_Foundation\\SPEC_KIT_INTEGRATION_AUDIT.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\00_Foundation\\SPEC_KIT_INTEGRATION_AUDIT.md",
+      "hash": "bdbc03fc5209e6ff1edb446e947b21609365197607861c89d578475f6d99b9d1",
+      "modified_at": "2026-09-01T09:43:41.915655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Spec Kit Integration & Workflow Audit Report\n\n> **Document Type:** Governance & Architecture Integration Audit  \n> **Date:** 2026-08-18  \n> **Status:** Final / Ratified for Engineering Integration  \n> **Scope:** Integration of Spec Kit workflow tooling into MailSent's ~70% completed production SaaS repository.  \n> **Governing References:** [MAILSENT_MASTER_WORKFLOW.md](MAILSENT_MASTER_WORKFLOW.md) \u00b7 [PROJECT_CONSTITUTION.md](PROJECT_CONSTITUTION.md) \u00b7 [00_IMPLEMENTATION_MASTER_CHECKLIST.md](../../implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md)\n\n---\n\n## Executive Summary\n\nMailSent is an existing, ~70% implemented, production-oriented AI Email Infrastructure Intelligence Platform (Java 21 / Spring Boot / Next.js / PostgreSQL / Redis). The codebase possesses a mature, highly disciplined, multi-tiered documentation and governance system with frozen architectural boundaries, immutable domain models, strict definition of done (DoD), and an exhaustive 32-phase Engineering Execution System (`implementation/00_IMPLEMENTATION_MASTER_CHECKLIST.md`).\n\nSpec Kit has recently been initialized in the repository (`.specify/` and `.agents/skills/`). \n\nThis audit evaluates the relationship between the existing MailSent engineering governance and Spec Kit, establishes an unambiguous authority hierarchy, maps Spec Kit constructs to existing assets, prevents workflow conflicts and duplication, and defines the exact integration model for Antigravity and development agents.\n\n---"
+    },
+    {
+      "path": "docs\\01_Product\\CUSTOMER_JOURNEY.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\01_Product\\CUSTOMER_JOURNEY.md",
+      "hash": "3b4150ab829d1512f2323cfaa8b110956b5c8310f80d8359c49ad9edd004ee59",
+      "modified_at": "2026-09-01T09:43:41.916654",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Customer Journey\n\n> The customer's complete journey from ignorance to confidence.\n>\n> This is **not** MailSent's journey, not a product flow, not an onboarding path, and not a feature narrative. It is the journey of the **people** who live with email delivery risk \u2014 the agency owner, the operator, the business decision-maker. Every stage of this journey would occur exactly as described if MailSent had never existed.\n>\n> The document treats the customer first and the psychology before the technology. It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), the [Product Vision](PRODUCT_VISION.md), and the [Customer Problems](CUSTOMER_PROBLEMS.md), and never contradicts them. It is written from the seat of a researcher who has watched many customers move, over months or years, from not knowing to finally changing how they work.\n\n---\n\n## 1. Introduction\n\nEvery customer who changes how they handle email delivery travels a journey \u2014 but the journey is not about email. It is about a person moving from *not knowing there is a problem* to *believing a problem exists*, and eventually to *being unwilling to tolerate it*. The technical facts are the same throughout; what changes is the person's awareness, emotion, and readiness to act.\n\nThis document maps that journey. It is organized around the people, their feelings, their business, their teams, their decisions, and the m"
+    },
+    {
+      "path": "docs\\01_Product\\CUSTOMER_PROBLEMS.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\01_Product\\CUSTOMER_PROBLEMS.md",
+      "hash": "4f595dc188f1525247010e198b4560ded43978061ed1e8c37ee5173c4f49f19e",
+      "modified_at": "2026-09-01T09:43:41.916654",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Customer Problems\n\n> The problems that justify MailSent's existence.\n>\n> This is **not** a feature list, a solution list, an architecture, or a roadmap. It is a disciplined account of the problems real customers live with \u2014 problems that exist entirely without MailSent. If MailSent disappeared tomorrow, every problem on this page would remain. That is the test this document must pass.\n>\n> This document exists *before* the product. It is written from the seat of a researcher interviewing agency owners, operators, and business decision-makers. For each problem it answers: **who** experiences it, **why** it happens, **why** it is expensive, **why** it is hard to solve today, **why** it keeps happening, and how it affects **trust**, **revenue**, and **operations**.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Product Vision](PRODUCT_VISION.md), and never contradicts them. It uses only the approved customer hierarchy \u2014 nothing new is invented.\n\n**Customer segments covered** (approved hierarchy only): Digital marketing agencies, email marketing agencies, MSPs (managed service providers), and multi-domain SaaS companies \u2014 primary. E-commerce, B2B companies, and startups \u2014 secondary.\n\n---\n\n## 1. Introduction\n\nThis document catalogues the problems that make email delivery a source of silent risk for the businesses and agencies that depend on it."
+    },
+    {
+      "path": "docs\\01_Product\\PRODUCT_POSITIONING.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\01_Product\\PRODUCT_POSITIONING.md",
+      "hash": "dcfba7bee73c48bb2e1c04b40b028b6692b6200e6c8da475a8678951b97a3862",
+      "modified_at": "2026-09-01T09:43:41.917655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Product Positioning\n\n> How MailSent should be understood.\n>\n> This is **not** why MailSent exists, not a catalogue of customer problems, not the value proposition, not messaging, and not sales copy. It is the definition of the place MailSent occupies in the customer's mind: the category it belongs to, the boundaries of that category, who it fits, when it is evaluated, how it should be judged, and when it should not be chosen. It is written to be timeless \u2014 true a decade from now.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), the [Product Vision](PRODUCT_VISION.md), the [Customer Problems](CUSTOMER_PROBLEMS.md), the [Customer Journey](CUSTOMER_JOURNEY.md), and the [Value Proposition](VALUE_PROPOSITION.md), and never contradicts them.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nAfter founder approval, update to **Status: Approved** and **Review Status: \ud83d\udd12 Frozen**. Only the founders may freeze this document.\n\n**Next review trigger:**\n- Product philosophy changes\n- Customer category changes\n- Business model changes\n\n---\n\n## 1. Introduction\n\nPositioning is the answer to a single question: **what is this, in the mind of the customer?** It is not what the product does; it is the place the customer files it. If the customer cannot quickly and correctly file MailSe"
+    },
+    {
+      "path": "docs\\01_Product\\PRODUCT_VISION.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\01_Product\\PRODUCT_VISION.md",
+      "hash": "e3f974a6923f5d641534d72ba50d71c715c12d4367d9d01f973a316accfd21fe",
+      "modified_at": "2026-09-01T09:43:41.918655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Product Vision\n\n> The story of *why* MailSent exists.\n>\n> This is not a feature list, a roadmap, a pricing page, or an architecture diagram. It is the reason the company deserves to exist, and it answers one question in every paragraph: **why**. It is written to be read by every future employee, every investor, and every partner before they go any further \u2014 because if you understand *why*, the *what* and *how* will follow from it.\n>\n> This document is subordinate to, and never contradicts, the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md) (our culture and engineering standards) and the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md) (our product and execution). Those are the authoritative sources. This is their human voice.\n\n---\n\n> **Our founding belief: email is too important to be a black box.**\n\n---\n\n## 1. Why MailSent Exists\n\nMailSent is an **AI Email Infrastructure Intelligence Platform** \u2014 and it exists because the most important message in a modern business is the one most likely to fail silently, and the business almost never finds out first.\n\nEmail is not a side channel. It is the artery of commerce: the password reset, the invoice, the order confirmation, the receipt, the notification that a contract was signed. When one of these does not reach its inbox, the business feels it \u2014 a churn, a support call, a bad review \u2014 without ever knowing the email was the cause.\n\nWe refuse to accept that a business's most important ch"
+    },
+    {
+      "path": "docs\\01_Product\\VALUE_PROPOSITION.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\01_Product\\VALUE_PROPOSITION.md",
+      "hash": "1f539e3f299d182f462352d08b9e73121117c40842e680937005c85263c582e9",
+      "modified_at": "2026-09-01T09:43:41.919655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Value Proposition\n\n> Why customers should change \u2014 and the commercial value MailSent exists to create.\n>\n> This is **not** why MailSent exists, not a catalogue of customer problems, not positioning, not pricing, not messaging, and not a feature story. It is a statement of the **value** a customer gains by changing how they treat email delivery. It defines the transformation and the ongoing worth of that change, described in business terms \u2014 not software terms.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), the [Product Vision](PRODUCT_VISION.md), the [Customer Problems](CUSTOMER_PROBLEMS.md), and the [Customer Journey](CUSTOMER_JOURNEY.md), and never contradicts them.\n\n---\n\n## 1. Introduction\n\nA customer does not buy email tooling. A customer changes because the **cost of staying the same** has become higher than the cost of changing. This document defines that arithmetic: what the customer's world looks like today, what it looks like when it is right, what it costs to keep things as they are, why the alternatives fail, what the customer trades, and what lasting value the change creates.\n\nThe value MailSent offers is not a list of capabilities. It is a shift in the customer's position \u2014 from a business that hopes its email works to a business that knows. Everything MailSent does is measured against whether it earns that shift. If it does not change"
+    },
+    {
+      "path": "docs\\02_Product_Design\\AI_REQUIREMENTS.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\02_Product_Design\\AI_REQUIREMENTS.md",
+      "hash": "0f0203127fcd6532b013a9370b304633d6be0aaa6f4ea41cf3b2eaa8cd13596f",
+      "modified_at": "2026-09-01T09:43:41.920655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 AI Requirements\n\n> The behavior and accountability requirements for any AI-enabled capability in MailSent.\n>\n> This document has **one responsibility**: the requirements that govern how AI behaves and who is accountable for its output. It is not the functional catalog and not the quality-attribute set. It defines the rules AI must follow so that the product's confidence remains grounded.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Product Requirements](PRODUCT_REQUIREMENTS.md), and never contradicts them. It applies to any AI-enabled behavior, wherever it appears.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n- **Next review trigger:** Product philosophy changes, or an AI capability changes.\n\n---\n\n## Behavior\n\n- **AI1.** AI must explain. It translates technical input into what happened, why it matters, and what to do, in business language.\n- **AI2.** AI must prioritize. It must order what matters most, so the user is not given an unprioritized wall of findings.\n- **AI3.** AI must guide. It must propose a fix with a reason and a confidence, so the user can act.\n- **AI4.** AI must assist. It must support the user's decision; it must not take meaningful action on its own, and it must not act on a customer's live systems without explicit, informed cons"
+    },
+    {
+      "path": "docs\\02_Product_Design\\FUNCTIONAL_REQUIREMENTS.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\02_Product_Design\\FUNCTIONAL_REQUIREMENTS.md",
+      "hash": "9b33691c53a2925679855afb9b413201061210e8d4bce0f3d784832a2cfd9efe",
+      "modified_at": "2026-09-01T09:43:41.920655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Functional Requirements\n\n> The complete functional requirement catalog for MailSent.\n>\n> This document has **one responsibility**: the engineering-grade catalog of what the product must enable, grouped by capability. It is not architecture, not an API specification, not a UI specification, and not the product overview. Product intent, goals, scope, user types, user flows, success criteria, and acceptance criteria live in the [Product Requirements](PRODUCT_REQUIREMENTS.md).\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), the [Product Vision](../01_Product/PRODUCT_VISION.md), and the [Product Requirements](PRODUCT_REQUIREMENTS.md), and never contradicts them. Each requirement is a statement of what the product must enable, written so that multiple teams could build the same product from it.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n- **Next review trigger:** Product scope changes, or a functional capability changes.\n\n---\n\n## 1. Domain and Portfolio Management\n\n- **D1. Domain addition.** The product must let a user add a domain and observe its delivery health, with clear guidance on any configuration needed to begin health observation.\n- **D2. Multiple domains.** The product must hold and distinguish many domains for one organization, and must present each dom"
+    },
+    {
+      "path": "docs\\02_Product_Design\\NON_FUNCTIONAL_REQUIREMENTS.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\02_Product_Design\\NON_FUNCTIONAL_REQUIREMENTS.md",
+      "hash": "ed8e46c7f7d5e2ecdc77a948a785beb9073dd51516529691a4166e0d2d3d1b08",
+      "modified_at": "2026-09-01T09:43:41.921655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Non-Functional Requirements\n\n> The complete set of quality attributes the product must satisfy.\n>\n> This document has **one responsibility**: the non-functional requirements of MailSent. It is not the functional catalog (which lives in [FUNCTIONAL_REQUIREMENTS.md](FUNCTIONAL_REQUIREMENTS.md)) and not the product overview. It states the quality the product must hold across security, reliability, performance, usability, scalability, accessibility, and auditability.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Product Requirements](PRODUCT_REQUIREMENTS.md), and never contradicts them.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n- **Next review trigger:** Product scope changes, or a quality standard changes.\n\n---\n\n## Security\n\n- **S1.** The product must apply least-privilege access: every user and role sees only what its role requires.\n- **S2.** The product must protect customer data for confidentiality and integrity, and must protect it in transit and at rest.\n- **S3.** The product must protect the safety of customer live infrastructure: it must not take action on a production system without explicit, informed consent, and any consented action must be safe and reversible in principle.\n- **S4.** The product must validate all inputs and not trust data"
+    },
+    {
+      "path": "docs\\02_Product_Design\\PRODUCT_REQUIREMENTS.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\02_Product_Design\\PRODUCT_REQUIREMENTS.md",
+      "hash": "3aa0dc7fb2ef9d77626415afdb07aeab36edca3635e7fe1fdf0c00344b3dc01e",
+      "modified_at": "2026-09-01T09:43:41.922655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Product Requirements (Master PRD)\n\n> The complete product requirements for MailSent, at the product and business level.\n>\n> This document defines **what the product must achieve** and is the entry point for the whole requirements set. It is not architecture, not an API specification, not a database design, not a UI specification, and not a sprint plan. The engineering-grade catalogs live in dedicated documents referenced throughout, so that each document has exactly one responsibility.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), the [Product Vision](../01_Product/PRODUCT_VISION.md), the [Customer Problems](../01_Product/CUSTOMER_PROBLEMS.md), the [Customer Journey](../01_Product/CUSTOMER_JOURNEY.md), the [Value Proposition](../01_Product/VALUE_PROPOSITION.md), and the [Product Positioning](../01_Product/PRODUCT_POSITIONING.md), and never contradicts them.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nAfter founder approval, update to **Status: Approved** and **Review Status: \ud83d\udd12 Frozen**. Only the founders may freeze this document.\n\n**Next review trigger:**\n- Product philosophy changes\n- Product scope changes\n- Business model changes\n\n---\n\n## The Requirements Document Set\n\nThe requirements are organized so that every document has exactly one responsibility."
+    },
+    {
+      "path": "docs\\02_Product_Design\\RELEASE_STRATEGY.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\02_Product_Design\\RELEASE_STRATEGY.md",
+      "hash": "9b3f80698ef66e91abd6edd94ab60a581609c99e7025da260450122869211fb3",
+      "modified_at": "2026-09-01T09:43:41.923655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Release Strategy\n\n> The phased, validation-based sequencing of MailSent's capabilities.\n>\n> This document has **one responsibility**: how the product is released over time. It is not the product overview and not the requirement catalogs. It defines the phases of delivery, what each phase must accomplish, and the principle that gates a phase.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Product Requirements](PRODUCT_REQUIREMENTS.md), and never contradicts them.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n- **Next review trigger:** Product scope changes, or a business model change.\n\n---\n\n## The Governing Principle\n\nRelease is phased by **capability and by validation**, not by calendar. Each phase is a set of capabilities that together deliver a complete, tested, meaningful step a customer can live with. The exact order of execution lives in the Master Workflow; this document defines the principle that governs.\n\nEach phase is gated by the Golden Rule and the Feature Formula: no phase opens until the capability is validated against a real customer problem, tested for accuracy, and approved. Phases are not tied to dates; a phase ships only when it truthfully works, not when a calendar says so.\n\n## The Phases\n\n- **Phase A \u2014 Foundation: from health to tr"
+    },
+    {
+      "path": "docs\\02_Product_Design\\REQUIREMENTS_TRACEABILITY_MATRIX.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\02_Product_Design\\REQUIREMENTS_TRACEABILITY_MATRIX.md",
+      "hash": "92ec5399bb03d5ab360edd4e478f1505931be336440e1c43b44b9231bf51dbb7",
+      "modified_at": "2026-09-01T09:43:41.923655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Requirements Traceability Matrix\n\n> The official governance model for how MailSent requirements relate and stay connected.\n>\n> This document defines the **system** that keeps every requirement traced to its source, its user, its value, and its acceptance \u2014 so that nothing exists without lineage. It does **not** define requirements, and it is **not** a populated spreadsheet. It is the rulebook and the table structure that the requirement workflow fills in.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with every document it references. Terminology here follows the Glossary (for example, capability, Health Signal, and the separate meanings of Confidence, Reliability, and Trust).\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after review.\n\n**Next review trigger:**\n- Product philosophy changes\n- The structure of the requirements set changes\n- The traceability model changes\n\n---\n\n## 1. Purpose\n\nTraceability is the guarantee that no requirement exists by accident. Every requirement in MailSent must answer two questions: **where did this come from** (its source), and **how will we know it is met** (its acceptance). The traceability system is the mechanism"
+    },
+    {
+      "path": "docs\\03_Architecture\\01_DOMAIN_MODEL.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\03_Architecture\\01_DOMAIN_MODEL.md",
+      "hash": "4120455498a9b2cb1a2f2a76c99d6079f28efa8029ce79ae7fff6ff970715c95",
+      "modified_at": "2026-09-01T09:43:41.924655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Business Domain Model\n\n> The model of the business, not of the software.\n>\n> This document models the concepts of MailSent's business \u2014 what they are, what they are responsible for, and how they relate \u2014 in business language. It is **not** a database schema, an API design, a class diagram, or a technology plan. If the technology changed completely, this model would still be true.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with every product and product-design document. Terminology follows the Glossary. Every concept here traces to a validated customer problem and a requirement area in the [Requirements Traceability Matrix](../02_Product_Design/REQUIREMENTS_TRACEABILITY_MATRIX.md).\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after review.\n\n**Next review trigger:**\n- Product philosophy changes\n- The business model changes\n- The requirement structure changes\n\n---\n\n## 1. Purpose\n\nA business domain model is a shared, unambiguous description of what the business is about. It answers, for each important business concept, three questions: **what it is**, **what it is responsible for**, and **how it relates to the other concepts**. It is the language an"
+    },
+    {
+      "path": "docs\\03_Architecture\\02_UBIQUITOUS_LANGUAGE.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\03_Architecture\\02_UBIQUITOUS_LANGUAGE.md",
+      "hash": "a2066d57b1728e339ae5f86c728235db69ccf57a297ea8f65983ed43fbed131b",
+      "modified_at": "2026-09-01T09:43:41.925655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Ubiquitous Language\n\n> The official language of MailSent \u2014 how humans, documentation, product, engineering, APIs, events, AI, and the UI all speak about the business, in the same words.\n>\n> This is **not** a glossary. Definitions live only in the [Glossary](../00_Foundation/GLOSSARY.md) and the [Domain Model](01_DOMAIN_MODEL.md); this document governs how those terms are used consistently across every surface. It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with the [Domain Model](01_DOMAIN_MODEL.md) and every product and product-design document.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after review.\n\n**Next review trigger:**\n- Product philosophy changes\n- Terminology changes\n- The naming conventions change\n\n---\n\n## 1. Purpose\n\nLanguage is the most load-bearing material a company builds with. When every engineer, product manager, designer, and AI agent uses the same word for the same business thing, the documentation stays consistent, the product is coherent, and the software is faithful to the business. When they do not, a single concept fractures into many names and the business's meaning is lost.\n\nThis document is the rulebook for that consistency"
+    },
+    {
+      "path": "docs\\03_Architecture\\03_BOUNDED_CONTEXTS.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\03_Architecture\\03_BOUNDED_CONTEXTS.md",
+      "hash": "7ec250e2e60bd1a68ce4eccddb913969eb3831e0d95ef0b005b6cd39c2e1ddc4",
+      "modified_at": "2026-09-01T09:43:41.927656",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Bounded Contexts\n\n> The definition of the business boundaries of MailSent.\n>\n> A Bounded Context is a **business boundary**, a **language boundary**, and an **ownership boundary** \u2014 the place where a set of the business's concepts is given one consistent meaning and one owner. It is **not** a microservice, a repository, a deployment unit, or a team. This document defines the business boundaries so that every later decision, including any decision about software structure, has a clear business map to read from.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with the [Domain Model](01_DOMAIN_MODEL.md) and the [Ubiquitous Language](02_UBIQUITOUS_LANGUAGE.md). Terminology uses only the Glossary; every context traces through the [Requirements Traceability Matrix](../02_Product_Design/REQUIREMENTS_TRACEABILITY_MATRIX.md) to a requirement area and a customer problem.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after review.\n\n**Next review trigger:**\n- Product philosophy changes\n- The domain model changes\n- The business boundaries change\n\n---\n\n## 1. Purpose\n\nThe business is too large to hold in one unbroken vocabulary. A Bounded Context gives a part of the"
+    },
+    {
+      "path": "docs\\03_Architecture\\04_INFORMATION_ARCHITECTURE.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\03_Architecture\\04_INFORMATION_ARCHITECTURE.md",
+      "hash": "8e9f2ccf85e9e689d20d33a599c7a0be5275db33aa8a28359dff5716b4d165f4",
+      "modified_at": "2026-09-01T09:43:41.928654",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Information Architecture\n\n> The business information architecture of MailSent.\n>\n> This document defines **what information exists**, **who owns it**, **how it flows**, **when it is authoritative**, and **how it evolves**. It models business information, not software. Information is not a database, not an API, and not a UI \u2014 so this document says nothing about tables, interfaces, or screens.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with the [Domain Model](01_DOMAIN_MODEL.md), the [Ubiquitous Language](02_UBIQUITOUS_LANGUAGE.md), and the [Bounded Contexts](03_BOUNDED_CONTEXTS.md). Terminology uses only the Glossary; every information category traces through a context to a requirement and a customer problem.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after review.\n\n**Next review trigger:**\n- Product philosophy changes\n- The domain model changes\n- The information boundaries change\n\n---\n\n## 1. Purpose\n\nInformation is the substance of the business. Delivery health, the issues found, the explanations given, the guidance offered, and the proof produced are pieces of information the business keeps, owns, and passes on. When the information is well o"
+    },
+    {
+      "path": "docs\\03_Architecture\\05_SYSTEM_ARCHITECTURE.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\03_Architecture\\05_SYSTEM_ARCHITECTURE.md",
+      "hash": "301df45c798b9141c56325aed6ce993c3d7d62714e480bfe769d1378f675761a",
+      "modified_at": "2026-09-01T09:43:41.928654",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 System Architecture (Logical)\n\n> The logical architecture of MailSent \u2014 how the system is organized as business responsibilities.\n>\n> This document explains **how the system is organized logically**, not how it is deployed, not its infrastructure, and not its codebase. A logical component is a responsibility; it is **not** a microservice, a repository, or a framework module. If the technology changed completely, this architecture would still be true.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with the [Domain Model](01_DOMAIN_MODEL.md), the [Ubiquitous Language](02_UBIQUITOUS_LANGUAGE.md), the [Bounded Contexts](03_BOUNDED_CONTEXTS.md), and the [Information Architecture](04_INFORMATION_ARCHITECTURE.md). Terminology uses only the Glossary; every responsibility traces through a context to a requirement and a customer problem.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after review.\n\n**Next review trigger:**\n- Product philosophy changes\n- The domain model or the information architecture changes\n- The system responsibilities change\n\n---\n\n## 1. Purpose\n\nAn architecture is the map of responsibilities: what each part of the system is for, what it own"
+    },
+    {
+      "path": "docs\\03_Architecture\\06_AI_ARCHITECTURE.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\03_Architecture\\06_AI_ARCHITECTURE.md",
+      "hash": "32291db39748a827d42bd4f73097b5bb44d0ffec9c3fd56cdfe0222f5060e4db",
+      "modified_at": "2026-09-01T09:43:41.929654",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 AI Architecture\n\n> The constitutional architecture of AI inside MailSent.\n>\n> This document defines **AI authority, AI boundaries, AI reasoning, the AI trust model, and AI governance**. It is constitutional \u2014 it says what role AI is allowed to play and what it must never be \u2014 not how a model or an agent is built. AI here is not an LLM, not an agent framework, and not a prompt; it is a capability of the business, governed by the same truth that governs the whole company.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with the [Domain Model](01_DOMAIN_MODEL.md), the [Ubiquitous Language](02_UBIQUITOUS_LANGUAGE.md), the [Bounded Contexts](03_BOUNDED_CONTEXTS.md), the [Information Architecture](04_INFORMATION_ARCHITECTURE.md), and the [System Architecture](05_SYSTEM_ARCHITECTURE.md). Terminology uses only the Glossary; every AI capability traces through a system responsibility to a customer problem.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after review.\n\n**Next review trigger:**\n- Product philosophy changes\n- The system responsibilities change\n- The AI governance model changes\n\n---\n\n## 1. Purpose\n\nAI is a core capability of MailSent, but it is a cap"
+    },
+    {
+      "path": "docs\\03_Architecture\\07_DATA_MODEL.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\03_Architecture\\07_DATA_MODEL.md",
+      "hash": "c07a11da8bdff8e2a537719f318b9ceba21430bca14364884f07bb14f3847fa4",
+      "modified_at": "2026-09-01T09:43:41.930655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Data Model (Conceptual)\n\n> The conceptual business data model of MailSent.\n>\n> This document models the business data of the product: the aggregates, the entities, the value objects, and how ownership, identity, lineage, and the invariants hold. It is **not** a database model. An aggregate is not a table, an entity is not a row, and a value object is not a primitive. Nothing here presumes a storage technology.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with the [Domain Model](01_DOMAIN_MODEL.md), the [Ubiquitous Language](02_UBIQUITOUS_LANGUAGE.md), the [Bounded Contexts](03_BOUNDED_CONTEXTS.md), the [Information Architecture](04_INFORMATION_ARCHITECTURE.md), the [System Architecture](05_SYSTEM_ARCHITECTURE.md), and the [AI Architecture](06_AI_ARCHITECTURE.md). Terminology uses only the Glossary; every aggregate traces through the domain model and a context to a requirement and a customer problem.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after review.\n\n**Next review trigger:**\n- Product philosophy changes\n- The domain model changes\n- The data boundaries change\n\n---\n\n## 1. Purpose\n\nThe business data model is the agreed shape of the product's"
+    },
+    {
+      "path": "docs\\03_Architecture\\08_API_PHILOSOPHY.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\03_Architecture\\08_API_PHILOSOPHY.md",
+      "hash": "0b4468afa4dd498c389d0dd647e140464c9bd18133d805788657f44cbdac977a",
+      "modified_at": "2026-09-01T09:43:41.931655",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 API Philosophy\n\n> The philosophy that governs every future API of MailSent.\n>\n> An API is a **business contract**, not a technology. It is the agreed way one part of the business asks another for its knowledge. It is not REST, not GraphQL, not HTTP, and not JSON \u2014 those are transports that serve the contract. This document defines the principles that every contract must follow, so that the APIs that later emerge are stable, trustworthy, and faithful to the business.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with the [Domain Model](01_DOMAIN_MODEL.md), the [Ubiquitous Language](02_UBIQUITOUS_LANGUAGE.md), the [Bounded Contexts](03_BOUNDED_CONTEXTS.md), the [Information Architecture](04_INFORMATION_ARCHITECTURE.md), the [System Architecture](05_SYSTEM_ARCHITECTURE.md), the [AI Architecture](06_AI_ARCHITECTURE.md), and the [Data Model](07_DATA_MODEL.md). Terminology uses only the Glossary; every API concept traces through the data model to a domain concept and a customer problem.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after review.\n\n**Next review trigger:**\n- Product philosophy changes\n- The domain model or the data model changes\n- The integ"
+    },
+    {
+      "path": "docs\\03_Architecture\\09_SECURITY_ARCHITECTURE.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\03_Architecture\\09_SECURITY_ARCHITECTURE.md",
+      "hash": "49dc7400ed2dea0936fe49ff351cfdc1d9d8796e670719591e7aac3cc7261a04",
+      "modified_at": "2026-09-01T09:43:41.932654",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Security Architecture (Business)\n\n> The business security architecture of MailSent, where **security is business trust** \u2014 not cybersecurity.\n>\n> This document governs how **trust, ownership, consent, protection of information, and the boundaries of AI** work in the business. It is not about OAuth, TLS, encryption, or firewalls; it is about who may hold what, who may act on what, and who is accountable. If the technology changed completely, this architecture would still be true.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with the [Domain Model](01_DOMAIN_MODEL.md), the [Ubiquitous Language](02_UBIQUITOUS_LANGUAGE.md), the [Bounded Contexts](03_BOUNDED_CONTEXTS.md), the [Information Architecture](04_INFORMATION_ARCHITECTURE.md), the [System Architecture](05_SYSTEM_ARCHITECTURE.md), the [AI Architecture](06_AI_ARCHITECTURE.md), the [Data Model](07_DATA_MODEL.md), and the [API Philosophy](08_API_PHILOSOPHY.md). Terminology uses only the Glossary; every security principle traces through the Information Architecture and the Data Model to a customer problem.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after review.\n\n**Next review trigger:**\n- Product"
+    },
+    {
+      "path": "docs\\03_Architecture\\10_DEPLOYMENT_ARCHITECTURE.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\docs\\03_Architecture\\10_DEPLOYMENT_ARCHITECTURE.md",
+      "hash": "385ffb367f207ddcba6993f446c4e82cdd899b05bd5c9f331f93a9dde9f04ac9",
+      "modified_at": "2026-09-01T09:43:41.933654",
+      "category": "document",
+      "authority": "project_doc",
+      "summary": "# MailSent \u2014 Deployment Architecture (Business)\n\n> The business deployment architecture of MailSent, where **deployment is business readiness** \u2014 not infrastructure.\n>\n> This document governs how the product is released into the customer's world: the philosophy of deployment, release, environment, reliability, rollback, and business continuity. It is not about servers, clouds, containers, or tooling. If the entire platform were rebuilt on different technology, this architecture would still be true.\n>\n> It is subordinate to the [Project Constitution](../00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../00_Foundation/MAILSENT_MASTER_WORKFLOW.md), and the [Glossary](../00_Foundation/GLOSSARY.md), and is consistent with the [Domain Model](01_DOMAIN_MODEL.md), the [Ubiquitous Language](02_UBIQUITOUS_LANGUAGE.md), the [Bounded Contexts](03_BOUNDED_CONTEXTS.md), the [Information Architecture](04_INFORMATION_ARCHITECTURE.md), the [System Architecture](05_SYSTEM_ARCHITECTURE.md), the [AI Architecture](06_AI_ARCHITECTURE.md), the [Data Model](07_DATA_MODEL.md), the [API Philosophy](08_API_PHILOSOPHY.md), and the [Security Architecture](09_SECURITY_ARCHITECTURE.md). Terminology uses only the Glossary; every deployment principle traces through the Release Strategy to a customer problem.\n\n---\n\n**Document governance**\n\n- **Status:** Draft\n- **Version:** 1.0\n- **Owner:** Founders\n- **Review Status:** Pending Founder Review\n\nOnly the founders may freeze this document after rev"
+    },
+    {
+      "path": "implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\implementation\\00_IMPLEMENTATION_MASTER_CHECKLIST.md",
+      "hash": "4a60bd59004dbdb792d713aae5f23c0f44117a280381baff9680c56d8fbd99b3",
+      "modified_at": "2026-09-01T09:43:43.294248",
+      "category": "document",
+      "authority": "authoritative_doc",
+      "summary": "# MailSent \u2014 Implementation Master Checklist (Engineering Execution System)\n\n> The definitive single executable source for the MailSent implementation team. It converts the frozen, approved documentation into explicit, small, testable tasks (30\u201390 min). Nothing is implemented outside this checklist; nothing on it is skipped, merged, removed, or invented.\n>\n> **Source of truth (frozen).** The approved documentation is immutable. On any conflict: **STOP and report**; never modify the documentation yourself.\n>\n> **Stack scope.** The frozen architecture intentionally leaves transport, database, framework, and file/class/package naming \"decided elsewhere.\" Therefore every task specifies its work at the **contract level** (what must exist, its interface, its owner), never inventing stack-specific names.\n\n---\n\n## How to Use\n\nWork unblocked phases in order; a task must not start while blocked. Mark **Status** with the legend; keep every phase **Progress / Completed / Remaining / Blocked** current. A task is **Done** only when the full **MPL** checklist completes.\n\n## Task Status Legend\n\n\u2b1c Not Started \u00b7 \ud83d\udfe8 In Progress \u00b7 \ud83d\udfe6 Code Complete \u00b7 \ud83d\udfea Tests Complete \u00b7 \ud83d\udfe9 Review Complete \u00b7 \u2705 Done \u00b7 \ud83d\udd12 Frozen\n\n## Mandatory Checklist (MPL)\n\nPlanning \u2192 Implementation \u2192 Testing \u2192 Documentation \u2192 Review \u2192 Deployment \u2192 Release \u2192 Post-Release. Full contents: Planning(CP/Req/Arch/RTM) \u00b7 Implementation(Backend/Frontend/DB/API/AI/Flag) \u00b7 Testing(T-MAT) \u00b7 Docs(API/README/Changelog) \u00b7 Review(Code/Arch/Founder) \u00b7"
+    },
+    {
+      "path": "implementation\\README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\implementation\\README.md",
+      "hash": "70cbdbe9864e1ad5407090d35b5ae9561f0cb883476d94083465a952c68986d0",
+      "modified_at": "2026-09-01T09:43:43.295248",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# MailSent \u2014 Implementation Execution Framework\n\n> The operating manual for the MailSent implementation phase.\n>\n> This is **not** product documentation, **not** architecture, and **not** implementation. It is the rulebook that governs how the approved, frozen documentation becomes working software \u2014 how engineers and AI agents work, how progress is tracked, how quality is enforced, and how the implementation stays faithful to the source of truth.\n>\n> It is subordinate to the [Project Constitution](../docs/00_Foundation/PROJECT_CONSTITUTION.md), the [Master Workflow](../docs/00_Foundation/MAILSENT_MASTER_WORKFLOW.md), the [Glossary](../docs/00_Foundation/GLOSSARY.md), and the [Requirements Traceability Matrix](../docs/02_Product_Design/REQUIREMENTS_TRACEABILITY_MATRIX.md). Those documents govern; this document explains how to work within them. It does not copy or rewrite them.\n\n---\n\n## 1. Purpose\n\nThe implementation phase turns an approved plan into a working product. It is a place where thousands of small decisions are made, and where the risk of drift is highest \u2014 a feature added on impulse, a name changed casually, a requirement quietly dropped. This framework exists to keep every one of those decisions faithful to the source.\n\nThe `implementation/` folder is the single execution system for MailSent. It is where every engineering task is defined, tracked, and completed. Nothing is built outside it; nothing on it is skipped or invented. This README is the instruction manual"
+    },
+    {
+      "path": "README.md",
+      "absolute_path": "C:\\Users\\Pradeep Singh\\Desktop\\MailSent\\README.md",
+      "hash": "791f8288f9d5755cdfc384e673fbeffd93d633b6d8a906508071570913f533d9",
+      "modified_at": "2026-09-01T09:43:43.296198",
+      "category": "document",
+      "authority": "project_constitution",
+      "summary": "# MailSent\n\n**AI Email Infrastructure Intelligence Platform.**\n\nMailSent sells **confidence** \u2014 the certainty that email reaches the inbox, that infrastructure stays healthy, that problems surface early, and that teams know exactly what to fix. It is not a DMARC checker, not a warmup tool, and not a communication platform; it is the intelligence layer that reasons across everything that determines inbox delivery.\n\n## Repository layout\n\n- `docs/` \u2014 the **frozen**, authoritative documentation: foundation (constitution, master workflow, glossary), product, product design, and architecture. This is the single source of truth; it changes only by governance.\n- `implementation/` \u2014 the **engineering execution system**: `README.md` (operating manual) and `00_IMPLEMENTATION_MASTER_CHECKLIST.md` (the exhaustive task list with status and traceability). This is where all implementation work is defined and tracked.\n- `scripts/` \u2014 foundation tooling of the implementation (currently the repository secrets guard).\n\n## The governing philosophy\n\n- Implementation follows documentation. Documentation never follows implementation.\n- Code follows architecture. Architecture follows requirements. Requirements follow customer value. Everything follows the Master Workflow.\n- No feature is approved because it is technically impressive; every feature must solve a validated customer problem and create recurring value.\n\n## Getting started (implementation)\n\nRead `implementation/README.md`, then the Master C"
+    }
+  ]
+}
